@@ -74,19 +74,18 @@ public:
     uint8_t PAN_ID;
     uint8_t RESET_TIMES;
     uint16_t START_TIME;
-    uint8_t pins_value[PIN_AMOUNT];
     uint8_t SAMPLE_RATE;
     uint8_t OS_VERSION;
     uint8_t DEVICE_ID;
+    uint8_t pins_value[PIN_AMOUNT];
     char pins_alias[PIN_AMOUNT][6];
     char DEVICE_NAME[21];
     
-    
-    char DEVICE_IP;
-    uint32_t MQTT_SERVER;
-    char *postTopic;
-    char *room;
-    
+    uint16_t MQTT_PORT;
+    char DEVICE_IP[16];
+    char MQTT_IP[16];
+    //char *room;
+
     Command cmd;
     char msg[200] = DEVICE_NAME;
     void post();
