@@ -1,32 +1,24 @@
-#include "TATUInterpreter.h"
+#include "TATUDevice.h"
 
-Device::Device(uint8_t pan, uint8_t reset, uint16_t start, uint8_t values[PIN_AMOUNT], uint8_t sample, 
-    uint8_t os, uint8_t device_id, char alias[PIN_AMOUNT][6], char* name, char* IP, 
-    char* server, char *topic){
-    //
-    int i = 0;
+TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t id_d,    const uint8_t pan_d,
+                        const uint8_t sample_d, const char *ip_m, const uint16_t port_m, const uint8_t os_v){
+    int i;
 
-    PAN_ID = pan;
-    RESET_TIMES = reset;
-    START_TIME = start;
-    for(i = 0; i < PIN_AMOUNT; i++)
-        pins_value[i] = value[i];
-    SAMPLE_RATE = sample;
-    OS_VERSION = os;
-    DEVICE_ID = device_id;
-    for (int i = 0; i < count; ++i)
-        sprintf(alias[i],"%s",pins_alias[i]);    
-    sprintf(DEVICE_NAME,"%s",name);
-    sprintf(DEVICE_IP,"%s",IP);
-    sprintf(MQTT_SERVER,"%s",server);
-    sprintf(postTopic,"%s",topic);
-    cmd.STRUCTURE = 0;
+    // Define os atributos básicos
+    STRCPY(name_d, device_name);
+    STRCPY(ip_d, device_ip);
+    device_id = id_d;
+    device_pan = pan_d;
+    device_samples = sample_d;
+    STRCPY(ip_m, mqtt_ip);
+    mqtt_port = port_m;
+    os_version = os_v;
 
-    header = "\"HEADER\"";
-    setHeader();
+    // Gera o header padrão e coloca no output_message atualizando a posição final do header
+    generateHeader();
 }
 
-void Device::generateHeader(){
+void TATUDevice::generateHeader(){
     int i,elemLength,length;
     char var[20];
     char value[20];
@@ -75,7 +67,7 @@ void Device::generatePost(uint32_t str_hash){
     CONCAT(msg,"\"BODY\":{",length);
 
 
-    CONCAT(msg,header);
+    CONCAT(msg,header,length);
 
     switch(cmd.OBJ.CODE){
         case TATU_CODE_INFO:
@@ -84,35 +76,35 @@ void Device::generatePost(uint32_t str_hash){
                     for (i = 0;i < PIN_AMOUNT && pinsWS_alias[i] != info; i++);
                         if (i < PIN_AMOUNT){
                             sprintf(value,"%d",pins_value[i]);
-                            WRITE(msg,pins_alias[i],pins_value[i],length);
+                            WRITE(msg,pins_alias[i],pins_value[i],elemLength,length);
                         }
                             //msg += info + ":" + pins_value[i];
                 case H_PAN_ID:
                     sprintf(value,"%d",PAN_ID);
-                    WRITE(msg,"\"PAN_ID\"",value,length);
+                    WRITE(msg,"\"PAN_ID\"",value,elemLength,length);
                     break;
                 case RESET_TIMES:
                     sprintf(value,"%d",RESET_TIMES);
-                    WRITE(msg,"\"RESET_TIMES\"",value,length);
+                    WRITE(msg,"\"RESET_TIMES\"",value,elemLength,length);
                     break;
                 case H_START_TIME:
                     sprintf(value,"%d",START_TIME);
-                    WRITE(msg,"\"START_TIME\"",value,length);
+                    WRITE(msg,"\"START_TIME\"",value,elemLength,length);
                 case H_SAMPLE_RATE:
                     sprintf(value,"%d",);
-                    WRITE(msg,"\"SAMPLE_RATE\"",value,length);
+                    WRITE(msg,"\"SAMPLE_RATE\"",value,elemLength,length);
                     break;
                 case H_OS_VERSION:
                     sprintf(value,"%d",OS_VERSION);
-                    WRITE(msg,"\"OS_VERSION\"",value,length);
+                    WRITE(msg,"\"OS_VERSION\"",value,elemLength,length);
                     break;
                 case H_DEVICE_ID:
                     sprintf(value,"%d"DEVICE_ID,);
-                    WRITE(msg,"\"DEVICE_ID\"",value,length);
+                    WRITE(msg,"\"DEVICE_ID\"",value,elemLength,length);
                     break;
                 case H_DEVICE_NAME:
                     sprintf(value,"%d",DEVICE_NAME);
-                    WRITE(msg,"\"DEVICE_NAME\"",value,length);
+                    WRITE(msg,"\"DEVICE_NAME\"",value,elemLength,length);
                     break;
 
             }
@@ -120,7 +112,7 @@ void Device::generatePost(uint32_t str_hash){
 
         case TATU_CODE_STATE:
             sprintf(value,"%d",pins_value[cmd.OBJ.PIN]);
-            WRITE(msg,"\"PIN\"",value,length);
+            WRITE(msg,"\"PIN\"",value,elemLength,length);
             break;
 
         case TATU_CODE_ALL: 
