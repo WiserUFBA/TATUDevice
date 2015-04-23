@@ -2,7 +2,7 @@
 #define TATUInterpreter_h
 
 #include "hash_list.h"
-#include <TATUInterpreter.h>
+#include "TATUInterpreter.h"
 #include <stdint.h>
 
 #ifndef PIN_AMOUNT
@@ -62,7 +62,7 @@ public:
     char MQTT_IP[16];
     
     Command cmd;
-    char msg[200] ;
+    char msg[200];
     
     void generateHeader();
     void generatePost();
