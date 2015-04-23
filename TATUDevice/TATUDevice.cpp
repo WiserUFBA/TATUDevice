@@ -1,4 +1,17 @@
 #include "TATUDevice.h"
+#include <stdint.h>
+#include <string.h>
+#include <avr/pgmspace.h>
+
+// Constantes
+const char start_post[] PROGMEM = "POST ";
+const char null_body[]  PROGMEM = "\"BODY\":null}");
+const char header_str[] PROGMEM = "\"HEADER\":{");
+const char name_str[]   PROGMEM = "\"NAME\":\"");
+const char id_str[]     PROGMEM = "\"ID\":");
+const char pan_str[]    PROGMEM = "\"PAN\":");
+const char ip_str[]     PROGMEM = "\"IP\":\"");
+const char body_str[]   PROGMEM = "\"BODY\":{");
 
 TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t id_d,    const uint8_t pan_d,
                         const uint8_t sample_d, const char *ip_m, const uint16_t port_m, const uint8_t os_v){
@@ -18,114 +31,89 @@ TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t 
     generateHeader();
 }
 
-void TATUDevice::generateHeader(){
-    int i,elemLength,length;
-    char var[20];
-    char value[20];
-    header = "\"HEADER\":{";
-
-    STRLEN(header,length);
-
-    //cout << "1\n";    
-    sprintf(var, "%s","ID");
-    sprintf(value, "%d",DEVICE_ID);
-    WRITE(header,var,value,elemLength,length);
-    
-  
-    sprintf(var, "%s","NAME");
-    sprintf(value, "%s",DEVICE_NAME);
-    ELEMENTWRITE(header,var,value,elemLength,length);
-
-
-    sprintf(var, "%s","IP");
-    sprintf(value, "%s",DEVICE_IP);
-    ELEMENTWRITE(header,var,value,elemLength,length);
-
-    sprintf(var, "%s","PAN_ID");
-    sprintf(value, "%d",PAN_ID);
-    ELEMENTWRITE(header,var,value,elemLength,length);
-
-    CONCATSINGLE(header,'}',length);
-
+TATUDevice::put_braces(char *brace_place, bool direction){
+    *brace_place = direction ? '{' : '}'; 
 }
-void Device::generatePost(uint32_t str_hash){
-    sprintf(msg,"%s","POST <");
-    bool retained = false;
-    int i,j,length = 0,elemLength = 0;
-    //char aux[100];
-    char var[20];
-    char value[20];
 
-    //É preciso saber o tamanho da string para adicionar outra
-    STRLEN(msg,length);
-    CONCAT(msg,DEVICE_NAME,length);
-    //Adiciona o header
-    CONCAT(msg,">:{",length);
-    CONCAT(msg,header,length);
-    CONCATSINGLE(msg,",",length);
-    //começa a adição do body
-    CONCAT(msg,"\"BODY\":{",length);
+TATUDevice::put_colon(char *colon_place, bool string){
+    colon_place[0] = ':';
+    if(string) colon_place[1] = '\"';
+}
 
+TATUDevice::put_comma(char *comma_place, bool string){
+    if(string) comma_place[0] = '\"';
+    colon_place[1] = ','
+}
 
-    CONCAT(msg,header,length);
+TATUDevice::put_colon_braces(char *brace_place){
+    brace_place[0] = ':';
+    brace_place[1] = '{'; 
+}
 
-    switch(cmd.OBJ.CODE){
-        case TATU_CODE_INFO:
-            switch(info){
-                default:
-                    for (i = 0;i < PIN_AMOUNT && pinsWS_alias[i] != info; i++);
-                        if (i < PIN_AMOUNT){
-                            sprintf(value,"%d",pins_value[i]);
-                            WRITE(msg,pins_alias[i],pins_value[i],elemLength,length);
-                        }
-                            //msg += info + ":" + pins_value[i];
-                case H_PAN_ID:
-                    sprintf(value,"%d",PAN_ID);
-                    WRITE(msg,"\"PAN_ID\"",value,elemLength,length);
-                    break;
-                case RESET_TIMES:
-                    sprintf(value,"%d",RESET_TIMES);
-                    WRITE(msg,"\"RESET_TIMES\"",value,elemLength,length);
-                    break;
-                case H_START_TIME:
-                    sprintf(value,"%d",START_TIME);
-                    WRITE(msg,"\"START_TIME\"",value,elemLength,length);
-                case H_SAMPLE_RATE:
-                    sprintf(value,"%d",);
-                    WRITE(msg,"\"SAMPLE_RATE\"",value,elemLength,length);
-                    break;
-                case H_OS_VERSION:
-                    sprintf(value,"%d",OS_VERSION);
-                    WRITE(msg,"\"OS_VERSION\"",value,elemLength,length);
-                    break;
-                case H_DEVICE_ID:
-                    sprintf(value,"%d"DEVICE_ID,);
-                    WRITE(msg,"\"DEVICE_ID\"",value,elemLength,length);
-                    break;
-                case H_DEVICE_NAME:
-                    sprintf(value,"%d",DEVICE_NAME);
-                    WRITE(msg,"\"DEVICE_NAME\"",value,elemLength,length);
-                    break;
+TATUDevice::generateHeader(){
+    /* Auxiliary variable */
+    int aux;
+    char aux_str[10];
 
-            }
-            break;
+    // Primeiro se coloca a seguinte string padrão no vetor
+    STRCPY_PROG(output_message, start_post);
+    strcpy(&output_message[5], device_name);
+    
+    // Inicia o JSON
+    aux = strlen(device_name) + 5;
+    put_colon_braces(SAIDA_STR);
+    aux += 2;
+    
+    // As próximas linhas produzem o HEADER
+    STRCPY_PROG(SAIDA_STR, header_str); /* Copia o HEADER */
+    aux += 10;
+    
+    /* Coloca o NAME */
+    STRCPY_PROG(SAIDA_STR, name_str);
+    aux += 8;
+    strcpy(SAIDA_STR, device_name);
+    aux += strlen(device_name);
+    put_comma(SAIDA_STR, ISSTRING);
+    aux += 2;
 
-        case TATU_CODE_STATE:
-            sprintf(value,"%d",pins_value[cmd.OBJ.PIN]);
-            WRITE(msg,"\"PIN\"",value,elemLength,length);
-            break;
+    /* Coloca o ID */
+    STRCPY_PROG(SAIDA_STR, id_str);
+    aux += 5;
+    itoa(device_id, aux_str, 10);
+    strcpy(SAIDA_STR, aux_str);
+    aux += strlen(aux_str);
+    put_comma(SAIDA_STR, ISNOTSTRING);
+    aux += 1;
+    
+    /* Coloca o PAN */
+    STRCPY_PROG(SAIDA_STR, pan_str);
+    aux += 6;
+    itoa(device_pan, aux_str, 10);
+    strcpy(SAIDA_STR, aux_str);
+    aux += strlen(aux_str);
+    put_comma(SAIDA_STR, ISNOTSTRING);
+    aux += 1;
+    
+    /* Coloca o IP */
+    STRCPY_PROG(SAIDA_STR, ip_str);
+    aux += 6;
+    strcpy(SAIDA_STR, device_ip);
+    aux += strlen(device_ip);
+    
+    /* Fecha a mensagem de saída */
+    output_message[aux++] = '\"';
+    output_message[aux++] = '}';
+    output_message[aux++] = ',';
+    output_message[aux] = 0;
 
-        case TATU_CODE_ALL: 
+    last_char = aux;
+}
 
-            for (i = 0,sprintf(value, "%d",pins_value[i]), WRITE(msg,pins_alias[i++],value,elemLength,length);i < PIN_AMOUNT; 
-                ELEMENTWRITE(msg,pins_alias[i++],value,elemLength,length) );
-            break;
+TATUDevice::generateBody(bool success){
+    if(!success) STRCPY_PROG(&output_message[last_char], null_body);
+    else{
 
     }
-
-    //fecha o body
-    CONCATSINGLE(msg,'}',length);
-    //fecha o arquivo
-    CONCATSINGLE(msg,'}',length);
-
 }
+
+// 
