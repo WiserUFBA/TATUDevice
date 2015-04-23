@@ -42,7 +42,7 @@ void TATUDevice::put_colon(char *colon_place, bool string){
 
 void TATUDevice::put_comma(char *comma_place, bool string){
     if(string) comma_place[0] = '\"';
-    colon_place[1] = ','
+    comma_place[1] = ',';
 }
 
 void TATUDevice::put_colon_braces(char *brace_place){
