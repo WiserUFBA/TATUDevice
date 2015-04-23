@@ -1,5 +1,7 @@
 #include "TATUDevice.h"
+#include "hash_list.h"
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <avr/pgmspace.h>
 

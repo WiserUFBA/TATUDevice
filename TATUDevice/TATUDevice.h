@@ -2,7 +2,6 @@
 #define TATUDevice_h
 
 #include <stdint.h>
-#include "hash_list.h"
 
 #ifndef PIN_AMOUNT
 #define PIN_AMOUNT 6
