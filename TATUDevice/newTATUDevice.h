@@ -17,7 +17,7 @@
 
 class TATUDevice{
 private:
-	typedef union {
+    typedef union {
         struct {
             uint8_t STATE : 1;
             uint8_t CODE  : 2;
@@ -28,37 +28,37 @@ private:
     } Command;
 
     typedef struct {
-    	char 	 value[6];
-    	uint32_t hash_value;
+        char     value[6];
+        uint32_t hash_value;
     } PinStruct;
 public:
-	// Atributos públicos
-	// Atributos do sistema
-	char 	 device_name[20];
-	char 	 device_ip[16];
-	uint8_t  device_id;
-	uint8_t  device_pan;
-	uint8_t  device_samples;
-	char	 mqtt_ip[16];
-	uint16_t mqtt_port;
-	uint8_t  os_version;
+    // Atributos públicos
+    // Atributos do sistema
+    char     device_name[20];
+    char     device_ip[16];
+    uint8_t  device_id;
+    uint8_t  device_pan;
+    uint8_t  device_samples;
+    char     mqtt_ip[16];
+    uint16_t mqtt_port;
+    uint8_t  os_version;
 
-	// Atributos variaveis
-	uint8_t	  header_final_pos = 0;
-	uint8_t	  pin_value[PIN_AMOUNT] = {0};
-	PinStruct pin_alias[PIN_AMOUNT];
+    // Atributos variaveis
+    uint8_t   header_final_pos = 0;
+    uint8_t   pin_value[PIN_AMOUNT] = {0};
+    PinStruct pin_alias[PIN_AMOUNT];
 
-	/* TEORICO */
-	/* uint8_t reset_counter;
-	uint8_t start_counter; */
+    /* TEORICO */
+    /* uint8_t reset_counter;
+    uint8_t start_counter; */
 
-	// Mensagem de saida
-	char output_msg[200] = {0};
+    // Mensagem de saida
+    char output_msg[200] = {0};
 
-	// Methodos públicos
-	TATUDevice();
-	void generateHeader();
-	void generateBody();
+    // Methodos públicos
+    TATUDevice();
+    void generateHeader();
+    void generateBody();
 };
 
 #endif
