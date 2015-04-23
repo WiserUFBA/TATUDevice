@@ -69,12 +69,12 @@ public:
     uint8_t start_counter; */
 
     // Mensagem de saida
-    char output_msg[200];
+    char output_message[200];
     char last_char;
 
     // Methodos públicos
     TATUDevice( const char *,  const char *, const uint8_t,  const uint8_t,
-                const uint8_t, const char *, const uint16_t, const uint8_t));
+                const uint8_t, const char *, const uint16_t, const uint8_t);
     void generateHeader();
     void generateBody(bool);
 };
