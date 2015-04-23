@@ -1,60 +1,23 @@
-#ifndef TATUDevice_h
-#define TATUDevice_h
-
 #include <stdint.h>
 
-#ifndef PIN_AMOUNT
-#define PIN_AMOUNT 6
-#endif
+TATUDevice::TATUDevice( const char *name_d, 	const char *ip_d, const uint8_t id_d, 	 const uint8_t pan_d,
+						const uint8_t sample_d, const char *ip_m, const uint16_t port_m, const uint8_t os_v){
+	int i;
 
-// Calcula o HASH DJB 
-#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; i < LEN; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
-// Calcula o comprimento da string
-#define STRLEN(STRING,LENGTH) for(LENGTH = 0; STRING[LENGTH] != '\0';){LENGTH++;}
+	// Define os atributos básicos
+	STRCPY(name_d, device_name);
+	STRCPY(ip_d, device_ip);
+	device_id = id_d;
+	device_pan = pan_d;
+	device_samples = sample_d;
+	STRCPY(ip_m, mqtt_ip);
+	mqtt_port = port_m;
+	os_version = os_v;
 
-class newTATUDevice{
-private:
-	typedef union {
-        struct {
-            uint8_t STATE : 1;
-            uint8_t CODE  : 2;
-            uint8_t TYPE  : 2;
-            uint8_t PIN   : 3;
-        } OBJ;
-        uint8_t STRUCTURE;
-    } Command;
+	// Gera o header padrão e coloca no output_message atualizando a posição final do header
+	generateHeader();
+}
 
-    typedef struct {
-    	char 	 value[6];
-    	uint32_t hash_value;
-    } PinStruct;
-public:
-	// Atributos públicos
-	// Atributos do sistema
-	char 	 device_name[20];
-	char 	 device_ip[16];
-	uint8_t  device_id;
-	uint8_t  device_pan;
-	uint8_t  device_samples;
-	char	 mqtt_ip[16];
-	uint16_t mqtt_port;
-	uint8_t  os_version;
-
-	// Atributos variaveis
-	uint8_t	  pin_value[PIN_AMOUNT];
-	PinStruct pin_alias[PIN_AMOUNT];
-
-	/* TEORICO */
-	/* uint8_t reset_counter;
-	uint8_t start_counter; */
-
-	// Mensagem de saida
-	char output_msg[200];
-
-	// Methodos públicos
-	newTATUDevice();
-	void generateHeader();
-	void generateBody();
-};
-
-#endif
+TATUDevice::generateHeader(){
+	// Primeiro se coloca a seguinte string padrão no vetor
+}
