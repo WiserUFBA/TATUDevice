@@ -43,8 +43,8 @@ void TATUDevice::put_colon(char *colon_place, bool string){
 }
 
 void TATUDevice::put_comma(char *comma_place, bool string){
-    if(string) comma_place[0] = '\"';
-    comma_place[1] = ',';
+    if(string){ comma_place[0] = '\"'; comma_place[1] = ',';}
+    else comma_place[0] = ',';
 }
 
 void TATUDevice::put_colon_braces(char *brace_place){
@@ -58,7 +58,7 @@ void TATUDevice::generateHeader(){
     char aux_str[10];
 
     // Primeiro se coloca a seguinte string padrão no vetor
-    STRCPY_PROG(output_message, start_post);
+    strcpy_P(output_message, start_post);
     strcpy(&output_message[5], device_name);
     
     // Inicia o JSON
@@ -67,11 +67,11 @@ void TATUDevice::generateHeader(){
     aux += 2;
     
     // As próximas linhas produzem o HEADER
-    STRCPY_PROG(SAIDA_STR, header_str); /* Copia o HEADER */
+    strcpy_P(SAIDA_STR, header_str); /* Copia o HEADER */
     aux += 10;
     
     /* Coloca o NAME */
-    STRCPY_PROG(SAIDA_STR, name_str);
+    strcpy_P(SAIDA_STR, name_str);
     aux += 8;
     strcpy(SAIDA_STR, device_name);
     aux += strlen(device_name);
@@ -79,7 +79,7 @@ void TATUDevice::generateHeader(){
     aux += 2;
 
     /* Coloca o ID */
-    STRCPY_PROG(SAIDA_STR, id_str);
+    strcpy_P(SAIDA_STR, id_str);
     aux += 5;
     itoa(device_id, aux_str, 10);
     strcpy(SAIDA_STR, aux_str);
@@ -88,7 +88,7 @@ void TATUDevice::generateHeader(){
     aux += 1;
     
     /* Coloca o PAN */
-    STRCPY_PROG(SAIDA_STR, pan_str);
+    strcpy_P(SAIDA_STR, pan_str);
     aux += 6;
     itoa(device_pan, aux_str, 10);
     strcpy(SAIDA_STR, aux_str);
@@ -97,7 +97,7 @@ void TATUDevice::generateHeader(){
     aux += 1;
     
     /* Coloca o IP */
-    STRCPY_PROG(SAIDA_STR, ip_str);
+    strcpy_P(SAIDA_STR, ip_str);
     aux += 6;
     strcpy(SAIDA_STR, device_ip);
     aux += strlen(device_ip);
@@ -112,7 +112,7 @@ void TATUDevice::generateHeader(){
 }
 
 void TATUDevice::generateBody(bool success){
-    if(!success) STRCPY_PROG(&output_message[last_char], null_body);
+    if(!success) strcpy_P(&output_message[last_char], null_body);
     else{
 
     }

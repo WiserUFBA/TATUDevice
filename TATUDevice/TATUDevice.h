@@ -21,8 +21,6 @@
 #define STRCPY(INPUT, OUTPUT) do{ for(i = 0;INPUT[i] != 0; ++i) OUTPUT[i] = INPUT[i]; OUTPUT[i] = 0; }while(0)
 // Gera o body tendo o OBJETO dispositivo
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
-// Copia da progmen para a memória com os devidos casts
-#define STRCPY_PROG(SAIDA, ENTRADA) strcpy_P(SAIDA, (char *)pgm_read_word(ENTRADA))
 
 class TATUDevice{
 private:
