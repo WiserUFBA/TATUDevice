@@ -62,7 +62,7 @@ public:
     char MQTT_IP[16];
     
     Command cmd;
-    char msg[200] = DEVICE_NAME;
+    char msg[200] ;
     
     void generateHeader();
     void generatePost();
