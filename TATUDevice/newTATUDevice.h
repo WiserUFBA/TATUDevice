@@ -61,8 +61,7 @@ public:
     uint8_t  os_version;
 
     // Atributos variaveis
-    uint8_t   header_final_pos = 0;
-    uint8_t   pin_value[PIN_AMOUNT] = {0};
+    uint8_t   pin_value[PIN_AMOUNT];
     PinStruct pin_alias[PIN_AMOUNT];
 
     /* TEORICO */
@@ -70,15 +69,14 @@ public:
     uint8_t start_counter; */
 
     // Mensagem de saida
-    char output_msg[200] = {0};
-    char last_char = 0;
+    char output_msg[200];
+    char last_char;
 
     // Methodos públicos
     TATUDevice( const char *,  const char *, const uint8_t,  const uint8_t,
                 const uint8_t, const char *, const uint16_t, const uint8_t));
     void generateHeader();
-    void generateBody();
-    void generatePost();
+    void generateBody(bool);
 };
 
 #endif
