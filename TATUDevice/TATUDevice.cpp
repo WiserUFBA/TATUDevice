@@ -5,13 +5,13 @@
 
 // Constantes
 const char start_post[] PROGMEM = "POST ";
-const char null_body[]  PROGMEM = "\"BODY\":null}");
-const char header_str[] PROGMEM = "\"HEADER\":{");
-const char name_str[]   PROGMEM = "\"NAME\":\"");
-const char id_str[]     PROGMEM = "\"ID\":");
-const char pan_str[]    PROGMEM = "\"PAN\":");
-const char ip_str[]     PROGMEM = "\"IP\":\"");
-const char body_str[]   PROGMEM = "\"BODY\":{");
+const char null_body[]  PROGMEM = "\"BODY\":null}";
+const char header_str[] PROGMEM = "\"HEADER\":{";
+const char name_str[]   PROGMEM = "\"NAME\":\"";
+const char id_str[]     PROGMEM = "\"ID\":";
+const char pan_str[]    PROGMEM = "\"PAN\":";
+const char ip_str[]     PROGMEM = "\"IP\":\"";
+const char body_str[]   PROGMEM = "\"BODY\":{";
 
 TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t id_d,    const uint8_t pan_d,
                         const uint8_t sample_d, const char *ip_m, const uint16_t port_m, const uint8_t os_v){
@@ -31,26 +31,26 @@ TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t 
     generateHeader();
 }
 
-TATUDevice::put_braces(char *brace_place, bool direction){
+void TATUDevice::put_braces(char *brace_place, bool direction){
     *brace_place = direction ? '{' : '}'; 
 }
 
-TATUDevice::put_colon(char *colon_place, bool string){
+void TATUDevice::put_colon(char *colon_place, bool string){
     colon_place[0] = ':';
     if(string) colon_place[1] = '\"';
 }
 
-TATUDevice::put_comma(char *comma_place, bool string){
+void TATUDevice::put_comma(char *comma_place, bool string){
     if(string) comma_place[0] = '\"';
     colon_place[1] = ','
 }
 
-TATUDevice::put_colon_braces(char *brace_place){
+void TATUDevice::put_colon_braces(char *brace_place){
     brace_place[0] = ':';
     brace_place[1] = '{'; 
 }
 
-TATUDevice::generateHeader(){
+void TATUDevice::generateHeader(){
     /* Auxiliary variable */
     int aux;
     char aux_str[10];
@@ -109,7 +109,7 @@ TATUDevice::generateHeader(){
     last_char = aux;
 }
 
-TATUDevice::generateBody(bool success){
+void TATUDevice::generateBody(bool success){
     if(!success) STRCPY_PROG(&output_message[last_char], null_body);
     else{
 
