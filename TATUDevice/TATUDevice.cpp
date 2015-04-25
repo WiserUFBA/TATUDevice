@@ -8,12 +8,16 @@
 // Constantes
 const char start_post[] PROGMEM = "POST ";
 const char null_body[]  PROGMEM = "\"BODY\":null}";
+const char true_body[]  PROGMEM = "\"BODY\":true}";
 const char header_str[] PROGMEM = "\"HEADER\":{";
 const char name_str[]   PROGMEM = "\"NAME\":\"";
 const char id_str[]     PROGMEM = "\"ID\":";
 const char pan_str[]    PROGMEM = "\"PAN\":";
 const char ip_str[]     PROGMEM = "\"IP\":\"";
 const char body_str[]   PROGMEM = "\"BODY\":{";
+const char true_str[]   PROGMEM = "true";
+const char false_str[]  PROGMEM = "false";
+const char pin_st[]     PROGMEM = "PIN";
 
 TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t id_d,    const uint8_t pan_d,
                         const uint8_t sample_d, const char *ip_m, const uint16_t port_m, const uint8_t os_v){
@@ -33,25 +37,6 @@ TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t 
     generateHeader();
 }
 
-void TATUDevice::put_braces(char *brace_place, bool direction){
-    *brace_place = direction ? '{' : '}'; 
-}
-
-void TATUDevice::put_colon(char *colon_place, bool string){
-    colon_place[0] = ':';
-    if(string) colon_place[1] = '\"';
-}
-
-void TATUDevice::put_comma(char *comma_place, bool string){
-    if(string){ comma_place[0] = '\"'; comma_place[1] = ',';}
-    else comma_place[0] = ',';
-}
-
-void TATUDevice::put_colon_braces(char *brace_place){
-    brace_place[0] = ':';
-    brace_place[1] = '{'; 
-}
-
 void TATUDevice::generateHeader(){
     /* Auxiliary variable */
     int aux;
@@ -63,8 +48,8 @@ void TATUDevice::generateHeader(){
     
     // Inicia o JSON
     aux = strlen(device_name) + 5;
-    put_colon_braces(SAIDA_STR);
-    aux += 2;
+    COLON;
+    BRACE_LEFT;
     
     // As próximas linhas produzem o HEADER
     strcpy_P(SAIDA_STR, header_str); /* Copia o HEADER */
@@ -75,8 +60,8 @@ void TATUDevice::generateHeader(){
     aux += 8;
     strcpy(SAIDA_STR, device_name);
     aux += strlen(device_name);
-    put_comma(SAIDA_STR, ISSTRING);
-    aux += 2;
+    QUOTE;
+    COMMA;
 
     /* Coloca o ID */
     strcpy_P(SAIDA_STR, id_str);
@@ -84,8 +69,7 @@ void TATUDevice::generateHeader(){
     itoa(device_id, aux_str, 10);
     strcpy(SAIDA_STR, aux_str);
     aux += strlen(aux_str);
-    put_comma(SAIDA_STR, ISNOTSTRING);
-    aux += 1;
+    COMMA;
     
     /* Coloca o PAN */
     strcpy_P(SAIDA_STR, pan_str);
@@ -93,29 +77,92 @@ void TATUDevice::generateHeader(){
     itoa(device_pan, aux_str, 10);
     strcpy(SAIDA_STR, aux_str);
     aux += strlen(aux_str);
-    put_comma(SAIDA_STR, ISNOTSTRING);
-    aux += 1;
+    COMMA;
     
     /* Coloca o IP */
     strcpy_P(SAIDA_STR, ip_str);
     aux += 6;
     strcpy(SAIDA_STR, device_ip);
     aux += strlen(device_ip);
-    
+    QUOTE;
+
     /* Fecha a mensagem de saída */
-    output_message[aux++] = '\"';
-    output_message[aux++] = '}';
-    output_message[aux++] = ',';
-    output_message[aux] = 0;
+    BRACE_RIGHT;
+    COMMA;
+    CLOSE_MSG;
 
     last_char = aux;
 }
 
-void TATUDevice::generateBody(bool success){
-    if(!success) strcpy_P(&output_message[last_char], null_body);
-    else{
+                                                                               /* Hash | Response */
+void TATUDevice::generateBody(char *payload, uint8_t length, void (*callback)(uint32_t, char*)){
+    int aux = last_char; /* **ponteiro** auxiliar do vetor de mensagens */
+    char response[20];
 
+    // O POST é importante pois define se a mensagem deve ser ignorada ou não logo
+    // o parse deve identificar se a mensagem é um post
+
+    // Se encontrados erros no PARSE retorne NULL
+    if(requisition->parse(payload, length);) strcpy_P(SAIDA_STR, null_body);
+
+    /** Aqui estarão contidos os 3 CALLBACKS**/
+    switch(requisition->cmd.OBJ.SYS){
+        // Função do usuario
+        switch TATU_ALIAS:
+            callback(requisition->str_hash, response)
+            break;
+        // Funções do sistema
+        switch TATU_SYSTEM:
+            /** **/
+            break;
+        switch TATU_PIN:
+            /** **/
+            break;
     }
-}
 
-// 
+    // Se a requisição não é um GET
+    if(requisition->cmd.OBJ.TYPE != TATU_GET){
+        // Se não encontrados erros no PARSE porém temos um SET ou EDIT
+        strcpy_P(SAIDA_STR, true_body);
+        return;
+    }
+
+    // Se foi lido um GET então temos que preparar o retorno
+    // INCLUIR NO TPI 
+    /*
+        Propriedades de sistema serão precedidas por $
+        informações que começam com um numero são pinos
+        TATU_SYSTEM
+        TATU_ALIAS
+        TATU_PIN
+        essas 3 constantes vão identificar qual o tipo do parametro
+    */
+
+    // Se for um pino ou uma configuração de sistema então o retorno está pronto
+    if(requisition->cmd.SYS != TATU_ALIAS) return;
+
+    // Copia o começo do body após a virgula ("BODY":{)
+    strcpy_P(SAIDA_STR, body_str);
+    aux += 8;
+
+    // Nessa versão ainda não contamos com o suporte a multiplos parametros então apenas copiamos
+    // A primeira variavel do payload
+    QUOTE;
+    strcpy(SAIDA_STR, payload);
+    QUOTE;
+    COLON;
+
+    // O valor dessa variavel se é um número o retorno é inteiro caso contrário o retorno
+    // é uma string
+    if(ISNUM(response[0])) strcpy(SAIDA_STR, response);
+    else{
+        QUOTE;
+        strcpy(SAIDA_STR, response);
+        QUOTE;
+    }
+
+    // Fecha o JSON e a STRING
+    BRACE_RIGHT;
+    BRACE_RIGHT;
+    CLOSE_MSG;
+}

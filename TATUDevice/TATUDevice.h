@@ -2,18 +2,27 @@
 #define TATUDevice_h
 
 #include <stdint.h>
+#include <TATUConfig.h>
+#include <TATUInterpreter.h>
 
 #ifndef PIN_AMOUNT
 #define PIN_AMOUNT 6
 #endif
 
+#ifndef N_CHAR_VALUE
+#define N_CHAR_VALUE 6
+#endif
+
 // Constantes do sistema
 #define PROGMEM __ATTR_PROGMEM__ 
 #define SAIDA_STR &output_message[aux]
-#define LEFT_BRACE  true
-#define RIGHT_BRACE false
-#define ISSTRING    true
-#define ISNOTSTRING false
+// Constantes da mensagem
+#define COMMA       output_message[aux++]=','
+#define COLON       output_message[aux++]=':'
+#define QUOTES      output_message[aux++]='\"'
+#define BRACE_LEFT  output_message[aux++]='{'
+#define BRACE_RIGHT output_message[aux++]='}'
+#define CLOSE_MSG   output_message[aux]=0
 
 // Calcula o HASH DJB 
 #define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; i < LEN; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
@@ -21,28 +30,10 @@
 #define STRCPY(INPUT, OUTPUT) do{ for(i = 0;INPUT[i] != 0; ++i) OUTPUT[i] = INPUT[i]; OUTPUT[i] = 0; }while(0)
 // Gera o body tendo o OBJETO dispositivo
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
+// Verifica se uma variavel é um numero
+#define ISNUM(VAR) VAR < 57
 
 class TATUDevice{
-private:
-    typedef union {
-        struct {
-            uint8_t STATE : 1;
-            uint8_t CODE  : 2;
-            uint8_t TYPE  : 2;
-            uint8_t PIN   : 3;
-        } OBJ;
-        uint8_t STRUCTURE;
-    } Command;
-
-    typedef struct {
-        char     value[6];
-        uint32_t hash_value;
-    } PinStruct;
-
-    void put_braces(char *brace_place, bool direction);
-    void put_colon(char *colon_place, bool string);
-    void put_comma(char *comma_place, bool string);
-    void put_colon_braces(char *brace_place);
 public:
     // Atributos públicos
     // Atributos do sistema
@@ -56,8 +47,10 @@ public:
     uint8_t  os_version;
 
     // Atributos variaveis
-    uint8_t   pin_value[PIN_AMOUNT];
-    PinStruct pin_alias[PIN_AMOUNT];
+    uint8_t   pin_digital[PIN_AMOUNT];
+    uint16_t  pin_analog[PIN_ANALOG_AMOUNT];
+    PinStruct *pin_alias;
+    TATUInterpreter *requisition;
 
     /* TEORICO */
     /* uint8_t reset_counter;
@@ -69,9 +62,10 @@ public:
 
     // Methodos públicos
     TATUDevice( const char *,  const char *, const uint8_t,  const uint8_t,
-                const uint8_t, const char *, const uint16_t, const uint8_t);
+                const uint8_t, const char *, const uint16_t, const uint8_t,
+                PinStruct *, TATUInterpreter *);
     void generateHeader();
-    void generateBody(bool);
+    void generateBodyString();
 };
 
 #endif
