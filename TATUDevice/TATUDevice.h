@@ -9,8 +9,12 @@
 #define PIN_AMOUNT 6
 #endif
 
-#ifndef N_CHAR_VALUE
-#define N_CHAR_VALUE 6
+#ifndef PIN_ANALOG_AMOUNT
+#define PIN_ANALOG_AMOUNT 6
+#endif
+
+#ifndef MAX_SIZE_RESPONSE
+#define MAX_SIZE_RESPONSE 20
 #endif
 
 // Constantes do sistema
@@ -30,10 +34,14 @@
 #define STRCPY(INPUT, OUTPUT) do{ for(i = 0;INPUT[i] != 0; ++i) OUTPUT[i] = INPUT[i]; OUTPUT[i] = 0; }while(0)
 // Gera o body tendo o OBJETO dispositivo
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
-// Verifica se uma variavel é um numero
-#define ISNUM(VAR) VAR < 57
+// Verifica se uma STRING está vazia
+#define ISEMPTY(VAR) (VAR[0] == 0)
 
 class TATUDevice{
+private:
+    // Atributos variaveis
+    bool        pin_digital[PIN_AMOUNT];
+    uint16_t    pin_analog[PIN_ANALOG_AMOUNT];
 public:
     // Atributos públicos
     // Atributos do sistema
@@ -47,9 +55,6 @@ public:
     uint8_t  os_version;
 
     // Atributos variaveis
-    uint8_t   pin_digital[PIN_AMOUNT];
-    uint16_t  pin_analog[PIN_ANALOG_AMOUNT];
-    PinStruct *pin_alias;
     TATUInterpreter *requisition;
 
     /* TEORICO */
@@ -58,14 +63,14 @@ public:
 
     // Mensagem de saida
     char output_message[200];
-    char last_char;
+    int last_char;
 
     // Methodos públicos
     TATUDevice( const char *,  const char *, const uint8_t,  const uint8_t,
                 const uint8_t, const char *, const uint16_t, const uint8_t,
-                PinStruct *, TATUInterpreter *);
+                TATUInterpreter *);
     void generateHeader();
-    void generateBodyString();
+    void generateBody(char *payload, uint8_t length, void (*callback)(uint32_t, char*)));
 };
 
 #endif

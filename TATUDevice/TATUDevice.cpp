@@ -9,6 +9,7 @@
 const char start_post[] PROGMEM = "POST ";
 const char null_body[]  PROGMEM = "\"BODY\":null}";
 const char true_body[]  PROGMEM = "\"BODY\":true}";
+const char false_body[]  PROGMEM = "\"BODY\":false}";
 const char header_str[] PROGMEM = "\"HEADER\":{";
 const char name_str[]   PROGMEM = "\"NAME\":\"";
 const char id_str[]     PROGMEM = "\"ID\":";
@@ -20,7 +21,8 @@ const char false_str[]  PROGMEM = "false";
 const char pin_st[]     PROGMEM = "PIN";
 
 TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t id_d,    const uint8_t pan_d,
-                        const uint8_t sample_d, const char *ip_m, const uint16_t port_m, const uint8_t os_v){
+                        const uint8_t sample_d, const char *ip_m, const uint16_t port_m, const uint8_t os_v,
+                        TATUInterpreter *req){
     int i;
 
     // Define os atributos básicos
@@ -32,6 +34,7 @@ TATUDevice::TATUDevice( const char *name_d,     const char *ip_d, const uint8_t 
     STRCPY(ip_m, mqtt_ip);
     mqtt_port = port_m;
     os_version = os_v;
+    requisition = req;
 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
@@ -48,121 +51,94 @@ void TATUDevice::generateHeader(){
     
     // Inicia o JSON
     aux = strlen(device_name) + 5;
-    COLON;
-    BRACE_LEFT;
+    COLON; BRACE_LEFT;
     
     // As próximas linhas produzem o HEADER
-    strcpy_P(SAIDA_STR, header_str); /* Copia o HEADER */
+    strcpy_P(OUT_STR, header_str); /* Copia o HEADER */
     aux += 10;
     
     /* Coloca o NAME */
-    strcpy_P(SAIDA_STR, name_str);
+    strcpy_P(OUT_STR, name_str);
     aux += 8;
-    strcpy(SAIDA_STR, device_name);
+    strcpy(OUT_STR, device_name);
     aux += strlen(device_name);
-    QUOTE;
-    COMMA;
+    QUOTE; COMMA;
 
     /* Coloca o ID */
-    strcpy_P(SAIDA_STR, id_str);
+    strcpy_P(OUT_STR, id_str);
     aux += 5;
     itoa(device_id, aux_str, 10);
-    strcpy(SAIDA_STR, aux_str);
+    strcpy(OUT_STR, aux_str);
     aux += strlen(aux_str);
     COMMA;
     
     /* Coloca o PAN */
-    strcpy_P(SAIDA_STR, pan_str);
+    strcpy_P(OUT_STR, pan_str);
     aux += 6;
     itoa(device_pan, aux_str, 10);
-    strcpy(SAIDA_STR, aux_str);
+    strcpy(OUT_STR, aux_str);
     aux += strlen(aux_str);
     COMMA;
     
     /* Coloca o IP */
-    strcpy_P(SAIDA_STR, ip_str);
+    strcpy_P(OUT_STR, ip_str);
     aux += 6;
-    strcpy(SAIDA_STR, device_ip);
+    strcpy(OUT_STR, device_ip);
     aux += strlen(device_ip);
     QUOTE;
 
     /* Fecha a mensagem de saída */
-    BRACE_RIGHT;
-    COMMA;
+    BRACE_RIGHT; COMMA;
     CLOSE_MSG;
 
     last_char = aux;
 }
 
-                                                                               /* Hash | Response */
-void TATUDevice::generateBody(char *payload, uint8_t length, void (*callback)(uint32_t, char*)){
-    int aux = last_char; /* **ponteiro** auxiliar do vetor de mensagens */
-    char response[20];
+void TATUDevice::generateBody(char *payload, uint8_t length, bool (*callback)(uint32_t, char*)){
+    int aux = last_char;
+    bool isString;
+    char response[MAX_SIZE_RESPONSE] = 0;
 
-    // O POST é importante pois define se a mensagem deve ser ignorada ou não logo
-    // o parse deve identificar se a mensagem é um post
+    // Se encontrados erros no PARSE retorne "BODY":null
+    if(requisition->parse(payload, length);){ strcpy_P(OUT_STR, null_body); return; }
 
-    // Se encontrados erros no PARSE retorne NULL
-    if(requisition->parse(payload, length);) strcpy_P(SAIDA_STR, null_body);
-
-    /** Aqui estarão contidos os 3 CALLBACKS**/
-    switch(requisition->cmd.OBJ.SYS){
+    switch(requisition->cmd.OBJ.VAR){
         // Função do usuario
-        switch TATU_ALIAS:
-            callback(requisition->str_hash, response)
+        switch TATU_TYPE_ALIAS:
+            isString = callback(requisition->str_hash, response);
             break;
         // Funções do sistema
-        switch TATU_SYSTEM:
+        switch TATU_TYPE_PIN:
             /** **/
             break;
-        switch TATU_PIN:
+        switch TATU_TYPE_SYSTEM:
             /** **/
             break;
     }
 
-    // Se a requisição não é um GET
     if(requisition->cmd.OBJ.TYPE != TATU_GET){
-        // Se não encontrados erros no PARSE porém temos um SET ou EDIT
-        strcpy_P(SAIDA_STR, true_body);
+        if(requisition->cmd.OBJ.ERROR) strcpy_P(OUT_STR, false_body);
+        else strcpy_P(OUT_STR, true_body);
         return;
     }
 
-    // Se foi lido um GET então temos que preparar o retorno
-    // INCLUIR NO TPI 
-    /*
-        Propriedades de sistema serão precedidas por $
-        informações que começam com um numero são pinos
-        TATU_SYSTEM
-        TATU_ALIAS
-        TATU_PIN
-        essas 3 constantes vão identificar qual o tipo do parametro
-    */
+    /* A função de edição dos pinos não necessita */
+    if(requisition->cmd.OBJ.VAR != TATU_ALIAS) return;
 
-    // Se for um pino ou uma configuração de sistema então o retorno está pronto
-    if(requisition->cmd.SYS != TATU_ALIAS) return;
-
-    // Copia o começo do body após a virgula ("BODY":{)
-    strcpy_P(SAIDA_STR, body_str);
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
     aux += 8;
 
-    // Nessa versão ainda não contamos com o suporte a multiplos parametros então apenas copiamos
-    // A primeira variavel do payload
-    QUOTE;
-    strcpy(SAIDA_STR, payload);
-    QUOTE;
-    COLON;
+    // !IMPORTANT! Suporte para apenas uma variavel 
+    /* Copia a variavel vinda do payload */
+    QUOTE; strcpy(OUT_STR, payload); aux+=strlen(payload); QUOTE; COLON;
 
-    // O valor dessa variavel se é um número o retorno é inteiro caso contrário o retorno
-    // é uma string
-    if(ISNUM(response[0])) strcpy(SAIDA_STR, response);
-    else{
-        QUOTE;
-        strcpy(SAIDA_STR, response);
-        QUOTE;
-    }
+    /* Verifica se a resposta esta vazia ou se ela é um número ou bool para o JSON */
+    if(ISEMPTY(response)) strcpy_P(OUT_STR, false_str);
+    else if(isString) { strcpy(OUT_STR, response); aux+=strlen(response);}
+    else{ QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE; }
 
     // Fecha o JSON e a STRING
-    BRACE_RIGHT;
-    BRACE_RIGHT;
+    BRACE_RIGHT; BRACE_RIGHT;
     CLOSE_MSG;
 }
