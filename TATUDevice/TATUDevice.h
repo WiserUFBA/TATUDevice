@@ -42,8 +42,8 @@ typedef uint8_t byte;
 #define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\
                                         void NAME(char *topic, byte *payload, unsigned int length) \
                                         {OBJ.mqtt_callback(topic, payload, length, BRIDGE);}
-#define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *out, char *topic)\
-                                  { OBJ.publish(out, topic); }
+#define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *topic, char *out)\
+                                  { OBJ.publish(topic,out); }
 
 
 /* Utilidades */
