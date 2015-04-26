@@ -48,7 +48,7 @@ int freeRAM(){
 
 void ipToString(byte *ip, char *str){
     int i, j;
-    for(i = 0, j = 0; i < 4; i++){ itoa(ip[i], &str[j], 10); j + = strlen(&str[j]); str[j++]= '.'; }
+    for(i = 0, j = 0; i < 4; i++){ itoa(ip[i], &str[j], 10); j += strlen(&str[j]); str[j++]= '.'; }
     str[j-1] = 0;
 }
 
@@ -83,8 +83,8 @@ public:
     bool (*callback)(uint32_t, char*);
 
     // Metodos públicos
-    TATUDevice( const char *,  const char *, const uint8_t,  const uint8_t,
-                const uint8_t, const char *, const uint16_t, const uint8_t,
+    TATUDevice( const char *,  byte *, const uint8_t,  const uint8_t,
+                const uint8_t, byte *, const uint16_t, const uint8_t,
                 TATUInterpreter *, bool (*callback)(uint32_t, char*));
     void generateHeader();
     void generateBody(char *payload, uint8_t length);
