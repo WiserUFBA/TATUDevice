@@ -16,14 +16,14 @@ typedef uint8_t byte;
 
 // Constantes do sistema
 #define PROGMEM __ATTR_PROGMEM__ 
-#define SAIDA_STR &output_message[aux]
+#define OUT_STR &output_message[aux]
 #define MAX_SIZE_IP     16
 #define MAX_SIZE_NAME   20
 
 // Constantes da mensagem
 #define COMMA       output_message[aux++]=','
 #define COLON       output_message[aux++]=':'
-#define QUOTES      output_message[aux++]='\"'
+#define QUOTE       output_message[aux++]='\"'
 #define BRACE_LEFT  output_message[aux++]='{'
 #define BRACE_RIGHT output_message[aux++]='}'
 #define CLOSE_MSG   output_message[aux]=0

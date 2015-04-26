@@ -119,7 +119,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     char response[MAX_SIZE_RESPONSE] = {0};
 
     // Se encontrados erros no PARSE retorne "BODY":null
-    if(!requisition->parse(payload, length);){ strcpy_P(OUT_STR, null_body); return; }
+    if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
 
     switch(requisition->cmd.OBJ.VAR){
         // Função do usuario
@@ -133,7 +133,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
                     break;
                 case TATU_SET:
-                    digitalWrite(requisition->cmd.OBJ.PIN);
+                    digitalWrite(requisition->cmd.OBJ.PIN,requisition->cmd.OBJ.STATE);
                     requisition->cmd.OBJ.ERROR = false;
                     break;
             }
