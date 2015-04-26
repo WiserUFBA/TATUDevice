@@ -2,7 +2,6 @@
 #define TATUDevice_h
 
 #include <stdint.h>
-#include <TATUConfig.h>
 #include <TATUInterpreter.h>
 
 #ifndef PIN_AMOUNT
@@ -20,6 +19,7 @@
 // Constantes do sistema
 #define PROGMEM __ATTR_PROGMEM__ 
 #define SAIDA_STR &output_message[aux]
+
 // Constantes da mensagem
 #define COMMA       output_message[aux++]=','
 #define COLON       output_message[aux++]=':'
@@ -36,20 +36,31 @@
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
 // Verifica se uma STRING está vazia
 #define ISEMPTY(VAR) (VAR[0] == 0)
+// Connecta o dispostivo ao client MQTT
+#define DEVICECONNECT(CLIENT,DEVICE) if(CLIENT.connect(DEVICE.name))CLIENT.subscribe(DEVICE.name)
+
+/* Utilidades */
+int freeRAM(){
+    extern int __heap_start, *__brkval;
+    int v;
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int)__brkval);
+}
+
+void ipToString(byte *ip, char *str){
+    int i, j;
+    for(i = 0, j = 0; i < 4; i++){ itoa(ip[i], &str[j], 10); j + = strlen(&str[j]); str[j++]= '.'; }
+    str[j-1] = 0;
+}
 
 class TATUDevice{
-private:
-    // Atributos variaveis
-    bool        pin_digital[PIN_AMOUNT];
-    uint16_t    pin_analog[PIN_ANALOG_AMOUNT];
 public:
     // Atributos públicos
     // Atributos do sistema
-    char     device_name[20];
-    char     device_ip[16];
-    uint8_t  device_id;
-    uint8_t  device_pan;
-    uint8_t  device_samples;
+    char     name[20];
+    char     ip[16];
+    uint8_t  id;
+    uint8_t  pan;
+    uint8_t  samples;
     char     mqtt_ip[16];
     uint16_t mqtt_port;
     uint8_t  os_version;
@@ -65,12 +76,18 @@ public:
     char output_message[200];
     int last_char;
 
-    // Methodos públicos
+    /* Callback's do Sistema */
+    // Callback MQTT
+    void mqtt_calback(char *, byte *, unsigned int);
+    // Callback Criado pelo usuario
+    bool (*callback)(uint32_t, char*);
+
+    // Metodos públicos
     TATUDevice( const char *,  const char *, const uint8_t,  const uint8_t,
                 const uint8_t, const char *, const uint16_t, const uint8_t,
-                TATUInterpreter *);
+                TATUInterpreter *, bool (*callback)(uint32_t, char*));
     void generateHeader();
-    void generateBody(char *payload, uint8_t length, void (*callback)(uint32_t, char*)));
+    void generateBody(char *payload, uint8_t length);
 };
 
 #endif
