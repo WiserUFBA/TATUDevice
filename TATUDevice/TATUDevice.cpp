@@ -22,7 +22,7 @@ const char pin_st[]     PROGMEM = "PIN";
 
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                        TATUInterpreter *req){
+                        TATUInterpreter *req, bool (*callback_con)(uint32_t, char*)){
     int i;
     char aux[20];
 
@@ -38,6 +38,7 @@ TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const 
     mqtt_port = (uint16_t) port_m;
     os_version = (uint8_t) os_v;
     requisition = req;
+    callback = callback_con;
 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
