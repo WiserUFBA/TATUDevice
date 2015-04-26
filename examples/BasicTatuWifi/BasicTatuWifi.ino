@@ -1,0 +1,49 @@
+#include <stdint.h>
+#include <SPI.h>
+#include <SFE_CC3000.h>
+#include <SFE_CC3000_Client.h>
+#include <PubSubClient.h>
+#include <TATUDevice.h>
+#include <TATUInterpreter.h>
+
+// Configuraçao do shield CC3000 Sparkfun
+#define TIMEOUT_CC3000 30000 // Tempo máximo CC3000 em ms
+#define CC3000_INT      2    // Needs to be an interrupt pin (D2/D3)
+#define CC3000_EN       7    // Pino de ativação
+#define CC3000_CS       10   // Pino de seleção, preferivel o pino 10 no UNO
+#define IP_ADDR_LEN     4    // Tamanho do IP em bytes
+
+// Propriedades do sistema
+byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
+byte server[] = { 192, 168, 0, 100 };
+byte ip[4]    = { 0 }; // Vetor nulo para que nao ocoram erros
+
+// Propriedades de rede
+char ap_ssid[] = "network";               
+char ap_password[] = "password";
+SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
+SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
+
+// Funçao do usuario para variaveis do TATU
+bool callback(uint32_t hash,char* response) {
+  /* Aqui fica o cdigo do usuario a ser executado quando houver requisiçes */
+}
+
+// Objetos para exemplo usando interface internet
+TATUInterpreter interpreter;
+TATUDevice device("nome", ip, 121, 88, 0, server, 1883, 1, &interpreter, callback);
+MQTT_CALLBACK(bridge, device, mqtt_callback);
+PubSubClient client(server, 1883, mqtt_callback , wifi_client);
+MQTT_PUBLISH(bridge, client);
+
+/* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
+void setup() {
+  ConnectionInfo connection_info;
+  char aux[16];  
+  if (!wifi.init() && !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) while(true);
+  DEVICECONNECT(client,device);
+  wifi.getConnectionInfo(connection_info);
+  ipToString(connection_info.ip_address, aux);
+  strcpy(device.ip, aux);
+}
+void loop() { client.loop(); }
