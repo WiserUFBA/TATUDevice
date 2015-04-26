@@ -4,21 +4,21 @@
 #include <stdint.h>
 #include <TATUInterpreter.h>
 
-#ifndef PIN_AMOUNT
-#define PIN_AMOUNT 6
-#endif
-
-#ifndef PIN_ANALOG_AMOUNT
-#define PIN_ANALOG_AMOUNT 6
-#endif
+typedef uint8_t byte;
 
 #ifndef MAX_SIZE_RESPONSE
-#define MAX_SIZE_RESPONSE 20
+#define MAX_SIZE_RESPONSE   20
+#endif
+
+#ifndef MAX_SIZE_OUTPUT
+#define MAX_SIZE_OUTPUT     200
 #endif
 
 // Constantes do sistema
 #define PROGMEM __ATTR_PROGMEM__ 
 #define SAIDA_STR &output_message[aux]
+#define MAX_SIZE_IP     16
+#define MAX_SIZE_NAME   20
 
 // Constantes da mensagem
 #define COMMA       output_message[aux++]=','
@@ -38,30 +38,24 @@
 #define ISEMPTY(VAR) (VAR[0] == 0)
 // Connecta o dispostivo ao client MQTT
 #define DEVICECONNECT(CLIENT,DEVICE) if(CLIENT.connect(DEVICE.name))CLIENT.subscribe(DEVICE.name)
+// Cria wrapper para a função de callback da classe
+#define MQTT_CALLBACK(OBJ, NAME) void NAME(char *topic, byte *payload, unsigned int length) \
+                                 {OBJ.mqtt_callback(topic, payload, length);}
 
 /* Utilidades */
-int freeRAM(){
-    extern int __heap_start, *__brkval;
-    int v;
-    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int)__brkval);
-}
-
-void ipToString(byte *ip, char *str){
-    int i, j;
-    for(i = 0, j = 0; i < 4; i++){ itoa(ip[i], &str[j], 10); j += strlen(&str[j]); str[j++]= '.'; }
-    str[j-1] = 0;
-}
+int freeRAM();
+void ipToString(byte *ip, char *str);
 
 class TATUDevice{
 public:
     // Atributos públicos
     // Atributos do sistema
-    char     name[20];
-    char     ip[16];
+    char     name[MAX_SIZE_NAME];
+    char     ip[MAX_SIZE_IP];
     uint8_t  id;
     uint8_t  pan;
     uint8_t  samples;
-    char     mqtt_ip[16];
+    char     mqtt_ip[MAX_SIZE_IP];
     uint16_t mqtt_port;
     uint8_t  os_version;
 
@@ -73,7 +67,7 @@ public:
     uint8_t start_counter; */
 
     // Mensagem de saida
-    char output_message[200];
+    char output_message[MAX_SIZE_OUTPUT];
     int last_char;
 
     /* Callback's do Sistema */

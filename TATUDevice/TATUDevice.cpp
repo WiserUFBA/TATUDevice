@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <avr/pgmspace.h>
+#include "Arduino.h"
 
 // Constantes
 const char start_post[] PROGMEM = "POST ";
@@ -19,6 +20,20 @@ const char body_str[]   PROGMEM = "\"BODY\":{";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
 const char pin_st[]     PROGMEM = "PIN";
+
+/* Utilidades */
+
+int freeRAM(){
+    extern int __heap_start, *__brkval;
+    int v;
+    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int)__brkval);
+}
+
+void ipToString(byte *ip, char *str){
+    int i, j;
+    for(i = 0, j = 0; i < 4; i++){ itoa(ip[i], &str[j], 10); j += strlen(&str[j]); str[j++]= '.'; }
+    str[j-1] = 0;
+}
 
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
@@ -101,7 +116,7 @@ void TATUDevice::generateHeader(){
 void TATUDevice::generateBody(char *payload, uint8_t length){
     int aux = last_char;
     bool isString;
-    char response[MAX_SIZE_RESPONSE] = 0;
+    char response[MAX_SIZE_RESPONSE] = {0};
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length);){ strcpy_P(OUT_STR, null_body); return; }
@@ -113,12 +128,14 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             break;
         // Funções do sistema
         case TATU_TYPE_PIN:
-            if(requisition->cmd.OBJ.TYPE == TATU_GET){
-                itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
-            }
-            else if(requisition->cmd.OBJ.TYPE == TATU_SET){
-                digitalWrite(requisition->cmd.OBJ.PIN);
-                requisition->cmd.OBJ.ERROR = false;
+            switch(requisition->cmd.OBJ.TYPE){
+                case TATU_GET:
+                    itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
+                    break;
+                case TATU_SET:
+                    digitalWrite(requisition->cmd.OBJ.PIN);
+                    requisition->cmd.OBJ.ERROR = false;
+                    break;
             }
             break;
         case TATU_TYPE_SYSTEM:
