@@ -78,7 +78,7 @@ public:
 
     /* Callback's do Sistema */
     // Callback MQTT
-    void mqtt_calback(char *, byte *, unsigned int);
+    void mqtt_callback(char *, byte *, unsigned int);
     // Callback Criado pelo usuario
     bool (*callback)(uint32_t, char*);
 
