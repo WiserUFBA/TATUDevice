@@ -2,6 +2,8 @@
 #define TATUInterpreter_h
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 // TATU Protocol available commands
 #define TATU_POST   0
@@ -51,8 +53,8 @@ private:
             uint8_t CODE  : 2;
             uint8_t TYPE  : 2;
             uint8_t VAR   : 2;
-            uint8_t PIN      ;
         } OBJ;
+        uint8_t PIN;
         uint16_t STRUCTURE;
     } Command;
 

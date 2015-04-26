@@ -1,7 +1,7 @@
 #include "TATUInterpreter.h"
 #include <stdint.h>
 
-bool TATUInterpreter::parse(unsigned char *string, uint8_t length){
+bool TATUInterpreter::parse(unsigned char *string, unsigned int length){
     uint8_t i, j = 0;
     str_hash = 5381;
     cmd.OBJ.VAR = TATU_TYPE_ALIAS;
@@ -46,7 +46,7 @@ bool TATUInterpreter::parse(unsigned char *string, uint8_t length){
             if(string[4] == CODE_ALL){
                 j = 8;
                 cmd.OBJ.CODE = TATU_CODE_ALL;
-                return;
+                return true;
             }
             else if(string[4] == CODE_INFO){
                 cmd.OBJ.CODE = TATU_CODE_INFO;
@@ -68,7 +68,7 @@ bool TATUInterpreter::parse(unsigned char *string, uint8_t length){
     if (!j)
         return false;
 
-    if(IS_NUM(string[j])){ cmd.OBJ.VAR = TATU_TYPE_PIN; cmd.OBJ.PIN = (uint8_t)atoi(&strin[strlen(string)+1]);}
+    if(IS_NUM(string[j])){ cmd.OBJ.VAR = TATU_TYPE_PIN; cmd.PIN = (uint8_t)atoi(&string[strlen(string)+1]);}
     else if(IS_SYS(string[j])){ j++; cmd.OBJ.VAR = TATU_TYPE_SYSTEM;}
 
     HASH_DJB(j, length, string, str_hash);
