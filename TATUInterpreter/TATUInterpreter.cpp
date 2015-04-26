@@ -71,7 +71,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             break;
         case COMMAND_POST:
             for(j = 6; string[j] != ':'; j++);
-            strcpy(payload, &payload[++j]);
+            strcpy(string, &string[++j]);
             return true;
     }
 
