@@ -83,8 +83,8 @@ public:
     bool (*callback)(uint32_t, char*);
 
     // Metodos públicos
-    TATUDevice( const char *,  byte *, const uint8_t,  const uint8_t,
-                const uint8_t, byte *, const uint16_t, const uint8_t,
+    TATUDevice( const char *, byte *, const int,  const int,
+                const int,    byte *, const int,  const int,
                 TATUInterpreter *, bool (*callback)(uint32_t, char*));
     void generateHeader();
     void generateBody(char *payload, uint8_t length);

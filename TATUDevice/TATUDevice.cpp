@@ -20,8 +20,8 @@ const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
 const char pin_st[]     PROGMEM = "PIN";
 
-TATUDevice::TATUDevice( const char *name_d,     byte *ip_d, const uint8_t id_d,    const uint8_t pan_d,
-                        const uint8_t sample_d, byte *ip_m, const uint16_t port_m, const uint8_t os_v,
+TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                        const int sample_d, byte *ip_m, const int port_m, const int os_v,
                         TATUInterpreter *req){
     int i;
     char aux[20];
@@ -30,13 +30,13 @@ TATUDevice::TATUDevice( const char *name_d,     byte *ip_d, const uint8_t id_d, 
     STRCPY(name_d, name);
     ipToString(ip_d, aux);
     STRCPY(aux, ip);
-    id = id_d;
-    pan = pan_d;
-    samples = sample_d;
+    id = (uint8_t)  id_d;
+    pan = (uint8_t) pan_d;
+    samples = (uint8_t) sample_d;
     ipToString(ip_m, aux);
     STRCPY(aux, mqtt_ip);
-    mqtt_port = port_m;
-    os_version = os_v;
+    mqtt_port = (uint16_t) port_m;
+    os_version = (uint8_t) os_v;
     requisition = req;
 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
