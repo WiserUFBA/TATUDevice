@@ -39,8 +39,12 @@ typedef uint8_t byte;
 // Connecta o dispostivo ao client MQTT
 #define DEVICECONNECT(CLIENT,DEVICE) if(CLIENT.connect(DEVICE.name))CLIENT.subscribe(DEVICE.name)
 // Cria wrapper para a função de callback da classe
-#define MQTT_CALLBACK(OBJ, NAME) void NAME(char *topic, byte *payload, unsigned int length) \
-                                 {OBJ.mqtt_callback(topic, payload, length);}
+#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\
+                                        void NAME(char *topic, byte *payload, unsigned int length) \
+                                        {OBJ.mqtt_callback(topic, payload, length, BRIDGE);}
+#define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *out, char *topic)\
+                                  { OBJ.publish(out, topic); }
+
 
 /* Utilidades */
 int freeRAM();
@@ -72,7 +76,7 @@ public:
 
     /* Callback's do Sistema */
     // Callback MQTT
-    void mqtt_callback(char *, byte *, unsigned int);
+    void mqtt_callback(char *, byte *, unsigned int, void (*publish)(char *, char *));
     // Callback Criado pelo usuario
     bool (*callback)(uint32_t, char*);
 
