@@ -14,7 +14,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
     str_hash = 5381;
     cmd.STRUCTURE = 0;
     cmd.OBJ.VAR = TATU_TYPE_ALIAS;
-
+    cmd.OBJ.TYPE = 1;
     switch(string[0]){
         case COMMAND_SET:
             cmd.OBJ.TYPE = TATU_SET;
@@ -70,6 +70,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             }
             break;
         case COMMAND_POST:
+            cmd.OBJ.TYPE = TATU_POST;
             for(j = 6; string[j] != ':'; j++);
             strcpy(string, &string[++j]);
             return true;

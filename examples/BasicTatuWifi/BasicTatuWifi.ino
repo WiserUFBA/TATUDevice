@@ -15,18 +15,18 @@
 
 // Propriedades do sistema
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 0, 100 };
+byte server[] = { 192, 168, 0, 102 };
 byte ip[4]    = { 0 }; // Vetor nulo para que nao ocoram erros
 
 // Propriedades de rede
-char ap_ssid[] = "network";               
-char ap_password[] = "password";
+char ap_ssid[] = "";               
+char ap_password[] = "";
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 
 // Funçao do usuario para variaveis do TATU
 bool callback(uint32_t hash,char* response) {
-  /* Aqui fica o cdigo do usuario a ser executado quando houver requisiçes */
+
 }
 
 // Objetos para exemplo usando interface internet
@@ -40,8 +40,17 @@ MQTT_PUBLISH(bridge, client);
 void setup() {
   ConnectionInfo connection_info;
   char aux[16];  
-  if (!wifi.init() && !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) while(true);
-  DEVICECONNECT(client,device);
+  Serial.begin(9600);
+  Serial.println("Tentando conectar");
+    
+  if ( !wifi.init() || !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) while(true);
+    Serial.println("Done");
+
+  //DEVICECONNECT(client,device);
+  if(client.connect("nome")){
+    client.subscribe(device.name);
+  }
+  else Serial.println("Nao conectou");
   wifi.getConnectionInfo(connection_info);
   ipToString(connection_info.ip_address, aux);
   strcpy(device.ip, aux);

@@ -172,5 +172,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, void (*publish)(char *, char *)){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);
+    if(requisition->cmd.OBJ.TYPE == TATU_POST || requisition->cmd.OBJ.ERROR)
+        return;
     publish(name, output_message);
 }
