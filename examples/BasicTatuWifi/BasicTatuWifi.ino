@@ -44,7 +44,7 @@ void setup() {
   Serial.println("Tentando conectar");
     
   if ( !wifi.init() || !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) while(true);
-    Serial.println("Done");
+  Serial.println("Done");
 
   //DEVICECONNECT(client,device);
   if(client.connect("nome")){
