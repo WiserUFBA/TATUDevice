@@ -7,7 +7,7 @@
 #include <TATUInterpreter.h>
 
 // Configuraçao do shield CC3000 Sparkfun
-#define TIMEOUT_CC3000 30000 // Tempo máximo CC3000 em ms
+#define TIMEOUT_CC3000  30000 // Tempo máximo CC3000 em ms
 #define CC3000_INT      2    // Needs to be an interrupt pin (D2/D3)
 #define CC3000_EN       7    // Pino de ativação
 #define CC3000_CS       10   // Pino de seleção, preferivel o pino 10 no UNO
@@ -26,10 +26,16 @@ SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 
 // Funçao do usuario para variaveis do TATU
 bool callback(uint32_t hash,char* response) {
-
+  // Faça as comparações aqui
+  // Todas comparações são realizadas com um hash DJB o switch abaixo
+  // pode receber quantas clausulas você quiser o padrão deve ser
+  // return true mas pode ser substiuido por uma resposta true ou false
+  switch(hash){
+    default: return true;
+  }
 }
 
-// Objetos para exemplo usando interface internet
+// Objetos para exemplo usando interface wifi CC3000
 TATUInterpreter interpreter;
 TATUDevice device("nome", ip, 121, 88, 0, server, 1883, 1, &interpreter, callback);
 MQTT_CALLBACK(bridge, device, mqtt_callback);

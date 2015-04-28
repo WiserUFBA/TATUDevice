@@ -13,6 +13,13 @@ byte ip[]     = { 192, 168, 0, 120 };
 // Funçao do usuario para variaveis do TATU
 bool callback(uint32_t hash,char* response) {
   /* Aqui fica o cdigo do usuario a ser executado quando houver requisiçes */
+  // Faça as comparações aqui
+  // Todas comparações são realizadas com um hash DJB o switch abaixo
+  // pode receber quantas clausulas você quiser o padrão deve ser
+  // return true mas pode ser substiuido por uma resposta true ou false
+  switch(hash){
+    default: return true;
+  }
 }
 
 // Objetos para exemplo usando interface internet
