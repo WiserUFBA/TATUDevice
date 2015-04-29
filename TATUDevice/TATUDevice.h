@@ -78,12 +78,12 @@ public:
     // Callback MQTT
     void mqtt_callback(char *, byte *, unsigned int, void (*publish)(char *, char *));
     // Callback Criado pelo usuario
-    bool (*callback)(uint32_t, char*);
+    bool (*callback)(uint32_t, char*, char*, uint8_t);
 
     // Metodos públicos
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*callback_con)(uint32_t, char*));
+                TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t));
     void generateHeader();
     void generateBody(char *payload, uint8_t length);
 };

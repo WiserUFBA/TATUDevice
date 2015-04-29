@@ -36,7 +36,7 @@ void ipToString(byte *ip, char *str){
 
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                        TATUInterpreter *req, bool (*callback_con)(uint32_t, char*)){
+                        TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
     int i;
     char aux[20];
 
@@ -119,11 +119,13 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
+    if(requisition->cmd.OBJ.TYPE == TATU_POST)
+        return;
 
     switch(requisition->cmd.OBJ.VAR){
         // Função do usuario
         case TATU_TYPE_ALIAS:
-            isString = callback(requisition->str_hash, response);
+            isString = callback(requisition->str_hash, response,&payload[strlen(payload)+1],requisition->cmd.OBJ.TYPE);
             break;
         // Funções do sistema
         case TATU_TYPE_PIN:
@@ -143,14 +145,14 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             strcpy_P(OUT_STR, false_body);
             break;
     }
-
+    Serial.println("1");
     // Se não temos um GET verificamos se o SET ou EDIT não apresentaram erro
     if(requisition->cmd.OBJ.TYPE != TATU_GET){
         if(requisition->cmd.OBJ.ERROR) strcpy_P(OUT_STR, false_body);
         else strcpy_P(OUT_STR, true_body);
         return;
     }
-
+    Serial.println("2");
     /* Coloca o BODY na resposta */
     strcpy_P(OUT_STR, body_str);
     aux += 8;
@@ -161,7 +163,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 
     /* Verifica se a resposta esta vazia ou se ela é um número ou bool para o JSON */
     if(ISEMPTY(response)) strcpy_P(OUT_STR, false_str);
-    else if(isString) { strcpy(OUT_STR, response); aux+=strlen(response);}
+    else if(!isString) { strcpy(OUT_STR, response); aux+=strlen(response);}
     else{ QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE; }
 
     // Fecha o JSON e a STRING
@@ -172,7 +174,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, void (*publish)(char *, char *)){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);
+    Serial.println("3 :" + requisition->cmd.OBJ.TYPE);
     if(requisition->cmd.OBJ.TYPE == TATU_POST)
         return;
+    Serial.println("4");
     publish(name, output_message);
+    Serial.println("5");
 }
