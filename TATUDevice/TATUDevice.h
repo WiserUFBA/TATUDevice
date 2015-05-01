@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <TATUInterpreter.h>
+#include "hash_list.h"
 
 typedef uint8_t byte;
 
@@ -28,8 +29,8 @@ typedef uint8_t byte;
 #define BRACE_RIGHT output_message[aux++]='}'
 #define CLOSE_MSG   output_message[aux]=0
 
-// Calcula o HASH DJB 
-#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; i < LEN; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
+// Calcula o HASH DJB (deprecated)
+//#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; i < LEN; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
 // Copiar uma string para a outra
 #define STRCPY(INPUT, OUTPUT) do{ for(i = 0;INPUT[i] != 0; ++i) OUTPUT[i] = INPUT[i]; OUTPUT[i] = 0; }while(0)
 // Gera o body tendo o OBJETO dispositivo

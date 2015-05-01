@@ -9,3 +9,6 @@
 #define H_OS_VERSION 0x68B6454C
 #define H_DEVICE 0xAB8ED255
 #define H_ID 0x5973F2
+#define H_lamp 2090464143
+#define H_valve 277698403
+

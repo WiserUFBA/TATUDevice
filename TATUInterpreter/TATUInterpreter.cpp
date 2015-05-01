@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+uint32_t hash_djb(char *string){
+    uint32_t hash = 5381;
+    int i;
+    for(i = 0; string[i] != 0; i++){ hash = ((hash << 5) + hash) + string[i]; }
+    return hash;
+}
 uint8_t atoi_T(char *p){
     int k = 0;
     while(*p){k = (k << 3) + (k << 1) + (*p) - '0'; p++; }
@@ -81,8 +87,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
     if(IS_NUM(string[j])){ cmd.OBJ.VAR = TATU_TYPE_PIN; cmd.OBJ.PIN = atoi_T(&string[strlen(string)+1]);}
     else if(IS_SYS(string[j])){ j++; cmd.OBJ.VAR = TATU_TYPE_SYSTEM;}
 
-    HASH_DJB(j, length, string, str_hash);
     VAR_COPY(j, length, string);
-
+    str_hash = hash_djb(string);
     return true;
 }

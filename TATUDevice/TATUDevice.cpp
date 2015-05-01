@@ -145,14 +145,14 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             strcpy_P(OUT_STR, false_body);
             break;
     }
-    Serial.println("1");
+    //Serial.println("1");
     // Se não temos um GET verificamos se o SET ou EDIT não apresentaram erro
     if(requisition->cmd.OBJ.TYPE != TATU_GET){
         if(requisition->cmd.OBJ.ERROR) strcpy_P(OUT_STR, false_body);
         else strcpy_P(OUT_STR, true_body);
         return;
     }
-    Serial.println("2");
+    //Serial.println("2");
     /* Coloca o BODY na resposta */
     strcpy_P(OUT_STR, body_str);
     aux += 8;
@@ -174,10 +174,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, void (*publish)(char *, char *)){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);
-    Serial.println("3 :" + requisition->cmd.OBJ.TYPE);
+    //Serial.println("3 :" + requisition->cmd.OBJ.TYPE);
     if(requisition->cmd.OBJ.TYPE == TATU_POST)
         return;
-    Serial.println("4");
-    publish(name, output_message);
-    Serial.println("5");
+    //Serial.println("4");
+        publish(name, output_message);
+    //Serial.println("5");
 }
