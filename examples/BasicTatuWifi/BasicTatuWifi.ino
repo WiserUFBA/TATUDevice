@@ -25,7 +25,7 @@ SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 
 // Funçao do usuario para variaveis do TATU
-bool callback(uint32_t hash,char* response) {
+bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
   // Faça as comparações aqui
   // Todas comparações são realizadas com um hash DJB o switch abaixo
   // pode receber quantas clausulas você quiser o padrão deve ser
