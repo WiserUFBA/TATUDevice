@@ -84,7 +84,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
 
     if (!j) return false;
 
-    if(IS_NUM(string[j])){i = strlen(string)+1 cmd.OBJ.VAR = TATU_TYPE_PIN; cmd.OBJ.PIN = atoi_T(&string[i]); i = strlen(string) + 1;requisition->cmd.OBJ.STATE = string[i] == 'T' ? 1:0}
+    if(IS_NUM(string[j])){i = strlen(string)+1 cmd.OBJ.VAR = TATU_TYPE_PIN; cmd.OBJ.PIN = atoi_T(&string[i]); i = strlen(string[i]) + 1;requisition->cmd.OBJ.STATE = string[i] == 'T' ? 1:0}
     else if(IS_SYS(string[j])){ j++; cmd.OBJ.VAR = TATU_TYPE_SYSTEM;}
 
     VAR_COPY(j, length, string);
