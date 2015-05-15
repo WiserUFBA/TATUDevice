@@ -36,7 +36,21 @@ void ipToString(byte *ip, char *str){
 
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                        TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
+                        TATUInterpreter *req,Callback callback_struct){
+    TATUCallback = callback_struct;
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
+
+}
+TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                        const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                        TATUInterpreter *req,bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
+    TATUCallback.info = callback_con;
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
+}
+
+void TATUDevice::init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                        const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                        TATUInterpreter *req){
     int i;
     char aux[20];
 
@@ -52,12 +66,10 @@ TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const 
     mqtt_port = (uint16_t) port_m;
     os_version = (uint8_t) os_v;
     requisition = req;
-    callback = callback_con;
-
+    //callback = callback_con;
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
 }
-
 void TATUDevice::generateHeader(){
     /* Auxiliary variable */
     int aux;
@@ -116,6 +128,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     int aux = last_char;
     bool isString;
     char response[MAX_SIZE_RESPONSE] = {0};
+    uint16_t response_int = 0,value_int = 0;
+    bool response_bool = 0,value_bool = 0;
+
+
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
@@ -125,7 +141,24 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     switch(requisition->cmd.OBJ.VAR){
         // Função do usuario
         case TATU_TYPE_ALIAS:
-            isString = callback(requisition->str_hash, response,&payload[strlen(payload)+1],requisition->cmd.OBJ.TYPE);
+            //Baseado no código da resposta, decide qual função do usuário deve ser usada
+            switch(requisition->cmd.OBJ.CODE){
+                case TATU_CODE_INFO:
+                    requisition->cmd.OBJ.ERROR = TATUCallback.info(requisition->str_hash,response,
+                                                                    &payload[strlen(payload)+1],
+                                                                    requisition->cmd.OBJ.TYPE);
+                    break;
+                case TATU_CODE_VALUE:
+                    value_int = atoi(&payload[strlen(payload)+1]);
+                    requisition->cmd.OBJ.ERROR = TATUCallback.value(requisition->str_hash,&response_int,
+                                                                    &value_int,requisition->cmd.OBJ.TYPE);
+                    break;
+                case TATU_CODE_STATE:
+                    value_bool = payload[strlen(payload)+1] == 'T' ? true:false;
+                    requisition->cmd.OBJ.ERROR = TATUCallback.state(requisition->str_hash,&response_bool,
+                                                                    &value_bool,requisition->cmd.OBJ.TYPE);
+                    break;
+            }
             break;
         // Funções do sistema
         case TATU_TYPE_PIN:
@@ -145,27 +178,37 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             strcpy_P(OUT_STR, false_body);
             break;
     }
-    //Serial.println("1");
+
     // Se não temos um GET verificamos se o SET ou EDIT não apresentaram erro
     if(requisition->cmd.OBJ.TYPE != TATU_GET){
         if(requisition->cmd.OBJ.ERROR) strcpy_P(OUT_STR, false_body);
         else strcpy_P(OUT_STR, true_body);
         return;
     }
-    //Serial.println("2");
     /* Coloca o BODY na resposta */
     strcpy_P(OUT_STR, body_str);
     aux += 8;
 
-    // !IMPORTANT! Suporte para apenas uma variavel 
+    // !IMPORTANT! Suporte para apenas uma variavel ''
     /* Copia a variavel vinda do payload */
     QUOTE; strcpy(OUT_STR, payload); aux += strlen(payload); QUOTE; COLON;
 
-    /* Verifica se a resposta esta vazia ou se ela é um número ou bool para o JSON */
-    if(ISEMPTY(response)) strcpy_P(OUT_STR, false_str);
-    else if(!isString) { strcpy(OUT_STR, response); aux+=strlen(response);}
-    else{ QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE; }
-
+    /* Verifica o tipo de resposta esperada, e responde adequadamente*/
+    switch(requisition->cmd.OBJ.CODE){
+        case TATU_CODE_INFO:
+            QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE;
+            break;
+        case TATU_CODE_VALUE:
+            itoa(response_int,response,10);
+            strcpy(OUT_STR, response);
+            aux+=strlen(response);
+            break;
+        case TATU_CODE_STATE:
+            if (response_bool)  response[0] = 'T';
+            else response[0] = 'F';
+            aux++;
+            break;
+    }
     // Fecha o JSON e a STRING
     BRACE_RIGHT; BRACE_RIGHT;
     CLOSE_MSG;
@@ -174,10 +217,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, void (*publish)(char *, char *)){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);
-    //Serial.println("3 :" + requisition->cmd.OBJ.TYPE);
+
     if(requisition->cmd.OBJ.TYPE == TATU_POST)
         return;
-    //Serial.println("4");
-        publish(name, output_message);
-    //Serial.println("5");
+
+    publish(name, output_message);
+
 }
