@@ -27,12 +27,30 @@ SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 // Funçao do usuario para variaveis do TATU
 bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
   // Faça as comparações aqui
-  // Todas comparações são realizadas com um hash DJB o switch abaixo
-  // pode receber quantas clausulas você quiser o padrão deve ser
-  // return true mas pode ser substiuido por uma resposta true ou false
-  switch(hash){
-    default: return true;
-  }
+  
+  //As comparações com o type são feitas para determinar que tipo de ação se espera 
+  //TATU_SET serve para alterções no dispositivo TATU_GET para retorna informações requisitadas
+  
+  // As comparações realizadas com um hash DJB são feitas para se determinar
+  // qual o atributo do dispositivo será usado e pode receber quantas 
+  // clausulas você quiser 
+  // o padrão deve ser return true mas pode ser substiuido por uma resposta true ou false
+  
+  
+  switch(type){  
+    case TATU_GET:
+      switch(hash){
+          break;  
+      }
+      break;
+    case TATU_SET:
+      switch(hash){
+          break;  
+      } 
+      //Serial.println(valor);
+      break;
+  } 
+  return true;
 }
 
 // Objetos para exemplo usando interface wifi CC3000
