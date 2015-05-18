@@ -85,8 +85,8 @@ void setup() {
   pinMode(VALVE,OUTPUT);
   
   Serial.println("Tentando conectar ao wifi");
-  if ( !wifi.init() || !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) Serial.println("Wifi conectado");
-  else Serial.println("wifi nao conectado");
+  if ( !wifi.init() || !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) Serial.println("Wifi nao conectado");
+  else Serial.println("wifi conectado");
   Serial.println("Done");
   
   //DEVICECONNECT(client,device);
