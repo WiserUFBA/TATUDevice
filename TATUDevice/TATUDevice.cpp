@@ -5,6 +5,25 @@
 #include <avr/pgmspace.h>
 #include "Arduino.h"
 
+/* DEBUG! */
+#ifdef DEBUG
+const char GENERATE_BODY[]      PROGMEM = "[DEBUG] Generating Body";
+const char CALLBACK_INFO[]      PROGMEM = "[DEBUG] INFO function is being executed";
+const char CALLBACK_VALUE[]     PROGMEM = "[DEBUG] VALUE function is being executed";
+const char CALLBACK_STATE[]     PROGMEM = "[DEBUG] STATE function is being executed";
+const char GET_PIN[]            PROGMEM = "[DEBUG] The value of the pin is: ";
+const char SET_PIN[]            PROGMEM = "[DEBUG] The value of the pin has been set";
+const char SET_PIN[]            PROGMEM = "[DEBUG] The system function isn't working yet";
+const char THE_INFO_RESPONSE[]  PROGMEM = "[DEBUG] The response for the GET INFO requisition is: ";
+const char THE_VALUE_RESPONSE[] PROGMEM = "[DEBUG] The response for the GET VALUE requisition is: ";
+const char THE_STATE_RESPONSE[] PROGMEM = "[DEBUG] The response for the GET STATE requisition is: ";
+const char BODY_GENERATED[]     PROGMEM = "[DEBUG] The body generation is done";
+const char IS_A_POST[]          PROGMEM = "[DEBUG] It's a post so it doesn't have to publish anything";
+const char PUBLISHING[]         PROGMEM = "[DEBUG] Publishing...";
+const char PUBLISHED[]          PROGMEM = "[DEBUG] The message has been published";
+const char NOT_A_GET[]          PROGMEM = "[DEBUG] It isn't a GET requisition";
+#endif
+
 // Constantes
 const char start_post[] PROGMEM = "POST ";
 const char null_body[]  PROGMEM = "\"BODY\":null}";
@@ -125,18 +144,19 @@ void TATUDevice::generateHeader(){
 }
 
 void TATUDevice::generateBody(char *payload, uint8_t length){
+    #ifdef
+    PRINT_DEBUG(GENERATE_BODY);
+    #endif
+    
     int aux = last_char;
     bool isString;
     char response[MAX_SIZE_RESPONSE] = {0};
     uint16_t response_int = 0,value_int = 0;
     bool response_bool = 0,value_bool = 0;
 
-
-
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
-    if(requisition->cmd.OBJ.TYPE == TATU_POST)
-        return;
+    if(requisition->cmd.OBJ.TYPE == TATU_POST) return;
 
     switch(requisition->cmd.OBJ.VAR){
         // Função do usuario
@@ -144,16 +164,25 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             //Baseado no código da resposta, decide qual função do usuário deve ser usada
             switch(requisition->cmd.OBJ.CODE){
                 case TATU_CODE_INFO:
+                    #ifdef
+                    PRINT_DEBUG(CALLBACK_INFO);
+                    #endif
                     requisition->cmd.OBJ.ERROR = TATUCallback.info(requisition->str_hash,response,
                                                                     &payload[strlen(payload)+1],
                                                                     requisition->cmd.OBJ.TYPE);
                     break;
                 case TATU_CODE_VALUE:
+                    #ifdef
+                    PRINT_DEBUG(CALLBACK_VALUE);
+                    #endif
                     value_int = atoi(&payload[strlen(payload)+1]);
                     requisition->cmd.OBJ.ERROR = TATUCallback.value(requisition->str_hash,&response_int,
                                                                     &value_int,requisition->cmd.OBJ.TYPE);
                     break;
                 case TATU_CODE_STATE:
+                    #ifdef
+                    PRINT_DEBUG(CALLBACK_STATE);
+                    #endif
                     value_bool = payload[strlen(payload)+1] == 'T' ? true:false;
                     requisition->cmd.OBJ.ERROR = TATUCallback.state(requisition->str_hash,&response_bool,
                                                                     &value_bool,requisition->cmd.OBJ.TYPE);
@@ -165,14 +194,24 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             switch(requisition->cmd.OBJ.TYPE){
                 case TATU_GET:
                     itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
+                    #ifdef
+                    PRINT_DEBUG(GET_PIN);
+                    Serial.println(response);
+                    #endif
                     break;
                 case TATU_SET:
                     digitalWrite(requisition->cmd.OBJ.PIN,requisition->cmd.OBJ.STATE);
                     requisition->cmd.OBJ.ERROR = false;
+                    #ifdef
+                    PRINT_DEBUG(SET_PIN);
+                    #endif
                     break;
             }
             break;
         case TATU_TYPE_SYSTEM:
+            #ifdef
+            PRINT_DEBUG(SYSTEM);
+            #endif
             /** MODIFICA PROPRIEDADE **/
             // ISTO AINDA NÃO FOI IMPLEMENTADO
             strcpy_P(OUT_STR, false_body);
@@ -181,6 +220,9 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 
     // Se não temos um GET verificamos se o SET ou EDIT não apresentaram erro
     if(requisition->cmd.OBJ.TYPE != TATU_GET){
+        #ifdef
+        PRINT_DEBUG(NOT_A_GET);
+        #endif
         if(requisition->cmd.OBJ.ERROR) strcpy_P(OUT_STR, false_body);
         else strcpy_P(OUT_STR, true_body);
         return;
@@ -197,30 +239,58 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     switch(requisition->cmd.OBJ.CODE){
         case TATU_CODE_INFO:
             QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE;
+            #ifdef
+            PRINT_DEBUG(THE_RESPONSE);
+            Serial.println(response);
+            #endif
             break;
         case TATU_CODE_VALUE:
             itoa(response_int,response,10);
             strcpy(OUT_STR, response);
             aux+=strlen(response);
+            #ifdef
+            PRINT_DEBUG(THE_RESPONSE);
+            Serial.println(response);
+            #endif
             break;
         case TATU_CODE_STATE:
             if (response_bool)  response[0] = 'T';
             else response[0] = 'F';
             aux++;
+            #ifdef
+            PRINT_DEBUG(THE_RESPONSE);
+            Serial.println(response);
+            #endif
             break;
     }
     // Fecha o JSON e a STRING
     BRACE_RIGHT; BRACE_RIGHT;
     CLOSE_MSG;
+    #ifdef
+    PRINT_DEBUG(BODY_GENERATED);
+    #endif
 }
 
 void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, void (*publish)(char *, char *)){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);
 
-    if(requisition->cmd.OBJ.TYPE == TATU_POST)
+    if(requisition->cmd.OBJ.TYPE == TATU_POST){
+        #ifdef
+        PRINT_DEBUG(IS_A_POST);
+        #endif
         return;
-
+    }
+    #ifdef
+    PRINT_DEBUG(PUBLISHING);
+    Serial.println(output_message);
+    #endif
+    
+    //publica a mensagem
     publish(name, output_message);
+    
+    #ifdef
+    PRINT_DEBUG(PUBLISHED);
+    #endif
 
 }

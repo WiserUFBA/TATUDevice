@@ -56,7 +56,6 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
   // clausulas você quiser 
   // o padrão deve ser return true mas pode ser substiuido por uma resposta true ou false
   
-  
   switch(type){  
     case TATU_GET:
       switch(hash){

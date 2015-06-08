@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+// System definitions
+#define PROGMEM __ATTR_PROGMEM__
+#define PRINT_DEBUG(MSG) Serial.println(MSG)
+
 // TATU Protocol available commands
 #define TATU_POST   0
 #define TATU_SET    1
@@ -19,7 +23,8 @@
 #define TATU_TYPE_ALIAS  0
 #define TATU_TYPE_PIN    1
 #define TATU_TYPE_SYSTEM 2
-#define TATU_TYPE_CRYPTO 3
+//#define TATU_TYPE_CRYPTO 3
+#define TATU_TYPE_ANALOG 3
 
 // Char that represents the TATU Protocol commands
 #define CODE_ALL   'A'
@@ -38,9 +43,11 @@
 // Copy property to begin of the payload array
 #define VAR_COPY(START, LEN, VECTOR) for(i = START; i < LEN; i++){ VECTOR[i-START] = VECTOR[i]; if(i+1 == LEN) VECTOR[i-START+1] = '\0'; else if(VECTOR[i] == ' ') VECTOR[i-START] = 0; }
 // Verifica se uma variavel é um numero
-#define IS_NUM(VAR) (VAR < 58)&&(VAR > 47)
+#define IS_NUM(VAR) ((VAR < 58)&&(VAR > 47))||(VAR == '#')
 #define IS_SYS(VAR) (VAR == '$')
-#define IS_CRYPTO(VAR) (VAR == '#')
+// Deprecated!
+//#define IS_CRYPTO(VAR) (VAR == '#')
+#define IS_ANALOG(VAR) (VAR == '#')
 
 /* Utilities */
 uint32_t hash_djb(char *string);
