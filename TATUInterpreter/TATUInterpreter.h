@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <avr/pgmspace.h>
 
+#ifdef DEBUG
+#define DEBUG_ON 1
+#endif
+
 // System definitions
 #define PROGMEM __ATTR_PROGMEM__
 #define putstring(x) SerialPrint_P(PSTR(x))

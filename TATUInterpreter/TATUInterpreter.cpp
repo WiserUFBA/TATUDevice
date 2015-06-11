@@ -5,6 +5,10 @@
 #include "Arduino.h"
 #include <avr/pgmspace.h>
 
+#ifdef DEBUG_ON
+#define DEBUG 1
+#endif
+
 #ifdef DEBUG
 const char START_PARSE[]        PROGMEM = "[DEBUG] Starting Parse";
 const char FOUND_GET[]          PROGMEM = "[DEBUG] Found GET";
