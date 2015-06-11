@@ -1,4 +1,4 @@
-#include "TATUInterpreter.h"
+    #include "TATUInterpreter.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -256,7 +256,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
     VAR_COPY(j, length, string);
     str_hash = hash_djb(string);
     if(cmd.OBJ.TYPE != TATU_GET && cmd.OBJ.CODE == TATU_CODE_STATE)
-        cmd.OBJ.STATE = string[strlen(string+1)] == 'T' ? 1:0;
+        cmd.OBJ.STATE = string[strlen(string)+1] == 'T' ? 1:0;
         
     #ifdef DEBUG
     // Print the received command
