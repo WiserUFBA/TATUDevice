@@ -184,9 +184,8 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     #ifdef DEBUG
                     PRINT_DEBUG(CALLBACK_STATE);
                     #endif
-                    value_bool = payload[strlen(payload)+1] == 'T' ? true:false;
                     requisition->cmd.OBJ.ERROR = TATUCallback.state(requisition->str_hash,&response_bool,
-                                                                    &value_bool,requisition->cmd.OBJ.TYPE);
+                                                                    requisition->cmd.OBJ.STATE,requisition->cmd.OBJ.TYPE);
                     break;
             }
             break;
