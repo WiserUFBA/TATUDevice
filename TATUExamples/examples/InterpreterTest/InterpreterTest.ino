@@ -23,8 +23,7 @@ TATUInterpreter debugger;
     Serial.println(INTERPETER.cmd.OBJ.STATE); \
     Serial.print(">> TATU PIN: "); \
     Serial.println(INTERPETER.cmd.OBJ.PIN); \
-    Serial.println(); \
-    Serial.println() \
+    Serial.println()
 
 void setup(){
     Serial.begin(9600);
