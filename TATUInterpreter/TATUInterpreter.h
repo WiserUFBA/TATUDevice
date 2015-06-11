@@ -1,10 +1,6 @@
 #ifndef TATUInterpreter_h
 #define TATUInterpreter_h
 
-#ifdef DEBUG
-#define DEBUG 1
-#endif
-
 #include <stdint.h>
 #include <avr/pgmspace.h>
 

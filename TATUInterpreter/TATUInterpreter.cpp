@@ -218,8 +218,6 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         string[i] = 0;
         cmd.OBJ.PIN = atoi_T(&string[j]);
         /* If it is a set */
-        if(cmd.OBJ.TYPE != TATU_GET && cmd.OBJ.CODE == TATU_CODE_STATE)
-            cmd.OBJ.STATE = string[++i] == 'T' ? 1:0;
         
     } 
     else if(IS_SYS(string[j])){ 
@@ -232,7 +230,9 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
 
     VAR_COPY(j, length, string);
     str_hash = hash_djb(string);
-    
+    if(cmd.OBJ.TYPE != TATU_GET && cmd.OBJ.CODE == TATU_CODE_STATE)
+        cmd.OBJ.STATE = string[strlen(string+1)] == 'T' ? 1:0;
+        
     #ifdef DEBUG
     // Print the received command
     Serial.print(PARAM_VAR);
