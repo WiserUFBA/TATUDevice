@@ -48,6 +48,7 @@ void SerialPrint_PROGMEM(const char str[] PROGMEM){
     if(!str) return;
     while((c = pgm_read_byte(str++)))
         Serial.write(c);
+    Serial.write('\n');
 }
 
 /* Parse TATU and return if this fail or not */
