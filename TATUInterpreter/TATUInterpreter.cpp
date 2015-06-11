@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Arduino.h"
-#include <avr/io.h>
 #include <avr/pgmspace.h>
 
 #ifdef DEBUG

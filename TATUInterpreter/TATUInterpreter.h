@@ -2,7 +2,6 @@
 #define TATUInterpreter_h
 
 #include <stdint.h>
-#include <avr/io.h>
 #include <avr/pgmspace.h>
 
 // System definitions
