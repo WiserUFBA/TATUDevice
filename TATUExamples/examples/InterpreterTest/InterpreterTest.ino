@@ -1,6 +1,4 @@
-#define DEBUG 1
 #include <TATUInterpreter.h>
-
 
 char test1[] = "GET VALUE 12";
 char test2[] = "SET STATE LAMP T";
@@ -33,6 +31,10 @@ TATUInterpreter debugger;
 void setup(){
     Serial.begin(9600);
     
+    Serial.println("=======================");
+    Serial.println("Starting Debug...");
+    Serial.println("=======================");
+    
     // Parse TEST 1
     debug(debugger,test1);
     
@@ -57,8 +59,9 @@ void setup(){
     // Parse TEST 8
     debug(debugger,test8);
 
-
-
+    Serial.println("=======================");
+    Serial.println("Finished Debug!");
+    Serial.println("=======================");
 }
 
 void loop(){}
