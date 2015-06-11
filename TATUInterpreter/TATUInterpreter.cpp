@@ -101,6 +101,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                     DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_STATE;
+                    j++;
                     break; 
                 case CODE_VALUE:
                     #ifdef DEBUG
@@ -252,7 +253,9 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         j++; 
         cmd.OBJ.VAR = TATU_TYPE_SYSTEM;
     }
-
+    #ifdef DEBUG
+        Serial.println(&string[j]);
+    #endif
     VAR_COPY(j, length, string);
     str_hash = hash_djb(string);
     if(cmd.OBJ.TYPE != TATU_GET && cmd.OBJ.CODE == TATU_CODE_STATE)
@@ -260,7 +263,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         
     #ifdef DEBUG
     // Print the received command
-    PRINT_DEBUG(PARAM_VAR);
+    PRINT_DEBUG(PARAM_VAR); 
     Serial.println(string);
     if(cmd.OBJ.TYPE != TATU_GET){
         PRINT_DEBUG(PARAM_VALUE);
