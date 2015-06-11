@@ -4,9 +4,8 @@
 #include <stdint.h>
 #include <avr/pgmspace.h>
 
-#ifdef DEBUG
-#define DEBUG_ON 1
-#endif
+// Uncomment the follow line to show debug
+// #define DEBUG 1
 
 // System definitions
 #define PROGMEM __ATTR_PROGMEM__
