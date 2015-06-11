@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Arduino.h"
 #include <avr/pgmspace.h>
+#include "Arduino.h"
 
 #ifdef DEBUG
 const char START_PARSE[]        PROGMEM = "[DEBUG] Starting Parse";
@@ -43,8 +43,11 @@ uint8_t atoi_T(char *p){
 }
 
 /* Little utilitie to print progmem char */
-void SerialPrint_PROGMEM(PGM_P str){
-    for (uint8_t c; (c = pgm_read_byte(str)); str++) Serial.write(c);
+void SerialPrint_PROGMEM(const char str[] PROGMEM){
+    char c;
+    if(!str) return;
+    while((c = pgm_read_byte(str++)))
+        Serial.write(c);
 }
 
 /* Parse TATU and return if this fail or not */

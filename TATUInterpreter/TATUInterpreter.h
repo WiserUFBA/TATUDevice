@@ -5,12 +5,12 @@
 #include <avr/pgmspace.h>
 
 // Uncomment the follow line to show debug
-// #define DEBUG 1
+#define DEBUG 1
 
 // System definitions
 #define PROGMEM __ATTR_PROGMEM__
-#define putstring(x) SerialPrint_P(PSTR(x))
-#define PRINT_DEBUG(MSG) putstring(MSG)
+#define putstring(x) SerialPrint_PROGMEM(x)
+#define PRINT_DEBUG(MSG) SerialPrint_PROGMEM(MSG)
 
 // TATU Protocol available commands
 #define TATU_POST   0
