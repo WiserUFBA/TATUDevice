@@ -1,11 +1,10 @@
-#ifdef DEBUG
-#include "Arduino.h"
-#include <avr/pgmspace.h>
-#endif
 #include "TATUInterpreter.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Arduino.h"
+#include <avr/io.h>
+#include <avr/pgmspace.h>
 
 #ifdef DEBUG
 const char START_PARSE[]        PROGMEM = "[DEBUG] Starting Parse";
@@ -44,13 +43,18 @@ uint8_t atoi_T(char *p){
     return k;
 }
 
+/* Little utilitie to print progmem char */
+void SerialPrint_PROGMEM(PGM_P str){
+    for (uint8_t c; (c = pgm_read_byte(str)); str++) Serial.write(c);
+}
+
 /* Parse TATU and return if this fail or not */
 bool TATUInterpreter::parse(char *string, unsigned int length){
     #ifdef DEBUG
     PRINT_DEBUG(START_PARSE);
     #endif
     /* Default Initialization */
-    uint8_t i, j = 0;
+    unsigned int i, j = 0;
     cmd.STRUCTURE = 0;
     cmd.OBJ.VAR = TATU_TYPE_ALIAS;
     cmd.OBJ.TYPE = 1;
@@ -99,7 +103,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                     j++;
                    break;
                 default:
-                    #ifdef
+                    #ifdef DEBUG
                     PRINT_DEBUG(CODE_ERROR);
                     #endif
                     /* If the desired command is not found return error */
@@ -135,7 +139,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                     j++;
                     break;
                 default:
-                    #ifdef
+                    #ifdef DEBUG
                     PRINT_DEBUG(CODE_ERROR);
                     #endif
                     /* If the desired command is not found return error */
@@ -171,7 +175,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                     j++; 
                     break;
                 default:
-                    #ifdef
+                    #ifdef DEBUG
                     PRINT_DEBUG(CODE_ERROR);
                     #endif
                     /* If the desired command is not found return error */
@@ -190,7 +194,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             strcpy(string, &string[++j]);
             return true;
         default:
-            #ifdef
+            #ifdef DEBUG
             PRINT_DEBUG(REQUISITION_ERROR);
             #endif
             /* If the desired command is not found return error */
@@ -203,7 +207,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         PRINT_DEBUG(FOUND_NUM);
         #endif
         if(IS_ANALOG(string[j])){
-            #ifdef
+            #ifdef DEBUG
             PRINT_DEBUG(FOUND_ANALOG);
             #endif
             j++;
@@ -239,7 +243,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         Serial.println(&string[strlen(string)+1]);
     }
     Serial.print(HASH_GENERATED);
-    Serial.println(hash);
+    Serial.println(str_hash);
     #endif
     
     return true;

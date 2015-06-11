@@ -2,10 +2,13 @@
 #define TATUInterpreter_h
 
 #include <stdint.h>
+#include <avr/io.h>
+#include <avr/pgmspace.h>
 
 // System definitions
 #define PROGMEM __ATTR_PROGMEM__
-#define PRINT_DEBUG(MSG) Serial.println(MSG)
+#define putstring(x) SerialPrint_P(PSTR(x))
+#define PRINT_DEBUG(MSG) putstring(MSG)
 
 // TATU Protocol available commands
 #define TATU_POST   0
@@ -52,6 +55,7 @@
 /* Utilities */
 uint32_t hash_djb(char *string);
 uint8_t atoi_T(char *p);
+void SerialPrint_PROGMEM(PGM_P str);
 
 class TATUInterpreter{
 private:

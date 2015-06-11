@@ -7,6 +7,7 @@
 
 typedef uint8_t byte;
 
+
 #ifndef MAX_SIZE_RESPONSE
 #define MAX_SIZE_RESPONSE   20
 #endif
@@ -14,6 +15,8 @@ typedef uint8_t byte;
 #ifndef MAX_SIZE_OUTPUT
 #define MAX_SIZE_OUTPUT     200
 #endif
+
+#define DEBUG 1
 
 // Constantes do sistema
 #define PROGMEM __ATTR_PROGMEM__ 
