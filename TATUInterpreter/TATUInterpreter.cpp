@@ -64,7 +64,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
     
     #ifdef DEBUG
     // Print the received command
-    Serial.print(COMMAND_RECEIVED);
+    PRINT_DEBUG(COMMAND_RECEIVED);
     for(i = 0; string[i] != 0 && string[i] != ' '; i++)
         Serial.print(string[i]);
     Serial.println(".");
@@ -239,13 +239,13 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         
     #ifdef DEBUG
     // Print the received command
-    Serial.print(PARAM_VAR);
+    PRINT_DEBUG(PARAM_VAR);
     Serial.println(string);
     if(cmd.OBJ.TYPE != TATU_GET){
-        Serial.print(PARAM_VALUE);
+        PRINT_DEBUG(PARAM_VALUE);
         Serial.println(&string[strlen(string)+1]);
     }
-    Serial.print(HASH_GENERATED);
+    PRINT_DEBUG(HASH_GENERATED);
     Serial.println(str_hash);
     #endif
     
