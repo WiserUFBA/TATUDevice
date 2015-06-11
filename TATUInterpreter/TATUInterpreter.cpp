@@ -19,6 +19,7 @@ const char FOUND_STATE[]        PROGMEM = "[DEBUG] Found STATE";
 const char FOUND_SYSTEM[]       PROGMEM = "[DEBUG] Is System";
 const char FOUND_ANALOG[]       PROGMEM = "[DEBUG] And is analog";
 const char PARAM_VAR[]          PROGMEM = "[DEBUG] Variable received: ";
+const char STRING_VAR[]         PROGMEM = "[DEBUG] Parameters String: ";
 const char CODE_ERROR[]         PROGMEM = "[DEBUG] Code ERROR";
 const char PARAM_VALUE[]        PROGMEM = "[DEBUG] Value received: ";
 const char START_CODING[]       PROGMEM = "[DEBUG] Starting coding";
@@ -254,6 +255,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         cmd.OBJ.VAR = TATU_TYPE_SYSTEM;
     }
     #ifdef DEBUG
+        PRINT_DEBUG(STRING_VAR);
         Serial.println(&string[j]);
     #endif
     VAR_COPY(j, length, string);
