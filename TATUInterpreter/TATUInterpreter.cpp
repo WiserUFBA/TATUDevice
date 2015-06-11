@@ -48,13 +48,13 @@ void SerialPrint_PROGMEM(const char str[] PROGMEM){
     if(!str) return;
     while((c = pgm_read_byte(str++)))
         Serial.write(c);
-    Serial.write('\n');
 }
 
 /* Parse TATU and return if this fail or not */
 bool TATUInterpreter::parse(char *string, unsigned int length){
     #ifdef DEBUG
     PRINT_DEBUG(START_PARSE);
+    DEBUG_NL;
     #endif
     /* Default Initialization */
     unsigned int i, j = 0;
@@ -74,6 +74,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         case COMMAND_GET:
             #ifdef DEBUG
             PRINT_DEBUG(FOUND_GET);
+            DEBUG_NL;
             #endif
             
             cmd.OBJ.TYPE = TATU_GET;
@@ -83,24 +84,28 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 case CODE_ALL:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_ALL);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_ALL;
                     return true;
                 case CODE_INFO:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_INFO);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_INFO;
                     break; 
                 case CODE_STATE:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_STATE);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_STATE;
                     break; 
                 case CODE_VALUE:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_VALUE);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_VALUE;
                     j++;
@@ -108,6 +113,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 default:
                     #ifdef DEBUG
                     PRINT_DEBUG(CODE_ERROR);
+                    DEBUG_NL;
                     #endif
                     /* If the desired command is not found return error */
                     return false;
@@ -116,6 +122,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         case COMMAND_SET: 
             #ifdef DEBUG
             PRINT_DEBUG(FOUND_SET);
+            DEBUG_NL;
             #endif
             
             cmd.OBJ.TYPE = TATU_SET;
@@ -124,12 +131,14 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 case CODE_INFO:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_INFO);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_INFO;
                     break;
                 case CODE_STATE:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_STATE);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_STATE;
                     j++;
@@ -137,6 +146,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 case CODE_VALUE:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_VALUE);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_VALUE;
                     j++;
@@ -144,6 +154,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 default:
                     #ifdef DEBUG
                     PRINT_DEBUG(CODE_ERROR);
+                    DEBUG_NL;
                     #endif
                     /* If the desired command is not found return error */
                     return false;
@@ -152,6 +163,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         case COMMAND_EDIT:
             #ifdef DEBUG
             PRINT_DEBUG(FOUND_EDIT);
+            DEBUG_NL;
             #endif
             
             cmd.OBJ.TYPE = TATU_EDIT;
@@ -160,12 +172,14 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 case CODE_INFO:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_INFO);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_INFO;
                     break;
                 case CODE_STATE:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_STATE);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_STATE;
                     j++; 
@@ -173,6 +187,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 case CODE_VALUE:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_VALUE);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_VALUE;
                     j++; 
@@ -180,6 +195,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                 default:
                     #ifdef DEBUG
                     PRINT_DEBUG(CODE_ERROR);
+                    DEBUG_NL;
                     #endif
                     /* If the desired command is not found return error */
                     return false;
@@ -188,6 +204,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         case COMMAND_POST:
             #ifdef DEBUG
             PRINT_DEBUG(FOUND_POST);
+            DEBUG_NL;
             #endif
         
             cmd.OBJ.TYPE = TATU_POST;
@@ -199,6 +216,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         default:
             #ifdef DEBUG
             PRINT_DEBUG(REQUISITION_ERROR);
+            DEBUG_NL;
             #endif
             /* If the desired command is not found return error */
             return false;
@@ -208,10 +226,12 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
         // If is Analog
         #ifdef DEBUG
         PRINT_DEBUG(FOUND_NUM);
+        DEBUG_NL;
         #endif
         if(IS_ANALOG(string[j])){
             #ifdef DEBUG
             PRINT_DEBUG(FOUND_ANALOG);
+            DEBUG_NL;
             #endif
             j++;
             cmd.OBJ.VAR = TATU_TYPE_ANALOG;
@@ -227,6 +247,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
     else if(IS_SYS(string[j])){ 
         #ifdef DEBUG
         PRINT_DEBUG(FOUND_SYSTEM);
+        DEBUG_NL;
         #endif
         j++; 
         cmd.OBJ.VAR = TATU_TYPE_SYSTEM;

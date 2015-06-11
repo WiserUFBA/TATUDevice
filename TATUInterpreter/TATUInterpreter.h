@@ -8,9 +8,10 @@
 #define DEBUG 1
 
 // System definitions
-#define PROGMEM __ATTR_PROGMEM__
-#define putstring(x) SerialPrint_PROGMEM(x)
-#define PRINT_DEBUG(MSG) SerialPrint_PROGMEM(MSG)
+#define PROGMEM             __ATTR_PROGMEM__
+#define putstring(x)        SerialPrint_PROGMEM(x)
+#define PRINT_DEBUG(MSG)    SerialPrint_PROGMEM(MSG)
+#define DEBUG_NL            Serial.write('\n')
 
 // TATU Protocol available commands
 #define TATU_POST   0
