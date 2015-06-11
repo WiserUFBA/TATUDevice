@@ -13,8 +13,6 @@ TATUInterpreter debugger;
 #define debug(INTERPETER,STRING) \
     Serial.println(STRING); \
     debugger.parse(STRING, strlen(STRING)); \
-    Serial.println(); \
-    Serial.println(INTERPETER.cmd.OBJ.TYPE); \
     Serial.print(">> TATU TYPE: "); \
     Serial.println(INTERPETER.cmd.OBJ.TYPE); \
     Serial.print(">> TATU CODE: "); \
