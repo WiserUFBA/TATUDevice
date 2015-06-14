@@ -42,7 +42,8 @@ byte ip[4]    = { 192, 168, 0, 68};
 
 //Construção do device 
 TATUInterpreter interpreter;
-TATUDevice device(name, ip, pan_id, id, sample_rate, server_ip, MQTTPORT, SYS_VERSION, &interpreter, callback);
+TATUDevice device(name, ip, pan_id, id, sample_rate, server_ip, MQTTPORT,
+                  SYS_VERSION, &interpreter, callback);
 
 // Funçao do usuario para variaveis do TATU
 bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
@@ -158,12 +159,16 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
     case TATU_SET:
       switch(hash){
         case H_lamp:
-          if (valor[0] == 'D'){ligar(LAMP); lamp = true;}//Liga a lâmpada se o primeiro character do valor for 'L'
-          else if (valor[0] == 'L'){desligar(LAMP); lamp = false;}//Desiga a lâmpada se o primeiro character do valor                                                                   //  for 'D'
+          if (valor[0] == 'D'){ligar(LAMP); lamp = true;}
+          //Liga a lâmpada se o primeiro character do valor for 'L'
+          else if (valor[0] == 'L'){desligar(LAMP); lamp = false;}
+          //Desiga a lâmpada se o primeiro character do valor                                                                   //  for 'D'
           break;
         case H_valve:
-          if (valor[0] == 'D'){ligar(VALVE); valve = true;}//Abre a válvula se o primeiro character do valor for 'A'
-          else if (valor[0] == 'L'){desligar(VALVE); valve = false;}//Fecha a válvula se o primeiro character do valor                                                                     //for 'F'
+          if (valor[0] == 'D'){ligar(VALVE); valve = true;}
+          //Abre a válvula se o primeiro character do valor for 'A'
+          else if (valor[0] == 'L'){desligar(VALVE); valve = false;}
+          //Fecha a válvula se o primeiro character do valor                                                                    //for 'F'
           break;
           default:
             return false;
@@ -189,8 +194,10 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
     case TATU_GET:
       switch(hash){
         case H_lamp:
-          if(lamp) strcpy(response,"ON");//response tem valor "ON" se a lâmpada estiver ligada
-          else strcpy(response,"OFF");//response tem valor "OFF" se a lâmpada estiver desligada
+          if(lamp) strcpy(response,"ON");
+          //response tem valor "ON" se a lâmpada estiver ligada
+          else strcpy(response,"OFF");
+          //response tem valor "OFF" se a lâmpada estiver desligada
           break;
         default:
           return false;
