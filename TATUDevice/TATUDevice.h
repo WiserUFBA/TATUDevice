@@ -7,7 +7,6 @@
 
 typedef uint8_t byte;
 
-
 #ifndef MAX_SIZE_RESPONSE
 #define MAX_SIZE_RESPONSE   20
 #endif
@@ -16,7 +15,7 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     200
 #endif
 
-#define DEBUG 1
+#define DEBUG
 
 // Constantes do sistema
 #define PROGMEM __ATTR_PROGMEM__ 
@@ -55,8 +54,7 @@ typedef struct
         //VALUE
         bool (*value)(uint32_t, uint16_t*, uint16_t*, uint8_t);
         //STATE
-        bool (*state)(uint32_t, bool*, bool*, uint8_t);
-
+        bool (*state)(uint32_t, bool*, bool, uint8_t);
 }Callback;
 
 /* Utilidades */

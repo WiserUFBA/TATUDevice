@@ -153,83 +153,83 @@ Property findProperty(uint8_t lrc_property){
 	}
 
 	/*
-	 * If we found a property so make the sum of all sizes
+	 * If we found a property, so make the sum of all sizes
 	 * of the previous properties, this sum is the corrected
 	 * location of the property we are looking for
 	 */
 	if(found.property != 0){
 		found.property_location = 0;
-		switch(lrc_property){
-			case SYSTEM_DATE:
+		switch(found.property){
+			case System_Date:
 				found.property_location += NUMBER_4BYTE;
 				/* no break */
-			case SYSTEM_VERSION:
+			case System_Version:
 				found.property_location += NUMBER_1BYTE;
 				/* no break */
-			case BOARD_AREF:
+			case Board_Aref:
 				found.property_location += NUMBER_1BYTE;
 				/* no break */
-			case BOARD_SLEEP:
+			case Board_Sleep:
 				found.property_location += NUMBER_2BYTE;
 				/* no break */
-			case BOARD_SAMPLE:
+			case Board_Sample:
 				found.property_location += NUMBER_4BYTE;
 				/* no break */
-			case BOARD_SERIAL:
+			case Board_Serial:
 				found.property_location += NUMBER_4BYTE;
 				/* no break */
-			case BOARD_PULLUP:
+			case Board_Pullup:
 				found.property_location += NUMBER_8BYTE;
 				/* no break */
-			case BOARD_PIN:
+			case Board_Pin:
 				found.property_location += NAMES_SIZE;
 				/* no break */
-			case DEVICE_NAME:
+			case Device_Name:
 				found.property_location += NUMBER_1BYTE;
 				/* no break */
-			case DEVICE_PAN:
+			case Device_Pan:
 				found.property_location += NAMES_SIZE;
 				/* no break */
-			case DEVICE_ID:
+			case Device_Id:
 				found.property_location += NUMBER_2BYTE;
 				/* no break */
-			case ADMIN_SALT:
+			case Admin_Salt:
 				found.property_location += NAMES_SIZE;
 				/* no break */
-			case ADMIN_PASSWORD:
+			case Admin_Password:
 				found.property_location += NAMES_SIZE;
 				/* no break */
-			case ADMIN_USER:
+			case Admin_User:
 				found.property_location += NAMES_SIZE;
 				/* no break */
-			case MQTT_PASS:
+			case Mqtt_Pass:
 				found.property_location += NAMES_SIZE;
 				/* no break */
-			case MQTT_USER:
+			case Mqtt_User:
 				found.property_location += NUMBER_2BYTE;
 				/* no break */
-			case MQTT_PORT:
+			case Mqtt_Port:
 				found.property_location += IP_SIZE;
 				/* no break */
-			case MQTT_IP:
+			case Mqtt_Ip:
 				found.property_location += NUMBER_1BYTE;
 				/* no break */
-			case NETWORK_ENCRYPTION:
+			case Network_Encryption:
 				found.property_location += NAMES_SIZE;
 				/* no break */
-			case NETWORK_PASS:
+			case Network_Pass:
 				found.property_location += NUMBER_1BYTE;
 				/* no break */
-			case NETWORK_TYPE:
+			case Network_Type:
 				found.property_location += ESSID_SIZE;
 				/* no break */
-			case NETWORK_ESSID:
+			case Network_Essid:
 				found.property_location += MAC_SIZE;
 				/* no break */
-			case NETWORK_MAC:
+			case Network_Mac:
 				found.property_location += IP_SIZE;
 				/* no break */
-			case NETWORK_IP:
+			case Network_Ip:
 				found.property_location += 0;
 				/* no break */
 		}
