@@ -28,7 +28,7 @@ Você pode clonar esse repositório e adicionar suas pastas ao diretório de bib
 
 O device é composto por atributos considerados por nós, importantes para sua identificação, um TATUInterpreter que serve para analisar a mensagem recebida e preparar o dispositivo para uma resposta apropriada e as informações necessárias para a conexão e o Callback utilizado para realizar as ações adequadas às requsições externas.
 
-```
+```cpp
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 
@@ -42,7 +42,8 @@ byte ip[4]    = { 192, 168, 0, 68};
 
 //Construção do device 
 TATUInterpreter interpreter;
-TATUDevice device(name, ip, pan_id, id, sample_rate, server_ip, MQTTPORT, SYS_VERSION, &interpreter, callback);
+TATUDevice device(name, ip, pan_id, id, sample_rate, server_ip, MQTTPORT,
+                  SYS_VERSION, &interpreter, callback);
 
 // Funçao do usuario para variaveis do TATU
 bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
@@ -99,7 +100,7 @@ O callback é a função chamada em resposta ao recebimento de uma mensagem, é 
 - response: Essé o parâmetro à ser utilizado pelo usuário para devolver à resposta em caso de uma requsição GET
 - value: Nessa variável estar o valor a ser usado para a realização da alteração pedida em uma requisição SET
 - type: é com essa variável que o a função determina o tipo de ação correspondente à requisição
-```
+```cpp
 bool Callback(uint32_t hash,char* response,char* value,uint8_t type) 
 
 ```
@@ -108,7 +109,7 @@ bool Callback(uint32_t hash,char* response,char* value,uint8_t type)
 É atravéz do switch(type) que a função executa ação correta.
 
 - TATU_GET: significa que houve uma requisição externa do valor de um atributo do dispositivo.
-```
+```cpp
   switch(type){  
     case TATU_GET:
       switch(hash){
@@ -120,7 +121,7 @@ bool Callback(uint32_t hash,char* response,char* value,uint8_t type)
       break;
 ```
 - TATU_SET: significa houve uma requisição externa de alteração do valor de um atributo do dispositivo.
-```
+```cpp
     case TATU_SET:
       switch(hash){
         case H_lamp:
@@ -133,7 +134,7 @@ bool Callback(uint32_t hash,char* response,char* value,uint8_t type)
 #### Switch(hash)
 
 É atravéz do switch(hash) que a função executa ação sobre o atributo correto.
-```
+```cpp
 bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
   
   switch(type){
@@ -158,12 +159,16 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
     case TATU_SET:
       switch(hash){
         case H_lamp:
-          if (valor[0] == 'D'){ligar(LAMP); lamp = true;}//Liga a lâmpada se o primeiro character do valor for 'L'
-          else if (valor[0] == 'L'){desligar(LAMP); lamp = false;}//Desiga a lâmpada se o primeiro character do valor                                                                   //  for 'D'
+          if (valor[0] == 'D'){ligar(LAMP); lamp = true;}
+          //Liga a lâmpada se o primeiro character do valor for 'L'
+          else if (valor[0] == 'L'){desligar(LAMP); lamp = false;}
+          //Desiga a lâmpada se o primeiro character do valor                                                                   //  for 'D'
           break;
         case H_valve:
-          if (valor[0] == 'D'){ligar(VALVE); valve = true;}//Abre a válvula se o primeiro character do valor for 'A'
-          else if (valor[0] == 'L'){desligar(VALVE); valve = false;}//Fecha a válvula se o primeiro character do valor                                                                     //for 'F'
+          if (valor[0] == 'D'){ligar(VALVE); valve = true;}
+          //Abre a válvula se o primeiro character do valor for 'A'
+          else if (valor[0] == 'L'){desligar(VALVE); valve = false;}
+          //Fecha a válvula se o primeiro character do valor                                                                    //for 'F'
           break;
           default:
             return false;
@@ -180,7 +185,7 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
 A melhor maneira de se fazer isso é definindo um constante para representar o atributo.
 Exemplo:
 
-```
+```cpp
 #define H_lamp 2090464143 // representa a string "lamp"
 
 bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
@@ -189,8 +194,10 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
     case TATU_GET:
       switch(hash){
         case H_lamp:
-          if(lamp) strcpy(response,"ON");//response tem valor "ON" se a lâmpada estiver ligada
-          else strcpy(response,"OFF");//response tem valor "OFF" se a lâmpada estiver desligada
+          if(lamp) strcpy(response,"ON");
+          //response tem valor "ON" se a lâmpada estiver ligada
+          else strcpy(response,"OFF");
+          //response tem valor "OFF" se a lâmpada estiver desligada
           break;
         default:
           return false;
@@ -219,7 +226,7 @@ No diretório **[TATUConfig]https://github.com/WiserUFBA/TATUDevice/tree/master/
 #### Retorno
 
 O retorno deve ser true se não houver erros na execução e false se tiver algum.
-```
+```cpp
   switch(type){  
     case TATU_GET:
       switch(hash){
