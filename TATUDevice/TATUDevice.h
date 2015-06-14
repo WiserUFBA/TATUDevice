@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <TATUInterpreter.h>
 #include "hash_list.h"
-
 typedef uint8_t byte;
 
 #ifndef MAX_SIZE_RESPONSE
@@ -15,10 +14,13 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     200
 #endif
 
-#define DEBUG
+#define DEBUG 1
 
-// Constantes do sistema
-#define PROGMEM __ATTR_PROGMEM__ 
+// System definitions
+#define PROGMEM             __ATTR_PROGMEM__
+#define putstring(x)        SerialPrint_PROGMEM(x)
+#define PRINT_DEBUG(MSG)    SerialPrint_PROGMEM(MSG)
+#define DEBUG_NL            Serial.write('\n')
 #define OUT_STR &output_message[aux]
 #define MAX_SIZE_IP     16
 #define MAX_SIZE_NAME   20
@@ -52,10 +54,18 @@ typedef struct
         //INFO
         bool (*info)(uint32_t, char*, char*, uint8_t);
         //VALUE
-        bool (*value)(uint32_t, uint16_t*, uint16_t*, uint8_t);
+        bool (*value)(uint32_t, uint16_t*, uint16_t, uint8_t);
         //STATE
         bool (*state)(uint32_t, bool*, bool, uint8_t);
 }Callback;
+
+//Essas funções tem como objetivo serem usadas como padrão, quando elas não são definidas pelo usuário
+//INFO
+bool info_default(uint32_t, char*, char*, uint8_t);
+//VALUE
+bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t);
+//STATE
+bool state_default(uint32_t, bool*, bool, uint8_t);
 
 /* Utilidades */
 int freeRAM();
@@ -99,6 +109,12 @@ public:
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
                 TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t));
+     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t));
+      TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t));
 
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,

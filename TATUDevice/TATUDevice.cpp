@@ -7,30 +7,31 @@
 
 /* DEBUG! */
 #ifdef DEBUG
-const char GENERATE_BODY[]      PROGMEM = "[DEBUG] Generating Body";
-const char CALLBACK_INFO[]      PROGMEM = "[DEBUG] INFO function is being executed";
-const char CALLBACK_VALUE[]     PROGMEM = "[DEBUG] VALUE function is being executed";
-const char CALLBACK_STATE[]     PROGMEM = "[DEBUG] STATE function is being executed";
-const char GET_PIN[]            PROGMEM = "[DEBUG] The value of the pin is: ";
-const char SET_PIN[]            PROGMEM = "[DEBUG] The value of the pin has been set";
-const char THE_INFO_RESPONSE[]  PROGMEM = "[DEBUG] The response for the GET INFO requisition is: ";
-const char THE_VALUE_RESPONSE[] PROGMEM = "[DEBUG] The response for the GET VALUE requisition is: ";
-const char THE_STATE_RESPONSE[] PROGMEM = "[DEBUG] The response for the GET STATE requisition is: ";
-const char BODY_GENERATED[]     PROGMEM = "[DEBUG] The body generation is done";
-const char IS_A_POST[]          PROGMEM = "[DEBUG] It's a post so it doesn't have to publish anything";
-const char PUBLISHING[]         PROGMEM = "[DEBUG] Publishing...";
-const char PUBLISHED[]          PROGMEM = "[DEBUG] The message has been published";
-const char NOT_A_GET[]          PROGMEM = "[DEBUG] It isn't a GET requisition";
-const char SYSTEM[]             PROGMEM = "[DEBUG] The system function isn't working yet";
-const char THE_RESPONSE[]       PROGMEM = "[DEBUG] The message is:";
-const char INITIATING 			PROGMEM = "[DEBUG] Initianting the class...";
-const char FINISHED_INIT 		PROGMEM = "[DEBUG] Finished init!";
-const char STARTING_GENERATE	PROGMEM = "[DEBUG] Starting generate HEADER...";
-const char ENDING_GENERATE 		PROGMEM = "[DEBUG] Finished generate HEADER!";
-const char HEADER_STR 			PROGMEM = "[DEBUG] HEADER Value : ";
-const char CLASS_CONSTRUCTED 	PROGMEM = "[DEBUG] Class constructed with success!";
-const char EXEC_ERROR			PROGMEM = "[DEBUG] Execution Error!";
-const char EXEC_ERROR_TYPE_VAR	PROGMEM = "[DEBUG] Unknown variable type!";
+const char GENERATE_BODY[]          PROGMEM = "[DEBUG] Generating Body";
+const char CALLBACK_INFO[]          PROGMEM = "[DEBUG] INFO function is being executed";
+const char CALLBACK_VALUE[]         PROGMEM = "[DEBUG] VALUE function is being executed";
+const char CALLBACK_STATE[]         PROGMEM = "[DEBUG] STATE function is being executed";
+const char GET_PIN[]                PROGMEM = "[DEBUG] The value of the pin is: ";
+const char SET_PIN[]                PROGMEM = "[DEBUG] The value of the pin has been set";
+const char THE_INFO_RESPONSE[]      PROGMEM = "[DEBUG] The response for the GET INFO requisition is: ";
+const char THE_VALUE_RESPONSE[]     PROGMEM = "[DEBUG] The response for the GET VALUE requisition is: ";
+const char THE_STATE_RESPONSE[]     PROGMEM = "[DEBUG] The response for the GET STATE requisition is: ";
+const char BODY_GENERATED[]         PROGMEM = "[DEBUG] The body generation is done";
+const char IS_A_POST[]              PROGMEM = "[DEBUG] It's a post so it doesn't have to publish anything";
+const char PUBLISHING[]             PROGMEM = "[DEBUG] Publishing...";
+const char PUBLISHED[]              PROGMEM = "[DEBUG] The message has been published";
+const char NOT_A_GET[]              PROGMEM = "[DEBUG] It isn't a GET requisition";
+const char SYSTEM[]                 PROGMEM = "[DEBUG] The system function isn't working yet";
+const char THE_RESPONSE[]           PROGMEM = "[DEBUG] The message is:";
+const char INITIATING[] 		    PROGMEM = "[DEBUG] Initianting the class...";
+const char FINISHED_INIT[] 		    PROGMEM = "[DEBUG] Finished init!";
+const char STARTING_GENERATE[]	    PROGMEM = "[DEBUG] Starting generate HEADER...";
+const char ENDING_GENERATE[] 	    PROGMEM = "[DEBUG] Finished generate HEADER!";
+const char HEADER_STR[] 		    PROGMEM = "[DEBUG] HEADER Value : ";
+const char CLASS_CONSTRUCTED[] 	    PROGMEM = "[DEBUG] Class constructed with success!";
+const char EXEC_ERROR[]			    PROGMEM = "[DEBUG] Execution Error!";
+const char EXEC_ERROR_TYPE_VAR[]	PROGMEM = "[DEBUG] Unknown variable type!";
+
 #endif
 
 // Constantes
@@ -61,6 +62,18 @@ void ipToString(byte *ip, char *str){
     for(i = 0, j = 0; i < 4; i++){ itoa(ip[i], &str[j], 10); j += strlen(&str[j]); str[j++]= '.'; }
     str[j-1] = 0;
 }
+//INFO
+bool info_default(uint32_t, char*, char*, uint8_t){
+    return false;
+}
+//VALUE
+bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t){
+    return false;
+}
+//STATE
+bool state_default(uint32_t, bool*, bool, uint8_t){
+    return false;
+} 
 
 /* Construct the TATUDevice Class passing the object Callback */
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,    const int pan_d,
@@ -80,12 +93,44 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
     TATUCallback.info = callback_con;
+    TATUCallback.value = value_default;
+    TATUCallback.state = state_default;
+
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 
     #ifdef DEBUG
     PRINT_DEBUG(CLASS_CONSTRUCTED);
     DEBUG_NL;
 	#endif
+}
+
+TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
+                        const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
+                        TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t)){
+    TATUCallback.info = info_default;
+    TATUCallback.value = callback_con;
+    TATUCallback.state = state_default;
+
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
+
+    #ifdef DEBUG
+    PRINT_DEBUG(CLASS_CONSTRUCTED);
+    DEBUG_NL;
+    #endif
+}
+TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
+                        const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
+                        TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t)){
+    TATUCallback.info = info_default;
+    TATUCallback.value = value_default;
+    TATUCallback.state = callback_con;
+
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
+
+    #ifdef DEBUG
+    PRINT_DEBUG(CLASS_CONSTRUCTED);
+    DEBUG_NL;
+    #endif
 }
 
 /* Initialize the class */
@@ -184,7 +229,7 @@ void TATUDevice::generateHeader(){
 	#ifdef DEBUG
     PRINT_DEBUG(HEADER_STR);
     Serial.println(output_message);
-    PRINT_DEBUG(FINISHED_GENERATE);
+    PRINT_DEBUG(ENDING_GENERATE);
     DEBUG_NL;
 	#endif
 }
@@ -231,7 +276,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     #endif
                     value_int = atoi(&payload[strlen(payload)+1]);
                     requisition->cmd.OBJ.ERROR = TATUCallback.value(requisition->str_hash,&response_int,
-                                                                    &value_int,requisition->cmd.OBJ.TYPE);
+                                                                    value_int,requisition->cmd.OBJ.TYPE);
                     break;
                 case TATU_CODE_STATE:
                     #ifdef DEBUG
@@ -322,6 +367,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         case TATU_CODE_STATE:
             if (response_bool)  response[0] = 'T';
             else response[0] = 'F';
+            strcpy(OUT_STR, response);
             aux++;
             #ifdef DEBUG
             PRINT_DEBUG(THE_RESPONSE);
