@@ -5,9 +5,13 @@ Biblioteca para a implementação do sistema operacional dos dispositvos TATU
 A biblioteca TATUDevice tem como o objetivo a implementação do sitema operacional TOS(Thing Operating System), sistema operacional criado, para facilitar e padroniza o desenvolvimento de dispositvos IoT da plataforma TATU.A Plataforma TATU ultiliza o protocolo TPI(Thing Protocol for Internet), uma extensão do protocolo [MQTT](http://mqtt.org/faq) para comunicação entre dispositvos e foi desenvolvida pela equipe de hardware do projeto [SmartUFBA](http://wiki.dcc.ufba.br/SmartUFBA). 
 
 ###Quais as funcionalidades desse Sistema Operacional?
-O TATUDevice permite uma ágil implementação de um dispositvo que use o protocolo TPI, além de providenciar uma interface para gereneciamento das configurações do dispositivo , como atributos que o caracterizem(e.g nome,id e ip do dispositivo) e para gerenciamento da comunicação do controlador com seus elementos(e.g sensores e atuadores).
+
+O TATUDevice permite uma ágil implementação de um dispositvo que use o protocolo TPI, além de providenciar uma 
+
+interface para gereneciamento das configurações do dispositivo , como atributos que o caracterizem(e.g nome,id e ip do dispositivo) e para gerenciamento da comunicação do controlador com seus elementos(e.g sensores e atuadores).
 
 ###Como o TATU integra os elementos de um sistema IoT?
+
 Através de um [Driver](https://github.com/WiserUFBA/DriverMQTT/blob/master/README.md) desenvolvido pelo projeto que trata as mensagens enviadas pelos e intermedia a comunicação desses dispositvos com possíveis serviços que se utilizem de suas funcionalidades,
 
 ##TATUDevice
@@ -180,7 +184,7 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
 }
 ```
 #### Hash
-  Hash como já dito é, um inteiro usado pelo device que representa o atributo relacionado à requisição. Como pode ser observado na definição do **[TPI]https://github.com/WiserUFBA/TATU/blob/master/doc/tpi.txt** as requisições são do formato "GET <propriedade> <var>" em caso de requisições GET e "SET <propriedade> <var> <valor>". O hash representa o elemento <var>, ele é conseguido através da aplicação de um algoritmo que converte-o para um hash djb.
+  Hash como já dito é, um inteiro usado pelo device que representa o atributo relacionado à requisição. Como pode ser observado na definição do [TPI](https://github.com/WiserUFBA/TATU/blob/master/doc/tpi.txt) as requisições são do formato **"GET \<propriedade> \<var>"** em caso de requisições GET e **"SET \<propriedade> \<var> \<valor>"**. O hash representa o elemento \<var>, ele é conseguido através da aplicação de um algoritmo que converte-o para um hash djb.
   
 A melhor maneira de se fazer isso é definindo um constante para representar o atributo.
 Exemplo:
@@ -221,7 +225,7 @@ bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
 ```
 Assim sendo o a mensagem "SET INFO lamp D", desligará a luz.
 
-No diretório **[TATUConfig]https://github.com/WiserUFBA/TATUDevice/tree/master/TATUConfig** existe um programa escrito em C que gera define's dos hash's djb das strings informadas, e um arquivo .h que recomendamos usar para trabalhos que envolvem um considerável número de hash's. 
+No diretório [TATUConfig](https://github.com/WiserUFBA/TATUDevice/tree/master/TATUConfig) existe um programa escrito em C que gera define's dos hash's djb das strings informadas, e um arquivo .h que recomendamos usar para trabalhos que envolvem um considerável número de hash's. 
 
 #### Retorno
 
