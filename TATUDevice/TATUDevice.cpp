@@ -382,12 +382,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             #endif
             break;
         case TATU_CODE_STATE:
-            QUOTE;
-            if (response_bool)  response[0] = 'T';
-            else response[0] = 'F';
+            if (response_bool)  strcpy(response, true_str);
+            else strcpy(response, false_str);
             strcpy(OUT_STR, response);
-            aux++;
-            QUOTE;
+            aux+=strlen(response);
             #ifdef DEBUG
             PRINT_DEBUG(RESPONSE_TYPE_STATE);
             DEBUG_NL;
