@@ -52,32 +52,33 @@ const char false_str[]  PROGMEM = "false";
 const char pin_st[]     PROGMEM = "PIN";
 
 /* Utilidades */
-
+/* Get the actual free ram */
 int freeRAM(){
     extern int __heap_start, *__brkval;
     int v;
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int)__brkval);
 }
-
+/* Convert a 4 bytes array to a string */
 void ipToString(byte *ip, char *str){
     int i, j;
     for(i = 0, j = 0; i < 4; i++){ itoa(ip[i], &str[j], 10); j += strlen(&str[j]); str[j++]= '.'; }
     str[j-1] = 0;
 }
-//INFO
+
+// INFO
 bool info_default(uint32_t, char*, char*, uint8_t){
     return false;
 }
-//VALUE
+// VALUE
 bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t){
     return false;
 }
-//STATE
+// STATE
 bool state_default(uint32_t, bool*, bool, uint8_t){
     return false;
 } 
 
-/* Construct the TATUDevice Class passing the object Callback */
+/* Construct the TATUDevice Class passing the object callback */
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
                         TATUInterpreter *req,Callback callback_struct){
@@ -90,7 +91,7 @@ TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,    const
 	#endif
 }
 
-/* Construct the TATUDevice Class with only a callback */
+/* Construct the TATUDevice Class with only the info callback*/
 TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
@@ -103,6 +104,7 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
 	#endif
 }
 
+/* Construct the TATUDevice Class with only the value callback*/
 TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t)){
@@ -115,6 +117,8 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
     DEBUG_NL;
     #endif
 }
+
+/* Construct the TATUDevice Class with only the state callback*/
 TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t)){
@@ -153,11 +157,11 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     os_version = (uint8_t) os_v;
     requisition = req;
     
-    //
+    /* Set the default callback if the param callback isn't null */
     if (!TATUCallback.info) TATUCallback.info = info_default;
     if (!TATUCallback.value) TATUCallback.value = value_default;
     if (!TATUCallback.state) TATUCallback.state = state_default;
-    //callback = callback_con;
+
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
 
@@ -242,21 +246,21 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     #endif
     
     int aux = last_char;
-    bool isString;
+    bool isString,
+    	 response_bool = false,
+    	 value_bool = false;
     char response[MAX_SIZE_RESPONSE] = {0};
     uint16_t response_int = 0,
     		 value_int = 0;
-    bool response_bool = false,
-    	 value_bool = false;
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
     // DEPRECATED //
     /* if(requisition->cmd.OBJ.TYPE == TATU_POST) return; */
 
-    /*  */
+    /* Check the variable type */
     switch(requisition->cmd.OBJ.VAR){
-        // Função do usuario
+        /* If the desired variable is of type ALIAS, call the user's function */
         case TATU_TYPE_ALIAS:
             //Baseado no código da resposta, decide qual função do usuário deve ser usada
             switch(requisition->cmd.OBJ.CODE){
@@ -288,7 +292,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     break;
             }
             break;
-        // Funções do sistema
+		/* GPIO Modifier */
         case TATU_TYPE_PIN:
             //MODIFICAR!!!
             switch(requisition->cmd.OBJ.TYPE){
@@ -309,6 +313,27 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     break;
             }
             break;
+            /* ADC Modifier */
+			case TATU_TYPE_ANALOG:
+				switch(requisition->cmd.OBJ.TYPE){
+					case TATU_GET:
+						itoa(analogRead(requisition->cmd.OBJ.PIN), response, 10);
+						#ifdef DEBUG
+						PRINT_DEBUG(GET_PIN);
+						Serial.println(response);
+						#endif
+						break;
+					case TATU_SET:
+						analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
+						requisition->cmd.OBJ.ERROR = false;
+						#ifdef DEBUG
+						PRINT_DEBUG(SET_PIN);
+						DEBUG_NL;
+						#endif
+						break;
+				}
+				break;
+		/* System functions */
         case TATU_TYPE_SYSTEM:
             #ifdef DEBUG
             PRINT_DEBUG(SYSTEM);
@@ -403,6 +428,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     #endif
 }
 
+/* Function to abstract some low-level publishing action */
 void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, void (*publish)(char *, char *)){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);

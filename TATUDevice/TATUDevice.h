@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <TATUInterpreter.h>
 #include "hash_list.h"
+
 typedef uint8_t byte;
 
 #ifndef MAX_SIZE_RESPONSE
@@ -14,7 +15,7 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     200
 #endif
 
-#define DEBUG 1
+#define DEBUG
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
@@ -105,25 +106,22 @@ public:
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
                 TATUInterpreter *req,Callback callback_struct);
-
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
                 TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t));
-     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t));
-      TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t));
+	TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+				const int sample_d, byte *ip_m, const int port_m, const int os_v,
+				TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t));
+	TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+				const int sample_d, byte *ip_m, const int port_m, const int os_v,
+				TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t));
 
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req); 
-    
 
     void generateHeader();
     void generateBody(char *payload, uint8_t length);
-
 };
 
 #endif
