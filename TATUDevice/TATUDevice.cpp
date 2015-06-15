@@ -256,7 +256,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
     // DEPRECATED //
-    /* if(requisition->cmd.OBJ.TYPE == TATU_POST) return; */
+    if(requisition->cmd.OBJ.TYPE == TATU_POST){ strcpy_P(OUT_STR, false_body); return; }
 
     /* Check the variable type */
     switch(requisition->cmd.OBJ.VAR){
