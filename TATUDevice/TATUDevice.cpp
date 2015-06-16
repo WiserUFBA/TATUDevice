@@ -85,11 +85,6 @@ TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,    const
                         TATUInterpreter *req,Callback callback_struct){
 	TATUCallback = callback_struct;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-
-    #ifdef DEBUG
-    PRINT_DEBUG(CLASS_CONSTRUCTED);
-    DEBUG_NL;
-	#endif
 }
 
 /* Construct the TATUDevice Class with only the info callback*/
@@ -98,11 +93,6 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
     TATUCallback.info = callback_con;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-
-    #ifdef DEBUG
-    PRINT_DEBUG(CLASS_CONSTRUCTED);
-    DEBUG_NL;
-	#endif
 }
 
 /* Construct the TATUDevice Class with only the value callback*/
@@ -110,13 +100,7 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t)){
     TATUCallback.value = callback_con;
-
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-
-    #ifdef DEBUG
-    PRINT_DEBUG(CLASS_CONSTRUCTED);
-    DEBUG_NL;
-    #endif
 }
 
 /* Construct the TATUDevice Class with only the state callback*/
@@ -124,13 +108,7 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t)){
     TATUCallback.state = callback_con;
-
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-
-    #ifdef DEBUG
-    PRINT_DEBUG(CLASS_CONSTRUCTED);
-    DEBUG_NL;
-    #endif
 }
 
 /* Initialize the class */
