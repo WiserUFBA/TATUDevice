@@ -31,7 +31,7 @@ const char HEADER_STR[] 		    PROGMEM = "[DEBUG] HEADER Value : ";
 const char CLASS_CONSTRUCTED[] 	    PROGMEM = "[DEBUG] Class constructed with success!";
 const char EXEC_ERROR[]			    PROGMEM = "[DEBUG] Execution Error!";
 const char EXEC_ERROR_TYPE_VAR[]	PROGMEM = "[DEBUG] Unknown variable type!";
-const char 
+const char PARAM_ERROR[]            PROGMEM = "[DEBUG] Param Error!";
 const char RESPONSE_TYPE_INFO[]     PROGMEM = "[DEBUG] The response type is INFO";
 const char RESPONSE_TYPE_VALUE[]    PROGMEM = "[DEBUG] The response type is VALUE";
 const char RESPONSE_TYPE_STATE[]    PROGMEM = "[DEBUG] The response type is STATE";
@@ -160,7 +160,6 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
-
 }
 
 /* Generate the header post */
