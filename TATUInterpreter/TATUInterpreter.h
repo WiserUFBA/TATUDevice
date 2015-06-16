@@ -5,7 +5,7 @@
 #include <avr/pgmspace.h>
 
 // Uncomment the follow line to show debug
-#define DEBUG 1
+//#define DEBUG 1
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__

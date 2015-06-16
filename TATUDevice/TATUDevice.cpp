@@ -153,11 +153,6 @@ void TATUDevice::generateHeader(){
     int aux;
     char aux_str[10];
 
-	#ifdef DEBUG
-	PRINT_DEBUG(STARTING_GENERATE);
-	DEBUG_NL;
-	#endif
-
     // Primeiro se coloca a seguinte string padrão no vetor
     strcpy_P(output_message, start_post);
     strcpy(&output_message[5], name);
@@ -205,13 +200,6 @@ void TATUDevice::generateHeader(){
     CLOSE_MSG;
 
     last_char = aux;
-
-	#ifdef DEBUG
-    PRINT_DEBUG(HEADER_STR);
-    Serial.println(output_message);
-    PRINT_DEBUG(ENDING_GENERATE);
-    DEBUG_NL;
-	#endif
 }
 
 /* Parse and generate the body for the POST message */
@@ -311,10 +299,6 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                                 response_bool = analogRead(requisition->cmd.OBJ.PIN);
                                 break;
                         }
-						#ifdef DEBUG
-						PRINT_DEBUG(GET_PIN);
-						DEBUG_NL;
-						#endif
 						break;
 					case TATU_SET:
 						analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
@@ -399,8 +383,8 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             #endif
             break;
         case TATU_CODE_STATE:
-            if (response_bool)  strcpy(response, true_str);
-            else strcpy(response, false_str);
+            if (response_bool)  strcpy_P(response, true_str);
+            else strcpy_P(response, false_str);
             strcpy(OUT_STR, response);
             aux+=strlen(response);
             #ifdef DEBUG
