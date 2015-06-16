@@ -22,7 +22,7 @@ const char PUBLISHING[]             PROGMEM = "[DEBUG] Publishing...";
 const char PUBLISHED[]              PROGMEM = "[DEBUG] The message has been published";
 const char NOT_A_GET[]              PROGMEM = "[DEBUG] It isn't a GET requisition";
 const char SYSTEM[]                 PROGMEM = "[DEBUG] The system function isn't working yet";
-const char THE_RESPONSE[]           PROGMEM = "[DEBUG] The message is: ";
+const char THE_RESPONSE[]           PROGMEM = "[DEBUG] The value of the response is: ";
 const char INITIATING[] 		    PROGMEM = "[DEBUG] Initianting the class...";
 const char FINISHED_INIT[] 		    PROGMEM = "[DEBUG] Finished init!";
 const char STARTING_GENERATE[]	    PROGMEM = "[DEBUG] Starting generate HEADER...";
@@ -108,6 +108,13 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t)){
     TATUCallback.state = callback_con;
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
+}
+
+/* Construct the TATUDevice Class without define a callback*/
+TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
+                        const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
+                        TATUInterpreter *req){
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
@@ -375,7 +382,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     QUOTE; strcpy(OUT_STR, payload); aux += strlen(payload); QUOTE; COLON;
 
     /* Verifica o tipo de resposta esperada, e responde adequadamente*/
-    switch( (requisition->cmd.OBJ.CODE) && (requisition->cmd.OBJ.VAR == TATU_TYPE_ALIAS) ){
+    switch(requisition->cmd.OBJ.CODE) {
         case TATU_CODE_INFO:
             QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE;
             #ifdef DEBUG
