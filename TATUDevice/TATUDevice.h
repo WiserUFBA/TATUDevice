@@ -21,9 +21,9 @@ typedef uint8_t byte;
 #define putstring(x)        SerialPrint_PROGMEM(x)
 #define PRINT_DEBUG(MSG)    SerialPrint_PROGMEM(MSG)
 #define DEBUG_NL            Serial.write('\n')
-#define OUT_STR &output_message[aux]
-#define MAX_SIZE_IP     16
-#define MAX_SIZE_NAME   20
+#define OUT_STR             &output_message[aux]
+#define MAX_SIZE_IP         16
+#define MAX_SIZE_NAME       20
 
 // Constantes da mensagem
 #define COMMA       output_message[aux++]=','
@@ -114,6 +114,9 @@ public:
 	TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
 				const int sample_d, byte *ip_m, const int port_m, const int os_v,
 				TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t));
+    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req);
 
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
