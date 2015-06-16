@@ -285,11 +285,6 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                             response_bool = digitalRead(requisition->cmd.OBJ.PIN);
                             break;
                     }
-                    #ifdef DEBUG
-                    PRINT_DEBUG(GET_PIN);
-                    DEBUG_NL;
-                    #endif
-                    break;
                 case TATU_SET:
                     digitalWrite(requisition->cmd.OBJ.PIN,requisition->cmd.OBJ.STATE);
                     requisition->cmd.OBJ.ERROR = false;
