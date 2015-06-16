@@ -15,7 +15,7 @@
 
 // Propriedades do sistema
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 0, 102 };
+byte server[] = { 192, 168, 25, 20 };
 byte ip[4]    = { 0 }; // Vetor nulo para que nao ocoram erros
 
 // Propriedades de rede
@@ -24,34 +24,41 @@ char ap_password[] = "";
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 
-// Funçao do usuario para variaveis do TATU
+// Funçao INFO do usuario, para ser usada quando se quer trabalhar com strings  
 bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
-  // Faça as comparações aqui
+    
+  /*As comparações com o type são feitas para determinar que tipo de ação se espera 
+  TATU_SET serve para alterções no dispositivo TATU_GET para retorna informações requisitadas*/
   
-  //As comparações com o type são feitas para determinar que tipo de ação se espera 
-  //TATU_SET serve para alterções no dispositivo TATU_GET para retorna informações requisitadas
+  /* As comparações realizadas com um hash DJB são feitas para se determinar
+  qual o atributo do dispositivo será usado e pode receber quantas 
+  clausulas você quiser 
+  o padrão deve ser return true mas deve ser substituido por uma resposta false se nao for possivel executar a requisicao*/
   
-  // As comparações realizadas com um hash DJB são feitas para se determinar
-  // qual o atributo do dispositivo será usado e pode receber quantas 
-  // clausulas você quiser 
-  // o padrão deve ser return true mas pode ser substiuido por uma resposta true ou false
-  
-  
-  switch(type){  
+  switch(type){
+    //Retorna o valor de um atributo  
     case TATU_GET:
       switch(hash){
-          break;  
+          default:
+            return false;  
       }
       break;
+    //Altera o valor de um atributo
     case TATU_SET:
       switch(hash){
-          break;  
+          default:
+            return false;  
       } 
-      //Serial.println(valor);
       break;
   } 
   return true;
 }
+
+/* Tambem podem ser usados essas duas formas de callback, alem do uso de uma estrutura que e demonstrada no exemplo structTATUReleDevice
+Funçao VALUE do usuario, para ser usada quando se quer trabalhar com inteiros
+bool callback(uint32_t hash,uint16_t* response,uint16_t valor,uint8_t type);
+Funçao STATE do usuario, para ser usada quando se quer trabalhar com booleanos
+bool callback(uint32_t hash,bool* response,bool valor,uint8_t type);*/
 
 // Objetos para exemplo usando interface wifi CC3000
 TATUInterpreter interpreter;
@@ -70,13 +77,17 @@ void setup() {
   if ( !wifi.init() || !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) while(true);
   Serial.println("Done");
 
-  //DEVICECONNECT(client,device);
-  if(client.connect("nome")){
+  Serial.println("Tentando se conectar ao broker");
+  if(client.connect(device.name)){
+    Serial.println("Conectou ao broker");
     client.subscribe(device.name);
   }
   else Serial.println("Nao conectou");
+  
+  //Passa o ip conseguido para o device
   wifi.getConnectionInfo(connection_info);
   ipToString(connection_info.ip_address, aux);
+  device.generateHeader();
   strcpy(device.ip, aux);
 }
 void loop() { client.loop(); }

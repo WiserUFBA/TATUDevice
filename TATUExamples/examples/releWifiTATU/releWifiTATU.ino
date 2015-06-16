@@ -7,12 +7,20 @@
 #include <TATUInterpreter.h>
 #include <string.h>
 
-#define LAMP 6
-#define VALVE 5
+// Definiçao dos hashs
+#define H_lamp 2090464143
+#define H_valve 277698403
+
+// Definiçoes de constantes importantes
+#define LAMP 9
+#define VALVE 6
 #define MQTTPORT 1883
 
-#define ligar(PIN) digitalWrite(PIN,true)
-#define desligar(PIN) digitalWrite(PIN,false)
+// Macro para os atuadores
+#define turn_on(PIN) digitalWrite(PIN,true)
+#define turn_off(PIN) digitalWrite(PIN,false)
+#define open_valve(PIN) digitalWrite(PIN,true)
+#define close_valve(PIN) digitalWrite(PIN,false)
 
 #define TIMEOUT_CC3000 30000 // Tempo máximo CC3000 em ms
 #define CC3000_INT      2    // Needs to be an interrupt pin (D2/D3)
@@ -20,7 +28,7 @@
 #define CC3000_CS       10   // Pino de seleção, preferivel o pino 10 no UNO
 #define IP_ADDR_LEN     4    // Tamanho do IP em bytes
 
-//variveis
+// Variveis
 bool lamp = 0,valve = 0;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
 byte server[] = { 192, 168, 0, 102 };
@@ -30,43 +38,47 @@ char ap_ssid[] = "";
 char ap_password[] = "";
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
+
 // Funçao do usuario para variaveis do TATU
-bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
+// Funçao STATE do usuario, para ser usada quando se quer trabalhar com booleanos
+bool callback(uint32_t hash,bool* response,bool valor,uint8_t type){
   
-  //strcpy(response, "")
-  
-  Serial.print("Hash :");
+  Serial.print("Hash: ");
   Serial.println(hash);
   
   switch(type){  
     case TATU_GET:
       switch(hash){
-        case H_lamp:
-          if(lamp) strcpy(response,"ON");
-          else strcpy(response,"OFF");
-          break;
-        case H_valve:
-          if(valve) strcpy(response,"OPEN");
-          else strcpy(response,"CLOSE");
-          break;  
+          //Devolve uma resposta booleana dizendo se a lampada esta ligada ou nao
+          case H_lamp:
+            *response = lamp;
+            break;
+          //Devolve uma resposta booleana dizendo se a valvula esta aberta ou nao
+          case H_valve:
+            *response = valve;
+            break;
+          default:
+            return false;  
       }
       break;
     case TATU_SET:
       switch(hash){
-        case H_lamp:
-          if (valor[0] == '1'){ligar(LAMP);Serial.println("ON"); lamp = true;}
-          else {desligar(LAMP);Serial.println("OFF"); lamp = false;}
-          break;
-        case H_valve:
-          if (valor[0] == '1'){ligar(VALVE);Serial.println("OPEN"); valve = true;}
-          else {desligar(VALVE);Serial.println("CLOSE"); valve = false;}
-          break;  
-      } 
-      //Serial.println(valor);
-      break;
-  } 
+          //liga ou desliga uma lampada baseado no valor booleano de uma requisiçao(true para ligar e false para desligar)
+          case H_lamp:
+            if (valor){turn_on(LAMP);Serial.println("ON"); valve = true;}
+            else {turn_off(LAMP);Serial.println("OFF"); valve = false;}
+            break;
+          //abre ou fecha uma lampada baseado no valor booleano de uma requisiçao(true para abrir e false para fechar)
+          case H_valve:
+            if (valor){close_valve(VALVE);Serial.println("OPEN"); valve = true;}
+            else {open_valve(VALVE);Serial.println("CLOSE"); valve = false;}
+            break;
+          default:
+            return false;  
+      }
+      break; 
+  }
   return true;
-
 }
 
 // Objetos para exemplo usando interface internet
@@ -89,19 +101,19 @@ void setup() {
   else Serial.println("wifi conectado");
   Serial.println("Done");
   
-  //DEVICECONNECT(client,device);
   Serial.println("Tentando se conectar ao broker");
   if(client.connect(device.name)){
     Serial.println("Conectou ao broker");
     client.subscribe(device.name);
   }
   else Serial.println("Nao conectou ao broker");
-  //wifi.getConnectionInfo(connection_info);
-  //ipToString(connection_info.ip_address, aux);
-  //Mdevice.generateHeader();
-  //strcpy(device.ip, aux);
   
-  //lamp = digitalRead(RELE);
+  //Passa o ip conseguido para o device
+  wifi.getConnectionInfo(connection_info);
+  ipToString(connection_info.ip_address, aux);
+  device.generateHeader();
+  strcpy(device.ip, aux);
+  
 }
 void loop() { client.loop(); 
   

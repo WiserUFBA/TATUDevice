@@ -18,10 +18,10 @@
 #define MQTTPORT 1883
 
 // Macro para os atuadores
-#define turn_on(PIN) digitalWrite(PIN,true);
-#define turn_off(PIN) digitalWrite(PIN,false);
-#define open_valve(PIN) digitalWrite(PIN,true);
-#define close_valve(PIN) digitalWrite(PIN,false);
+#define turn_on(PIN) digitalWrite(PIN,true)
+#define turn_off(PIN) digitalWrite(PIN,false)
+#define open_valve(PIN) digitalWrite(PIN,true)
+#define close_valve(PIN) digitalWrite(PIN,false)
 
 // Internet
 #define TIMEOUT_CC3000 30000 // Tempo máximo CC3000 em ms
@@ -31,8 +31,8 @@
 #define IP_ADDR_LEN     4    // Tamanho do IP em bytes
 
 // Variaveis de conexao
-char ap_ssid[] = "PiratasDoValeDoCanela";               
-char ap_password[] = "naovaqueebarril";
+char ap_ssid[] = "";               
+char ap_password[] = "";
 
 // Objetos para conexao wifi
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
