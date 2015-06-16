@@ -140,11 +140,6 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     int i;
     char aux[20];
 
-	#ifdef DEBUG
-    PRINT_DEBUG(INITIATING);
-    DEBUG_NL;
-	#endif
-
     // Define os atributos básicos
     STRCPY(name_d, name);
     ipToString(ip_d, aux);
@@ -166,10 +161,6 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
 
-	#ifdef DEBUG
-    PRINT_DEBUG(FINISHED_INIT);
-	DEBUG_NL;
-    #endif
 }
 
 /* Generate the header post */
