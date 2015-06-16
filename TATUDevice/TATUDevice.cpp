@@ -22,7 +22,7 @@ const char PUBLISHING[]             PROGMEM = "[DEBUG] Publishing...";
 const char PUBLISHED[]              PROGMEM = "[DEBUG] The message has been published";
 const char NOT_A_GET[]              PROGMEM = "[DEBUG] It isn't a GET requisition";
 const char SYSTEM[]                 PROGMEM = "[DEBUG] The system function isn't working yet";
-const char THE_RESPONSE[]           PROGMEM = "[DEBUG] The message is:";
+const char THE_RESPONSE[]           PROGMEM = "[DEBUG] The message is: ";
 const char INITIATING[] 		    PROGMEM = "[DEBUG] Initianting the class...";
 const char FINISHED_INIT[] 		    PROGMEM = "[DEBUG] Finished init!";
 const char STARTING_GENERATE[]	    PROGMEM = "[DEBUG] Starting generate HEADER...";
@@ -31,6 +31,7 @@ const char HEADER_STR[] 		    PROGMEM = "[DEBUG] HEADER Value : ";
 const char CLASS_CONSTRUCTED[] 	    PROGMEM = "[DEBUG] Class constructed with success!";
 const char EXEC_ERROR[]			    PROGMEM = "[DEBUG] Execution Error!";
 const char EXEC_ERROR_TYPE_VAR[]	PROGMEM = "[DEBUG] Unknown variable type!";
+const char 
 const char RESPONSE_TYPE_INFO[]     PROGMEM = "[DEBUG] The response type is INFO";
 const char RESPONSE_TYPE_VALUE[]    PROGMEM = "[DEBUG] The response type is VALUE";
 const char RESPONSE_TYPE_STATE[]    PROGMEM = "[DEBUG] The response type is STATE";
@@ -297,10 +298,21 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             //MODIFICAR!!!
             switch(requisition->cmd.OBJ.TYPE){
                 case TATU_GET:
-                    itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
+                    //Baseado no código da resposta, decide como a resposta deve ser dada
+                    switch(requisition->cmd.OBJ.CODE){
+                        case TATU_CODE_INFO:
+                            itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
+                            break;
+                        case TATU_CODE_VALUE:
+                            response_int = digitalRead(requisition->cmd.OBJ.PIN);
+                            break;
+                        case TATU_CODE_STATE:
+                            response_bool = digitalRead(requisition->cmd.OBJ.PIN);
+                            break;
+                    }
                     #ifdef DEBUG
                     PRINT_DEBUG(GET_PIN);
-                    Serial.println(response);
+                    DEBUG_NL;
                     #endif
                     break;
                 case TATU_SET:
@@ -317,10 +329,21 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 			case TATU_TYPE_ANALOG:
 				switch(requisition->cmd.OBJ.TYPE){
 					case TATU_GET:
-						itoa(analogRead(requisition->cmd.OBJ.PIN), response, 10);
+                        //Baseado no código da resposta, decide como a resposta deve ser dada
+                        switch(requisition->cmd.OBJ.CODE){
+                            case TATU_CODE_INFO:
+                                itoa(analogRead(requisition->cmd.OBJ.PIN), response, 10);
+                                break;
+                            case TATU_CODE_VALUE:
+                                value_int = analogRead(requisition->cmd.OBJ.PIN);
+                                break;
+                            case TATU_CODE_STATE:
+                                response_bool = analogRead(requisition->cmd.OBJ.PIN);
+                                break;
+                        }
 						#ifdef DEBUG
 						PRINT_DEBUG(GET_PIN);
-						Serial.println(response);
+						DEBUG_NL;
 						#endif
 						break;
 					case TATU_SET:
@@ -342,6 +365,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             /** MODIFICA PROPRIEDADE **/
             // ISTO AINDA NÃO FOI IMPLEMENTADO
             strcpy_P(OUT_STR, false_body);
+            return;
             break;
         default:
 			#ifdef DEBUG
@@ -357,9 +381,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     // Se encontrado qualquer tipo de erro
     if(requisition->cmd.OBJ.ERROR){ 
         #ifdef DEBUG
-        PRINT_DEBUG(EXEC_ERROR);
-        DEBUG_NL;
-        PRINT_DEBUG(EXEC_ERROR_TYPE_VAR);
+        PRINT_DEBUG(PARAM_ERROR);
         DEBUG_NL;
         #endif
         strcpy_P(OUT_STR, false_body);
@@ -385,7 +407,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     QUOTE; strcpy(OUT_STR, payload); aux += strlen(payload); QUOTE; COLON;
 
     /* Verifica o tipo de resposta esperada, e responde adequadamente*/
-    switch(requisition->cmd.OBJ.CODE){
+    switch( (requisition->cmd.OBJ.CODE) && (requisition->cmd.OBJ.VAR == TATU_TYPE_ALIAS) ){
         case TATU_CODE_INFO:
             QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE;
             #ifdef DEBUG
