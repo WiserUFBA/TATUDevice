@@ -26,6 +26,7 @@ const char START_CODING[]       PROGMEM = "[DEBUG] Starting coding";
 const char HASH_GENERATED[]     PROGMEM = "[DEBUG] Hash generated: ";
 const char COMMAND_RECEIVED[]   PROGMEM = "[DEBUG] Command received: ";
 const char REQUISITION_ERROR[]  PROGMEM = "[DEBUG] Requisition ERROR";
+const char ALL_ERROR[]          PROGMEM = "[DEBUG] The ALL function isn't working yet";
 #endif
 
 /* Generate the djb hash */
@@ -86,9 +87,11 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_ALL);
                     DEBUG_NL;
+                    PRINT_DEBUG(ALL_ERROR);
+                    DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_ALL;
-                    return true;
+                    return false;
                 case CODE_INFO:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_INFO);
