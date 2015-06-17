@@ -460,8 +460,12 @@ void TATUWatchDog::watchdogSetup(){
 }
 
 void TATUWatchDog::loop(){
-    time = millis();
-    if (time - lastConnect < reset_time) 
-        wdt_reset();
+    /*time = millis();
+    if (!client.connected()){
+        client.connect(name);
+    }
+        
+    if (time - lastConnect > reset_time) 
+        wdt_reset();*/
 }
     

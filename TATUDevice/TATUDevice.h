@@ -151,6 +151,8 @@ public:
     long int time;
     long int lastConnect;
     long int reset_time;
+    //PubSubClient client;
+    char name[MAX_SIZE_NAME];
 
     void watchdogSetup();
     void loop(); 
