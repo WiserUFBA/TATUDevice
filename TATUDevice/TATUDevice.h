@@ -24,6 +24,7 @@ typedef uint8_t byte;
 #define OUT_STR             &output_message[aux]
 #define MAX_SIZE_IP         16
 #define MAX_SIZE_NAME       20
+#define OS_VERSION          1
 
 // Constantes da mensagem
 #define COMMA       output_message[aux++]=','
@@ -41,22 +42,41 @@ typedef uint8_t byte;
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
 // Verifica se uma STRING está vazia
 #define ISEMPTY(VAR) (VAR[0] == 0)
-// Connecta o dispostivo ao client MQTT
-#define DEVICECONNECT(CLIENT,DEVICE) if(CLIENT.connect(DEVICE.name))CLIENT.subscribe(DEVICE.name)
+
 // Cria wrapper para a função de callback da classe
 #define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\
                                         void NAME(char *topic, byte *payload, unsigned int length) \
                                         {OBJ.mqtt_callback(topic, payload, length, BRIDGE);}
 #define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *topic, char *out)\
                                   { OBJ.publish(topic,out); }
-typedef struct 
-    {
-        //INFO
-        bool (*info)(uint32_t, char*, char*, uint8_t);
-        //VALUE
-        bool (*value)(uint32_t, uint16_t*, uint16_t, uint8_t);
-        //STATE
-        bool (*state)(uint32_t, bool*, bool, uint8_t);
+
+// Constrói o dispositivo e o cliente 
+#define SETUP(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, CALLBACK, CLIENT) \
+                        TATUInterpreter interpreter; \
+                        TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK); \
+                        MQTT_CALLBACK( bridge, device, mqtt_callback); \
+                        PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT); \
+                        MQTT_PUBLISH(bridge, client)
+
+// Conecta o cliente mqtt
+#define DEVICECONNECT() Serial.println("Trying to connect to the broker"); \
+                        if(client.connect(device.name)){ \
+                            Serial.println("The connection has suceeded"); \
+                            client.subscribe(device.name);} \
+                        else Serial.println("The connection has failed")
+
+// Conecta o cliente mqtt usando usuário e senha
+#define SECURE_DEVICECONNECT(USER,PASS) Serial.println("Trying to connect to the broker"); \
+                                        if(client.connect(device.name,USER,PASS)){ \
+                                            Serial.println("The connection has suceed"); \
+                                            client.subscribe(device.name);} \
+                                        else Serial.println("The connection has failed")
+
+/* Callback Struct */
+typedef struct {
+    bool (*info)(uint32_t, char*, char*, uint8_t);          /* Info Callback */
+    bool (*value)(uint32_t, uint16_t*, uint16_t, uint8_t);  /* Value Callback */
+    bool (*state)(uint32_t, bool*, bool, uint8_t);          /* State Callback */
 }Callback;
 
 //Essas funções tem como objetivo serem usadas como padrão, quando elas não são definidas pelo usuário
@@ -100,7 +120,7 @@ public:
     void mqtt_callback(char *, byte *, unsigned int, void (*publish)(char *, char *));
     // Callback Criado pelo usuario
     Callback TATUCallback;
-    bool (*callback)(uint32_t, char*, char*, uint8_t);
+
     // Metodos públicos
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,

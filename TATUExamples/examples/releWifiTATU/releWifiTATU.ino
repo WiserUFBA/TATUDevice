@@ -16,6 +16,11 @@
 #define VALVE 6
 #define MQTTPORT 1883
 
+// Constantes do dispositivo
+#define DEVICE_SAMPLE 0
+#define DEVICE_ID 121
+#define DEVICE_PAN_ID 88
+
 // Macro para os atuadores
 #define turn_on(PIN) digitalWrite(PIN,true)
 #define turn_off(PIN) digitalWrite(PIN,false)
@@ -31,7 +36,7 @@
 // Variveis
 bool lamp = 0,valve = 0;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 0, 102 };
+byte server[] = { 192, 168, 25, 20 };
 byte ip[4]    = { 0 };
 
 char ap_ssid[] = "";               
@@ -65,8 +70,8 @@ bool callback(uint32_t hash,bool* response,bool valor,uint8_t type){
       switch(hash){
           //liga ou desliga uma lampada baseado no valor booleano de uma requisiçao(true para ligar e false para desligar)
           case H_lamp:
-            if (valor){turn_on(LAMP);Serial.println("ON"); valve = true;}
-            else {turn_off(LAMP);Serial.println("OFF"); valve = false;}
+            if (valor){turn_on(LAMP);Serial.println("ON"); lamp = true;}
+            else {turn_off(LAMP);Serial.println("OFF"); lamp = false;}
             break;
           //abre ou fecha uma lampada baseado no valor booleano de uma requisiçao(true para abrir e false para fechar)
           case H_valve:
@@ -82,11 +87,8 @@ bool callback(uint32_t hash,bool* response,bool valor,uint8_t type){
 }
 
 // Objetos para exemplo usando interface internet
-TATUInterpreter interpreter;
-TATUDevice device("rele", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, callback);
-MQTT_CALLBACK(bridge, device, mqtt_callback);
-PubSubClient client(server, MQTTPORT, mqtt_callback , wifi_client);
-MQTT_PUBLISH(bridge, client);
+SETUP("rele", ip, DEVICE_ID, DEVICE_PAN_ID, DEVICE_SAMPLE, server, MQTTPORT, callback, wifi_client);
+
 
 /* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
 void setup() {
@@ -101,12 +103,7 @@ void setup() {
   else Serial.println("wifi conectado");
   Serial.println("Done");
   
-  Serial.println("Tentando se conectar ao broker");
-  if(client.connect(device.name)){
-    Serial.println("Conectou ao broker");
-    client.subscribe(device.name);
-  }
-  else Serial.println("Nao conectou ao broker");
+  DEVICECONNECT();
   
   //Passa o ip conseguido para o device
   wifi.getConnectionInfo(connection_info);
@@ -115,6 +112,6 @@ void setup() {
   strcpy(device.ip, aux);
   
 }
-void loop() { client.loop(); 
-  
+void loop() {
+  client.loop();
 }

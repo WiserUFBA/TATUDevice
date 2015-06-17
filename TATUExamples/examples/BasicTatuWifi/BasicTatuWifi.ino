@@ -13,14 +13,20 @@
 #define CC3000_CS       10   // Pino de seleção, preferivel o pino 10 no UNO
 #define IP_ADDR_LEN     4    // Tamanho do IP em bytes
 
+// Constantes do dispositivo
+#define DEVICE_SAMPLE 0
+#define DEVICE_ID 121
+#define DEVICE_PAN_ID 88
+#define MQTTPORT 1883
+
 // Propriedades do sistema
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
 byte server[] = { 192, 168, 25, 20 };
 byte ip[4]    = { 0 }; // Vetor nulo para que nao ocoram erros
 
 // Propriedades de rede
-char ap_ssid[] = "";               
-char ap_password[] = "";
+char ap_ssid[] = "PiratasDoValeDoCanela";               
+char ap_password[] = "naovaqueebarril";
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 
@@ -61,11 +67,7 @@ Funçao STATE do usuario, para ser usada quando se quer trabalhar com booleanos
 bool callback(uint32_t hash,bool* response,bool valor,uint8_t type);*/
 
 // Objetos para exemplo usando interface wifi CC3000
-TATUInterpreter interpreter;
-TATUDevice device("nome", ip, 121, 88, 0, server, 1883, 1, &interpreter, callback);
-MQTT_CALLBACK(bridge, device, mqtt_callback);
-PubSubClient client(server, 1883, mqtt_callback , wifi_client);
-MQTT_PUBLISH(bridge, client);
+SETUP("nome", ip, DEVICE_ID, DEVICE_PAN_ID, DEVICE_SAMPLE, server, MQTTPORT, callback, wifi_client);
 
 /* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
 void setup() {
@@ -77,12 +79,7 @@ void setup() {
   if ( !wifi.init() || !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) while(true);
   Serial.println("Done");
 
-  Serial.println("Tentando se conectar ao broker");
-  if(client.connect(device.name)){
-    Serial.println("Conectou ao broker");
-    client.subscribe(device.name);
-  }
-  else Serial.println("Nao conectou");
+  DEVICECONNECT();
   
   //Passa o ip conseguido para o device
   wifi.getConnectionInfo(connection_info);
@@ -90,4 +87,7 @@ void setup() {
   device.generateHeader();
   strcpy(device.ip, aux);
 }
-void loop() { client.loop(); }
+void loop() { 
+  client.loop(); 
+}
+

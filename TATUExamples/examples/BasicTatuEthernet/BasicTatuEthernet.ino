@@ -5,10 +5,16 @@
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 
+// Constantes do dispositivos
+#define DEVICE_SAMPLE 0
+#define DEVICE_ID 121
+#define DEVICE_PAN_ID 88
+#define MQTTPORT 1883
+
 // Propriedades do sistema
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 0, 100 };
-byte ip[]     = { 192, 168, 0, 120 };
+byte server[] = { 192, 168, 25, 20 };
+byte ip[]     = { 192, 168, 25, 40 };
 
 // Funçao INFO do usuario, para ser usada quando se quer trabalhar com strings  
 bool callback(uint32_t hash,char* response,char* valor,uint8_t type) {
@@ -47,21 +53,12 @@ bool callback(uint32_t hash,bool* response,bool valor,uint8_t type);*/
 
 // Objetos para exemplo usando interface internet
 EthernetClient ethClient;
-TATUInterpreter interpreter;
-TATUDevice device("nome", ip, 121, 88, 0, server, 1883, 1, &interpreter, callback);
-MQTT_CALLBACK(bridge, device, mqtt_callback);
-PubSubClient client(server, 1883, mqtt_callback , ethClient);
-MQTT_PUBLISH(bridge, client);
+SETUP("name", ip, DEVICE_ID, DEVICE_PAN_ID, DEVICE_SAMPLE, server, MQTTPORT, callback, ethClient);
 
 /* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
 void setup() { Ethernet.begin(mac, ip); 
   Serial.begin(9600);
-  
-  Serial.println("Tentando se conectar ao broker");
-  if(client.connect(device.name)){
-    Serial.println("Conectou ao broker");
-    client.subscribe(device.name);
-  }
-  else Serial.println("Nao conectou");
+ 
+  DEVICECONNECT();
 }
 void loop() { client.loop(); }
