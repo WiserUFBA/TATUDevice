@@ -1,6 +1,7 @@
 #ifndef TATUDevice_h
 #define TATUDevice_h
 
+#include <avr/wdt.h>
 #include <stdint.h>
 #include <TATUInterpreter.h>
 
@@ -13,8 +14,6 @@ typedef uint8_t byte;
 #ifndef MAX_SIZE_OUTPUT
 #define MAX_SIZE_OUTPUT     200
 #endif
-
-#define DEBUG
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
@@ -144,6 +143,17 @@ public:
 
     void generateHeader();
     void generateBody(char *payload, uint8_t length);
+    void loop();
+};
+
+class TATUWatchDog{
+public:
+    long int time;
+    long int lastConnect;
+    long int reset_time;
+
+    void watchdogSetup();
+    void loop(); 
 };
 
 #endif
