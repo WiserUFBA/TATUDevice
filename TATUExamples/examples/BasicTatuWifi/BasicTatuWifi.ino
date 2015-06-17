@@ -25,8 +25,8 @@ byte server[] = { 192, 168, 25, 20 };
 byte ip[4]    = { 0 }; // Vetor nulo para que nao ocoram erros
 
 // Propriedades de rede
-char ap_ssid[] = "PiratasDoValeDoCanela";               
-char ap_password[] = "naovaqueebarril";
+char ap_ssid[] = "";               
+char ap_password[] = "";
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
 SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 
