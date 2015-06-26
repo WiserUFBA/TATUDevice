@@ -15,7 +15,7 @@
 // Definiçoes de constantes importantes
 #define LAMP 9
 #define VALVE 6
-#define MQTTPORT 1883
+#define MQTTPORT 8081
 
 // Macro para os atuadores
 #define turn_on(PIN) digitalWrite(PIN,true)
@@ -31,8 +31,8 @@
 #define IP_ADDR_LEN     4    // Tamanho do IP em bytes
 
 // Variaveis de conexao
-char ap_ssid[] = "";               
-char ap_password[] = "";
+char ap_ssid[] = "GVT-A4F9";               
+char ap_password[] = "CP1115BUKJP";
 
 // Objetos para conexao wifi
 SFE_CC3000 wifi = SFE_CC3000(CC3000_INT, CC3000_EN, CC3000_CS);
@@ -41,7 +41,7 @@ SFE_CC3000_Client wifi_client = SFE_CC3000_Client(wifi);
 // Variveis
 bool lamp = 0,valve = 0;
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte server[] = { 192, 168, 25, 20 };
+byte server[] = { 192, 168, 1, 26 };
 byte ip[4]    = { 0, 0, 0, 0}; // Vetor nulo para que nao ocoram erros
 
 // Funçao INFO do usuario, para ser usada quando se quer trabalhar com strings  
@@ -190,7 +190,11 @@ void setup() {
   Serial.begin(9600);
   pinMode(LAMP,OUTPUT);
   pinMode(VALVE,OUTPUT);
-
+  
+  Serial.println("subscreve em");
+  Serial.println(device.subscribe_topic);
+  Serial.println("publica em");
+  Serial.println(device.publish_topic);
   Serial.println("Tentando conectar ao wifi");
   if ( !wifi.init() || !wifi.connect(ap_ssid, WLAN_SEC_WPA2, ap_password, TIMEOUT_CC3000)) Serial.println("Wifi nao conectado");
   else Serial.println("wifi conectado");
@@ -199,7 +203,7 @@ void setup() {
   Serial.println("Tentando se conectar ao broker");
   if(client.connect(device.name)){
     Serial.println("Conectou ao broker");
-    client.subscribe(device.name);
+    client.subscribe(device.subscribe_topic);
   }
   else Serial.println("Nao conectou ao broker");
   

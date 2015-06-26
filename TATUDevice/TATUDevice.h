@@ -61,7 +61,7 @@ typedef uint8_t byte;
 #define DEVICECONNECT() Serial.println("Trying to connect to the broker"); \
                         if(client.connect(device.name)){ \
                             Serial.println("The connection has suceeded"); \
-                            client.subscribe(device.name);} \
+                            client.subscribe(device.subscribe_topic);} \
                         else Serial.println("The connection has failed")
 
 // Conecta o cliente mqtt usando usuário e senha
@@ -95,6 +95,8 @@ public:
     // Atributos públicos
     // Atributos do sistema
     char     name[MAX_SIZE_NAME];
+    char     subscribe_topic[MAX_SIZE_NAME+4];
+    char     publish_topic[MAX_SIZE_NAME+4];
     char     ip[MAX_SIZE_IP];
     uint8_t  id;
     uint8_t  pan;

@@ -50,7 +50,10 @@ const char ip_str[]     PROGMEM = "\"IP\":\"";
 const char body_str[]   PROGMEM = "\"BODY\":{";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
-const char pin_st[]     PROGMEM = "PIN";
+const char pin_str[]    PROGMEM = "PIN";
+const char diso_str[]   PROGMEM = "DISO";
+const char dosi_str[]   PROGMEM = "DOSI";
+
 
 /* Utilidades */
 /* Get the actual free ram */
@@ -126,7 +129,12 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     char aux[20];
 
     // Define os atributos básicos
+    i = strlen(name_d);
     STRCPY(name_d, name);
+    STRCPY(name, subscribe_topic);
+    STRCPY(name, publish_topic);
+    strcpy_P(&subscribe_topic[i],diso_str);
+    strcpy_P(&publish_topic[i],dosi_str);
     ipToString(ip_d, aux);
     STRCPY(aux, ip);
     id = (uint8_t)  id_d;
@@ -422,7 +430,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     #endif
     
     //publica a mensagem
-    publish(name, output_message);
+    publish(publish_topic, output_message);
     
     #ifdef DEBUG
     PRINT_DEBUG(PUBLISHED);
