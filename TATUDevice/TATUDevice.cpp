@@ -430,7 +430,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     #endif
     
     //publica a mensagem
-    publish(publish_topic, output_message);
+    publish(name, output_message);
     
     #ifdef DEBUG
     PRINT_DEBUG(PUBLISHED);
