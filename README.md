@@ -2,7 +2,9 @@
 Biblioteca para a implementação do sistema operacional dos dispositvos TATU
 --
 ### Introdução
-A biblioteca TATUDevice tem como o objetivo a implementação do sitema operacional TOS(Thing Operating System), sistema operacional criado, para facilitar e padroniza o desenvolvimento de dispositvos IoT da plataforma TATU.A Plataforma TATU ultiliza o protocolo TPI(Thing Protocol for Internet), uma extensão do protocolo [MQTT](http://mqtt.org/faq) para comunicação entre dispositvos e foi desenvolvida pela equipe de hardware do projeto [SmartUFBA](http://wiki.dcc.ufba.br/SmartUFBA). 
+A biblioteca TATUDevice tem como o objetivo a implementação do sitema operacional TOS(Thing Operating System), sistema operacional criado, para facilitar e padroniza o desenvolvimento de dispositvos IoT da plataforma TATU.A Plataforma TATU ultiliza o protocolo TPI(Thing Protocol for Internet), um protocolo para comunicação entre dispositvos e foi desenvolvida pela equipe de hardware do projeto [SmartUFBA](http://wiki.dcc.ufba.br/SmartUFBA). 
+
+A biblioteca TATUDevice usa o TPI sobre o protocolo [MQTT](http://mqtt.org/faq), um protocolo leve, popular para o uso na Internet das Coisas.
 
 ###Quais as funcionalidades desse Sistema Operacional?
 
@@ -12,7 +14,7 @@ interface para gereneciamento das configurações do dispositivo , como atributo
 
 ###Como o TATU integra os elementos de um sistema IoT?
 
-Através de um [Driver](https://github.com/WiserUFBA/DriverMQTT/blob/master/README.md) desenvolvido pelo projeto que trata as mensagens enviadas pelos e intermedia a comunicação desses dispositvos com possíveis serviços que se utilizem de suas funcionalidades,
+Através de um [Driver](https://github.com/WiserUFBA/DriverMQTT/blob/master/README.md) desenvolvido pelo projeto, que trata as mensagens enviadas pelos dispositivos e intermedia a comunicação destes com possíveis serviços que se utilizem de suas funcionalidades.
 
 ##TATUDevice
 
