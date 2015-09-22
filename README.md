@@ -4,7 +4,9 @@ Biblioteca para a implementação do sistema operacional dos dispositvos TATU
 ### Introdução
 A biblioteca TATUDevice tem como o objetivo a implementação do sitema operacional TOS(Thing Operating System), sistema operacional criado, para facilitar e padroniza o desenvolvimento de dispositvos IoT da plataforma TATU.A Plataforma TATU ultiliza o protocolo TPI(Thing Protocol for Internet), um protocolo para comunicação entre dispositvos e foi desenvolvida pela equipe de hardware do projeto [SmartUFBA](http://wiki.dcc.ufba.br/SmartUFBA). 
 
-A biblioteca TATUDevice usa o TPI sobre o protocolo [MQTT](http://mqtt.org/faq), um protocolo leve, popular para o uso na Internet das Coisas.
+A biblioteca TATUDevice usa o TPI sobre o protocolo [MQTT](http://mqtt.org/faq), um protocolo leve, popular para o uso na Internet das Coisas. Diferentemente do HTTP o MQTT não é baseado no paradigma requisição ↔ resposta, ao invés disso temos uma analogia parecida a um blog com um feed RSS ou uma revista com assinatura aonde as pessoas subscritas,  ou seja os assinantes recebem as publicações assim que os publicantes, publicam a informação. Este modelo é conhecido como modelo de publicação↑  subscrição↓.
+
+Os tópicos são as vias de comunicação do protocolo e funcionam como um terminal de replicação, tudo que chega num determinado tópico é replicado para todos os clientes inscritos neste determinado tópico. O responsável por replicar estas mensagens é o “broker”.
 
 ###Quais as funcionalidades desse Sistema Operacional?
 
@@ -27,12 +29,16 @@ O instanciamento `device(...params...)` significa a criação de um dispositivo 
 - Interface para comunicação com sensores e atuadores
 - Sistema de comunicação externa através do protocolo TPI
 
-### Baixando as classe
+### Baixando as classes
+
 Você pode clonar esse repositório e adicionar suas pastas ao diretório de bibliotecas do Arduino, e simplesmente inclui-las(e.g. #include<TATUDevice.h>). é importante apontar que você precisa do TATUIntepreter para usar o TATUDevice.
 
 ## Configurando e usando o TATUDevice
 
-O device é composto por atributos considerados por nós, importantes para sua identificação, um TATUInterpreter que serve para analisar a mensagem recebida e preparar o dispositivo para uma resposta apropriada e as informações necessárias para a conexão e o Callback utilizado para realizar as ações adequadas às requsições externas.
+Para o funcionamento correto, um dispositivo possui certos requisitos:
+
+O device é composto por atributos que consideramos importantes para sua identificação, um objeto do tipo TATUInterpreter, que serve para analisar a mensagem recebida e preparar o dispositivo para uma resposta apropriada, o identificador do broker, a porta da comunicação com o broker, e o Callback, que é uma função á ser executada quando o cliente recebe uma mensagem vinda do tópico em que estiver inscrito.
+
 
 ```cpp
 #include <TATUDevice.h>
