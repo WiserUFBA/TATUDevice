@@ -37,6 +37,16 @@ Você pode clonar esse repositório e adicionar suas pastas ao diretório de bib
 
 Para o funcionamento correto, um dispositivo possui certos requisitos:
 
+-Um cliente que lhe forneça conexão com a internet
+-Um cliente que lhe forneça conexão via MQTT
+-Um broker MQTT com o qual se comunicar
+
+Até agora foram testadas as seguintes bibliotecas com o nosso framework.
+
+-[SFE_CC3000_Library](https://github.com/sparkfun/SFE_CC3000_Library) para o uso com o shield wifi -[CC3000](https://www.sparkfun.com/products/12071) 
+-[Adafruit_CC3000_Library](https://github.com/adafruit/Adafruit_CC3000_Library)
+-[Ethernet]https://github.com/arduino/Arduino/tree/master/libraries/Ethernet
+
 O device é composto por atributos que consideramos importantes para sua identificação, um objeto do tipo TATUInterpreter, que serve para analisar a mensagem recebida e preparar o dispositivo para uma resposta apropriada, o identificador do broker, a porta da comunicação com o broker, e o Callback, que é uma função á ser executada quando o cliente recebe uma mensagem vinda do tópico em que estiver inscrito.
 
 
