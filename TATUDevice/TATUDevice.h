@@ -51,11 +51,11 @@ typedef uint8_t byte;
 
 // Constrói o dispositivo e o cliente 
 #define SETUP(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, CALLBACK, CLIENT) \
-                        TATUInterpreter interpreter; \
-                        TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK); \
-                        MQTT_CALLBACK( bridge, device, mqtt_callback); \
-                        PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT); \
-                        MQTT_PUBLISH(bridge, client)
+            TATUInterpreter interpreter; \
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK); \
+            MQTT_CALLBACK( bridge, device, mqtt_callback); \
+            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT); \
+            MQTT_PUBLISH(bridge, client)
 
 // Conecta o cliente mqtt
 #define DEVICECONNECT() Serial.println("Trying to connect to the broker"); \
@@ -72,19 +72,20 @@ typedef uint8_t byte;
                                         else Serial.println("The connection has failed")
 
 /* Callback Struct */
-typedef struct {
-    bool (*info)(uint32_t, char*, char*, uint8_t);          /* Info Callback */
-    bool (*value)(uint32_t, uint16_t*, uint16_t, uint8_t);  /* Value Callback */
-    bool (*state)(uint32_t, bool*, bool, uint8_t);          /* State Callback */
-}Callback;
+// REMOVED!
+// typedef struct {
+//     bool (*info)(uint32_t, char*, char*, uint8_t);          /* Info Callback */
+//     bool (*value)(uint32_t, uint16_t*, uint16_t, uint8_t);  /* Value Callback */
+//     bool (*state)(uint32_t, bool*, bool, uint8_t);          /* State Callback */
+// }Callback;
 
-//Essas funções tem como objetivo serem usadas como padrão, quando elas não são definidas pelo usuário
-//INFO
-bool info_default(uint32_t, char*, char*, uint8_t);
-//VALUE
-bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t);
-//STATE
-bool state_default(uint32_t, bool*, bool, uint8_t);
+// Essas funções tem como objetivo serem usadas como padrão, quando elas não são definidas pelo usuário
+// INFO
+// bool info_default(uint32_t, char*, char*, uint8_t);
+// VALUE
+// bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t);
+// STATE
+// bool state_default(uint32_t, bool*, bool, uint8_t);
 
 /* Utilidades */
 int freeRAM();
@@ -94,16 +95,16 @@ class TATUDevice{
 public:
     // Atributos públicos
     // Atributos do sistema
-    char     name[MAX_SIZE_NAME];
-    char     subscribe_topic[MAX_SIZE_NAME+4];
-    char     publish_topic[MAX_SIZE_NAME+4];
-    char     ip[MAX_SIZE_IP];
-    uint8_t  id;
-    uint8_t  pan;
-    uint8_t  samples;
-    char     mqtt_ip[MAX_SIZE_IP];
-    uint16_t mqtt_port;
-    uint8_t  os_version;
+    char        name[MAX_SIZE_NAME];
+    int         len_name;
+    char        aux_topic_name[MAX_SIZE_NAME + 5];
+    char        ip[MAX_SIZE_IP];
+    uint8_t     id;
+    uint8_t     pan;
+    uint8_t     samples;
+    char        mqtt_ip[MAX_SIZE_IP];
+    uint16_t    mqtt_port;
+    uint8_t     os_version;
 
     // Atributos variaveis
     TATUInterpreter *requisition;
@@ -119,25 +120,44 @@ public:
     /* Callback's do Sistema */
     // Callback MQTT
     void mqtt_callback(char *, byte *, unsigned int, void (*publish)(char *, char *));
+    
+    // REMOVED!
     // Callback Criado pelo usuario
-    Callback TATUCallback;
+    // Callback TATUCallback;
 
     // Metodos públicos
+    // REMOVIDO CONSTRUTORES REDUNDANTES
+    /*
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
                 TATUInterpreter *req,Callback callback_struct);
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
                 TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t));
-	TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-				const int sample_d, byte *ip_m, const int port_m, const int os_v,
-				TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t));
-	TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-				const int sample_d, byte *ip_m, const int port_m, const int os_v,
-				TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t));
+    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t));
+    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t));
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
                 TATUInterpreter *req);
+    */
+    // NOVA ARQUITETURA DE CALLBACK
+    // ONLY GET AND SET ARE NEEDED
+    // > ONLY GET
+    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req, **);
+    // > ONLY SET
+    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req, **);
+    // > BOTH
+    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req, **, **);
 
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,

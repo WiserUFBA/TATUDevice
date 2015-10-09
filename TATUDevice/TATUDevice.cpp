@@ -23,14 +23,14 @@ const char PUBLISHED[]              PROGMEM = "[DEBUG] The message has been publ
 const char NOT_A_GET[]              PROGMEM = "[DEBUG] It isn't a GET requisition";
 const char SYSTEM[]                 PROGMEM = "[DEBUG] The system function isn't working yet";
 const char THE_RESPONSE[]           PROGMEM = "[DEBUG] The value of the response is: ";
-const char INITIATING[] 		    PROGMEM = "[DEBUG] Initianting the class...";
-const char FINISHED_INIT[] 		    PROGMEM = "[DEBUG] Finished init!";
-const char STARTING_GENERATE[]	    PROGMEM = "[DEBUG] Starting generate HEADER...";
-const char ENDING_GENERATE[] 	    PROGMEM = "[DEBUG] Finished generate HEADER!";
-const char HEADER_STR[] 		    PROGMEM = "[DEBUG] HEADER Value : ";
-const char CLASS_CONSTRUCTED[] 	    PROGMEM = "[DEBUG] Class constructed with success!";
-const char EXEC_ERROR[]			    PROGMEM = "[DEBUG] Execution Error!";
-const char EXEC_ERROR_TYPE_VAR[]	PROGMEM = "[DEBUG] Unknown variable type!";
+const char INITIATING[]             PROGMEM = "[DEBUG] Initianting the class...";
+const char FINISHED_INIT[]          PROGMEM = "[DEBUG] Finished init!";
+const char STARTING_GENERATE[]      PROGMEM = "[DEBUG] Starting generate HEADER...";
+const char ENDING_GENERATE[]        PROGMEM = "[DEBUG] Finished generate HEADER!";
+const char HEADER_STR[]             PROGMEM = "[DEBUG] HEADER Value : ";
+const char CLASS_CONSTRUCTED[]      PROGMEM = "[DEBUG] Class constructed with success!";
+const char EXEC_ERROR[]             PROGMEM = "[DEBUG] Execution Error!";
+const char EXEC_ERROR_TYPE_VAR[]    PROGMEM = "[DEBUG] Unknown variable type!";
 const char PARAM_ERROR[]            PROGMEM = "[DEBUG] Param Error!";
 const char RESPONSE_TYPE_INFO[]     PROGMEM = "[DEBUG] The response type is INFO";
 const char RESPONSE_TYPE_VALUE[]    PROGMEM = "[DEBUG] The response type is VALUE";
@@ -51,8 +51,10 @@ const char body_str[]   PROGMEM = "\"BODY\":{";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
 const char pin_str[]    PROGMEM = "PIN";
-const char diso_str[]   PROGMEM = "DISO";
-const char dosi_str[]   PROGMEM = "DOSI";
+
+const char int_str[]    PROGMEM = "INT";
+const char res_str[]    PROGMEM = "RES";
+const char flow_str[]   PROGMEM = "FLOW";
 
 
 /* Utilidades */
@@ -86,7 +88,7 @@ bool state_default(uint32_t, bool*, bool, uint8_t){
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
                         TATUInterpreter *req,Callback callback_struct){
-	TATUCallback = callback_struct;
+    TATUCallback = callback_struct;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
@@ -130,11 +132,15 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
 
     // Define os atributos básicos
     i = strlen(name_d);
+    len_name = i;
     STRCPY(name_d, name);
-    STRCPY(name, subscribe_topic);
-    STRCPY(name, publish_topic);
-    strcpy_P(&subscribe_topic[i],diso_str);
-    strcpy_P(&publish_topic[i],dosi_str);
+
+    // REMOVED, NOT NEEDED
+    // STRCPY(name, subscribe_topic);
+    // STRCPY(name, publish_topic);
+    // strcpy_P(&subscribe_topic[i], diso_str);
+    // strcpy_P(&publish_topic[i], dosi_str);
+    
     ipToString(ip_d, aux);
     STRCPY(aux, ip);
     id = (uint8_t)  id_d;
@@ -219,11 +225,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     
     int aux = last_char;
     bool isString,
-    	 response_bool = false,
-    	 value_bool = false;
+         response_bool = false,
+         value_bool = false;
     char response[MAX_SIZE_RESPONSE] = {0};
     uint16_t response_int = 0,
-    		 value_int = 0;
+             value_int = 0;
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
@@ -264,7 +270,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     break;
             }
             break;
-		/* GPIO Modifier */
+        /* GPIO Modifier */
         case TATU_TYPE_PIN:
             //MODIFICAR!!!
             switch(requisition->cmd.OBJ.TYPE){
@@ -292,9 +298,9 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             }
             break;
             /* ADC Modifier */
-			case TATU_TYPE_ANALOG:
-				switch(requisition->cmd.OBJ.TYPE){
-					case TATU_GET:
+            case TATU_TYPE_ANALOG:
+                switch(requisition->cmd.OBJ.TYPE){
+                    case TATU_GET:
                         //Baseado no código da resposta, decide como a resposta deve ser dada
                         switch(requisition->cmd.OBJ.CODE){
                             case TATU_CODE_INFO:
@@ -307,18 +313,18 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                                 response_bool = analogRead(requisition->cmd.OBJ.PIN);
                                 break;
                         }
-						break;
-					case TATU_SET:
-						analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
-						requisition->cmd.OBJ.ERROR = false;
-						#ifdef DEBUG
-						PRINT_DEBUG(SET_PIN);
-						DEBUG_NL;
-						#endif
-						break;
-				}
-				break;
-		/* System functions */
+                        break;
+                    case TATU_SET:
+                        analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
+                        requisition->cmd.OBJ.ERROR = false;
+                        #ifdef DEBUG
+                        PRINT_DEBUG(SET_PIN);
+                        DEBUG_NL;
+                        #endif
+                        break;
+                }
+                break;
+        /* System functions */
         case TATU_TYPE_SYSTEM:
             #ifdef DEBUG
             PRINT_DEBUG(SYSTEM);
@@ -330,14 +336,14 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             return;
             break;
         default:
-			#ifdef DEBUG
-			PRINT_DEBUG(EXEC_ERROR);
-			DEBUG_NL;
-			PRINT_DEBUG(EXEC_ERROR_TYPE_VAR);
-			DEBUG_NL;
-			#endif
-        	strcpy_P(OUT_STR, null_body);
-        	return;
+            #ifdef DEBUG
+            PRINT_DEBUG(EXEC_ERROR);
+            DEBUG_NL;
+            PRINT_DEBUG(EXEC_ERROR_TYPE_VAR);
+            DEBUG_NL;
+            #endif
+            strcpy_P(OUT_STR, null_body);
+            return;
     }
 
     // Se encontrado qualquer tipo de erro
