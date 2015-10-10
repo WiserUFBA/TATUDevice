@@ -23,7 +23,7 @@ byte server[] = { 192, 168, 25, 20 };
 byte ip[4]    = { 192, 168, 25, 110}; // Vetor nulo para que nao ocoram erros
 
 // Funçao do usuario para variaveis do TATU  
-bool info(uint32_t hash,char* response,char* valor,uint8_t type) {  
+bool info(uint32_t hash, char* response, char* valor, uint8_t type) {  
   Serial.print("Hash :");
   Serial.println(hash);
   
@@ -52,7 +52,7 @@ bool info(uint32_t hash,char* response,char* valor,uint8_t type) {
   Serial.println(gas_amount);
   return true;
 }
-bool value(uint32_t hash,uint16_t* response,uint16_t valor,uint8_t type) {
+bool value(uint32_t hash, uint16_t* response, uint16_t valor, uint8_t type) {
   
   Serial.print("Hash :");
   Serial.println(hash);

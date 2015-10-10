@@ -23,7 +23,8 @@ typedef uint8_t byte;
 #define OUT_STR             &output_message[aux]
 #define MAX_SIZE_IP         16
 #define MAX_SIZE_NAME       20
-#define OS_VERSION          1
+#define OS_VERSION          2
+#define MQTTPORT_STANDARD   1883
 
 // Constantes da mensagem
 #define COMMA       output_message[aux++]=','
@@ -33,6 +34,9 @@ typedef uint8_t byte;
 #define BRACE_RIGHT output_message[aux++]='}'
 #define CLOSE_MSG   output_message[aux]=0
 
+// Constantes do Sistema
+#define SAMPLE_NUMBER 0
+
 // Calcula o HASH DJB (deprecated)
 //#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; i < LEN; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
 // Copiar uma string para a outra
@@ -41,6 +45,9 @@ typedef uint8_t byte;
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
 // Verifica se uma STRING está vazia
 #define ISEMPTY(VAR) (VAR[0] == 0)
+// Switch topic to the following topic
+// REQ
+#define SWITCH_REQ_TOPIC(TOPIC, )
 
 // Cria wrapper para a função de callback da classe
 #define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\
@@ -50,11 +57,41 @@ typedef uint8_t byte;
                                   { OBJ.publish(topic,out); }
 
 // Constrói o dispositivo e o cliente 
-#define SETUP(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, CALLBACK, CLIENT) \
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK, CLIENT) \
             TATUInterpreter interpreter; \
             TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK); \
             MQTT_CALLBACK( bridge, device, mqtt_callback); \
             PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT); \
+            MQTT_PUBLISH(bridge, client)
+
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK_GET, CALLBACK_SET, CLIENT) \
+            TATUInterpreter interpreter; \
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET); \
+            MQTT_CALLBACK( bridge, device, mqtt_callback); \
+            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT); \
+            MQTT_PUBLISH(bridge, client)
+
+// -----------
+// Omite a porta padrão do MQTT
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK, CLIENT) \
+            TATUInterpreter interpreter; \
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK); \
+            MQTT_CALLBACK( bridge, device, mqtt_callback); \
+            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT); \
+            MQTT_PUBLISH(bridge, client)
+
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK_GET, CALLBACK_SET, CLIENT) \
+            TATUInterpreter interpreter; \
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET); \
+            MQTT_CALLBACK( bridge, device, mqtt_callback); \
+            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT); \
+            MQTT_PUBLISH(bridge, client)
+
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CLIENT) \
+            TATUInterpreter interpreter; \
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter); \
+            MQTT_CALLBACK( bridge, device, mqtt_callback); \
+            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT); \
             MQTT_PUBLISH(bridge, client)
 
 // Conecta o cliente mqtt
@@ -105,6 +142,8 @@ public:
     char        mqtt_ip[MAX_SIZE_IP];
     uint16_t    mqtt_port;
     uint8_t     os_version;
+    bool (*get_function)(uint32_t hash, void* response, char* valor, uint8_t type);
+    bool (*set_function)(uint32_t hash, void* response, char* valor, uint8_t type);
 
     // Atributos variaveis
     TATUInterpreter *requisition;
@@ -149,15 +188,20 @@ public:
     // > ONLY GET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, **);
+                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type));
     // > ONLY SET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, **);
+                TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, void* response, void* valor, uint8_t type));
     // > BOTH
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, **, **);
+                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type),
+                bool (*SET_FUNCTION)(uint32_t hash, void* response, void* valor, uint8_t type));
+    // > NONE
+    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                TATUInterpreter *req);
 
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,

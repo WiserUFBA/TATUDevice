@@ -9,8 +9,8 @@
 #define H_sound 274653294
 #define H_rele 2090684077
 #define DEVICE_SAMPLE 0
-#define DEVICE_ID 121
-#define DEVICE_PAN_ID 88
+#define DEVICE_ID 1
+#define DEVICE_PAN_ID 1
 #define MQTTPORT 1883
 #define SOUND_PIN A1
 #define RELE 13

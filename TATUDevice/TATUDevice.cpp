@@ -138,22 +138,36 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
 // > ONLY GET
 TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, **){
-
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type)){
+    get_function = GET_FUNCTION;
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 // > ONLY SET
 TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, **){
-
+            TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type)){
+    set_function = SET_FUNCTION;
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 // > BOTH
 TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, **, **){
-    
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type),
+            bool (*SET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type)){
+    get_function = GET_FUNCTION;
+    set_function = SET_FUNCTION;
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
+}
+
+// > NONE
+TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+            const int sample_d, byte *ip_m, const int port_m, const int os_v,
+            TATUInterpreter *req){
+    get_function = NULL;
+    set_function = NULL;
+    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 /* Initialize the class */
@@ -233,14 +247,16 @@ void TATUDevice::generateHeader(){
     itoa(pan, aux_str, 10);
     strcpy(OUT_STR, aux_str);
     aux += strlen(aux_str);
-    COMMA;
+    // COMMA;
     
     /* Coloca o IP */
+    /*
     strcpy_P(OUT_STR, ip_str);
     aux += 6;
     strcpy(OUT_STR, ip);
     aux += strlen(ip);
     QUOTE;
+    */
 
     /* Fecha a mensagem de saída */
     BRACE_RIGHT; COMMA;
