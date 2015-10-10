@@ -71,6 +71,7 @@ void ipToString(byte *ip, char *str){
     str[j-1] = 0;
 }
 
+/*
 // INFO
 bool info_default(uint32_t, char*, char*, uint8_t){
     return false;
@@ -82,45 +83,77 @@ bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t){
 // STATE
 bool state_default(uint32_t, bool*, bool, uint8_t){
     return false;
-} 
+}
+*/
 
 /* Construct the TATUDevice Class passing the object callback */
+/*
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
                         TATUInterpreter *req,Callback callback_struct){
     TATUCallback = callback_struct;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
+*/
 
 /* Construct the TATUDevice Class with only the info callback*/
+/*
 TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
     TATUCallback.info = callback_con;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
+*/
 
 /* Construct the TATUDevice Class with only the value callback*/
+/*
 TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t)){
     TATUCallback.value = callback_con;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
+*/
 
 /* Construct the TATUDevice Class with only the state callback*/
+/*
 TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t)){
     TATUCallback.state = callback_con;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
+*/
 
 /* Construct the TATUDevice Class without define a callback*/
+/*
 TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
                         const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
                         TATUInterpreter *req){
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
+}
+*/
+
+// > ONLY GET
+TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+            const int sample_d, byte *ip_m, const int port_m, const int os_v,
+            TATUInterpreter *req, **){
+
+}
+
+// > ONLY SET
+TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+            const int sample_d, byte *ip_m, const int port_m, const int os_v,
+            TATUInterpreter *req, **){
+
+}
+
+// > BOTH
+TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+            const int sample_d, byte *ip_m, const int port_m, const int os_v,
+            TATUInterpreter *req, **, **){
+    
 }
 
 /* Initialize the class */
@@ -444,9 +477,11 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     #endif
 
 }
+
 void TATUDevice::loop(){
     //mqtt_client.loop();
 }
+
 void TATUWatchDog::watchdogSetup(){
     cli();
     // disable all interrupts
