@@ -272,35 +272,34 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     DEBUG_NL;
     #endif
     
+    void response;
     int aux = last_char;
     bool isString,
-         response_bool = false,
-         value_bool = false;
-    char response_str[MAX_SIZE_RESPONSE] = {0};
-    uint16_t response_int = 0,
-             value_int = 0;
+         bool_buffer = false,
+    char str_buffer[MAX_SIZE_RESPONSE] = {0};
+    uint16_t int_buffer = 0,            
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
     // DEPRECATED //
     if(requisition->cmd.OBJ.TYPE == TATU_POST){ strcpy_P(OUT_STR, false_body); return; }
-
+    if (requisition->cmd.OBJ.VAR == TATU_TYPE_SYSTEM){
+            #ifdef DEBUG
+            PRINT_DEBUG(SYSTEM);
+            DEBUG_NL;
+            #endif
+            /** MODIFICA PROPRIEDADE **/
+            // ISTO AINDA NÃO FOI IMPLEMENTADO
+            strcpy_P(OUT_STR, false_body);
+            return;
+            break;
+    }
 
 
     /* Check the variable type */
     switch(requisition->cmd.OBJ.TYPE){
         /* If the desired variable is of type ALIAS, call the user's function */
-        switch(requisition->cmd.OBJ.CODE) {
-            case TATU_CODE_INFO:
-                response = response_str;
-                break;
-            case TATU_CODE_VALUE:
-                response = response_int;
-                break;
-            case TATU_CODE_STATE:
-                response = response_bool;
-                break;
-        }
+
         case TATU_GET:
             #ifdef DEBUG
             PRINT_DEBUG(CALLBACK_GET);
@@ -309,45 +308,49 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             switch(requisition->cmd.OBJ.VAR){
                 case TATU_TYPE_ALIAS:
                     //Baseado no código da resposta, decide qual função do usuário deve ser usada
+                    switch(requisition->cmd.OBJ.CODE) {
+                        case TATU_CODE_INFO:
+                            response = &str_buffer;
+                            break;
+                        case TATU_CODE_VALUE:
+                            response = &int_buffer;
+                            break;
+                        case TATU_CODE_STATE:
+                            response = &bool_buffer;
+                            break;
+                    }
                     requisition->cmd.OBJ.ERROR = get(requisition->str_hash,response,requisition->cmd.OBJ.CODE);
                     break;
                 /* GPIO Modifier */
                 case TATU_TYPE_PIN:
-                //MODIFICAR!!!
-                    switch(requisition->cmd.OBJ.TYPE){
-                        case TATU_GET:
-                            //Baseado no código da resposta, decide como a resposta deve ser dada
-                            switch(requisition->cmd.OBJ.CODE){
-                                case TATU_CODE_INFO:
-                                    itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
-                                    break;
-                                case TATU_CODE_VALUE:
-                                    response_int = digitalRead(requisition->cmd.OBJ.PIN);
-                                    break;
-                                case TATU_CODE_STATE:
-                                    response_bool = digitalRead(requisition->cmd.OBJ.PIN);
-                                    break;
-                            }
-
+                    //MODIFICAR!!!
+                    switch(requisition->cmd.OBJ.CODE){
+                        case TATU_CODE_INFO:
+                            itoa(digitalRead(requisition->cmd.OBJ.PIN), str_buffer, 10);
+                            break;
+                        case TATU_CODE_VALUE:
+                            int_buffer = digitalRead(requisition->cmd.OBJ.PIN);
+                            break;
+                        case TATU_CODE_STATE:
+                            bool_buffer = digitalRead(requisition->cmd.OBJ.PIN);
+                            break;
                     }
                     break;
                 /* ADC Modifier */
                 case TATU_TYPE_ANALOG:
-                    switch(requisition->cmd.OBJ.TYPE){
-                        case TATU_GET:
-                            //Baseado no código da resposta, decide como a resposta deve ser dada
-                            switch(requisition->cmd.OBJ.CODE){
-                                case TATU_CODE_INFO:
-                                    itoa(analogRead(requisition->cmd.OBJ.PIN), response, 10);
-                                    break;
-                                case TATU_CODE_VALUE:
-                                    value_int = analogRead(requisition->cmd.OBJ.PIN);
-                                    break;
-                                case TATU_CODE_STATE:
-                                    response_bool = analogRead(requisition->cmd.OBJ.PIN);
-                                    break;
-                            }
+                    //Baseado no código da resposta, decide como a resposta deve ser dada
+                    switch(requisition->cmd.OBJ.CODE){
+                        case TATU_CODE_INFO:
+                            itoa(analogRead(requisition->cmd.OBJ.PIN), str_buffer, 10);
                             break;
+                        case TATU_CODE_VALUE:
+                            int_buffer = analogRead(requisition->cmd.OBJ.PIN);
+                            break;
+                        case TATU_CODE_STATE:
+                            bool_buffer = analogRead(requisition->cmd.OBJ.PIN);
+                            break;
+                    
+                    break;
                     }
                 break;
             }
@@ -360,6 +363,18 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             switch(requisition->cmd.OBJ.VAR){
                 case TATU_TYPE_ALIAS:
                     //Baseado no código da resposta, decide qual função do usuário deve ser usada
+                    switch(requisition->cmd.OBJ.CODE) {
+                        case TATU_CODE_INFO:
+                            requisition = &payload[strlen(payload)+1];
+                            break;
+                        case TATU_CODE_VALUE:
+                            int_buffer = atoi(&payload[strlen(payload)+1]);
+                            requisition = &int_buffer;
+                            break;
+                        case TATU_CODE_STATE:
+                            requisition = &requisition->cmd.OBJ.STATE;
+                            break;
+                    }
                     requisition->cmd.OBJ.ERROR = set(requisition->str_hash,requisition,requisition->cmd.OBJ.CODE);
                     break;
                 /* GPIO Modifier */
@@ -387,16 +402,6 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             break;
         }
         /* System functions */
-        case TATU_TYPE_SYSTEM:
-            #ifdef DEBUG
-            PRINT_DEBUG(SYSTEM);
-            DEBUG_NL;
-            #endif
-            /** MODIFICA PROPRIEDADE **/
-            // ISTO AINDA NÃO FOI IMPLEMENTADO
-            strcpy_P(OUT_STR, false_body);
-            return;
-            break;
         default:
             #ifdef DEBUG
             PRINT_DEBUG(EXEC_ERROR);
