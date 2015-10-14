@@ -276,7 +276,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     bool isString,
          response_bool = false,
          value_bool = false;
-    char response[MAX_SIZE_RESPONSE] = {0};
+    char response_str[MAX_SIZE_RESPONSE] = {0};
     uint16_t response_int = 0,
              value_int = 0;
 
@@ -285,94 +285,107 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     // DEPRECATED //
     if(requisition->cmd.OBJ.TYPE == TATU_POST){ strcpy_P(OUT_STR, false_body); return; }
 
+
+
     /* Check the variable type */
-    switch(requisition->cmd.OBJ.VAR){
+    switch(requisition->cmd.OBJ.TYPE){
         /* If the desired variable is of type ALIAS, call the user's function */
-        case TATU_TYPE_ALIAS:
-            //Baseado no código da resposta, decide qual função do usuário deve ser usada
-            switch(requisition->cmd.OBJ.CODE){
-                case TATU_CODE_INFO:
-                    #ifdef DEBUG
-                    PRINT_DEBUG(CALLBACK_INFO);
-                    DEBUG_NL;
-                    #endif
-                    requisition->cmd.OBJ.ERROR = !TATUCallback.info(requisition->str_hash,response,
-                                                                    &payload[strlen(payload)+1],
-                                                                    requisition->cmd.OBJ.TYPE);
+        switch(requisition->cmd.OBJ.CODE) {
+            case TATU_CODE_INFO:
+                response = response_str;
+                break;
+            case TATU_CODE_VALUE:
+                response = response_int;
+                break;
+            case TATU_CODE_STATE:
+                response = response_bool;
+                break;
+        }
+        case TATU_GET:
+            #ifdef DEBUG
+            PRINT_DEBUG(CALLBACK_GET);
+            DEBUG_NL;
+            #endif
+            switch(requisition->cmd.OBJ.VAR){
+                case TATU_TYPE_ALIAS:
+                    //Baseado no código da resposta, decide qual função do usuário deve ser usada
+                    requisition->cmd.OBJ.ERROR = get(requisition->str_hash,response,requisition->cmd.OBJ.CODE);
                     break;
-                case TATU_CODE_VALUE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG(CALLBACK_VALUE);
-                    DEBUG_NL;
-                    #endif
-                    value_int = atoi(&payload[strlen(payload)+1]);
-                    requisition->cmd.OBJ.ERROR = !TATUCallback.value(requisition->str_hash,&response_int,
-                                                                    value_int,requisition->cmd.OBJ.TYPE);
+                /* GPIO Modifier */
+                case TATU_TYPE_PIN:
+                //MODIFICAR!!!
+                    switch(requisition->cmd.OBJ.TYPE){
+                        case TATU_GET:
+                            //Baseado no código da resposta, decide como a resposta deve ser dada
+                            switch(requisition->cmd.OBJ.CODE){
+                                case TATU_CODE_INFO:
+                                    itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
+                                    break;
+                                case TATU_CODE_VALUE:
+                                    response_int = digitalRead(requisition->cmd.OBJ.PIN);
+                                    break;
+                                case TATU_CODE_STATE:
+                                    response_bool = digitalRead(requisition->cmd.OBJ.PIN);
+                                    break;
+                            }
+
+                    }
                     break;
-                case TATU_CODE_STATE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG(CALLBACK_STATE);
-                    DEBUG_NL;
-                    #endif
-                    requisition->cmd.OBJ.ERROR = !TATUCallback.state(requisition->str_hash,&response_bool,
-                                                                    requisition->cmd.OBJ.STATE,requisition->cmd.OBJ.TYPE);
-                    break;
-            }
-            break;
-        /* GPIO Modifier */
-        case TATU_TYPE_PIN:
-            //MODIFICAR!!!
-            switch(requisition->cmd.OBJ.TYPE){
-                case TATU_GET:
-                    //Baseado no código da resposta, decide como a resposta deve ser dada
-                    switch(requisition->cmd.OBJ.CODE){
-                        case TATU_CODE_INFO:
-                            itoa(digitalRead(requisition->cmd.OBJ.PIN), response, 10);
-                            break;
-                        case TATU_CODE_VALUE:
-                            response_int = digitalRead(requisition->cmd.OBJ.PIN);
-                            break;
-                        case TATU_CODE_STATE:
-                            response_bool = digitalRead(requisition->cmd.OBJ.PIN);
+                /* ADC Modifier */
+                case TATU_TYPE_ANALOG:
+                    switch(requisition->cmd.OBJ.TYPE){
+                        case TATU_GET:
+                            //Baseado no código da resposta, decide como a resposta deve ser dada
+                            switch(requisition->cmd.OBJ.CODE){
+                                case TATU_CODE_INFO:
+                                    itoa(analogRead(requisition->cmd.OBJ.PIN), response, 10);
+                                    break;
+                                case TATU_CODE_VALUE:
+                                    value_int = analogRead(requisition->cmd.OBJ.PIN);
+                                    break;
+                                case TATU_CODE_STATE:
+                                    response_bool = analogRead(requisition->cmd.OBJ.PIN);
+                                    break;
+                            }
                             break;
                     }
-                case TATU_SET:
+                break;
+            }
+            break;
+        case TATU_SET:
+            #ifdef DEBUG
+            PRINT_DEBUG(CALLBACK_SET);
+            DEBUG_NL;
+            #endif
+            switch(requisition->cmd.OBJ.VAR){
+                case TATU_TYPE_ALIAS:
+                    //Baseado no código da resposta, decide qual função do usuário deve ser usada
+                    requisition->cmd.OBJ.ERROR = set(requisition->str_hash,requisition,requisition->cmd.OBJ.CODE);
+                    break;
+                /* GPIO Modifier */
+                case TATU_TYPE_PIN:
                     digitalWrite(requisition->cmd.OBJ.PIN,requisition->cmd.OBJ.STATE);
                     requisition->cmd.OBJ.ERROR = false;
                     #ifdef DEBUG
                     PRINT_DEBUG(SET_PIN);
                     DEBUG_NL;
                     #endif
+                    break; 
+                break;
+                /* ADC Modifier */
+                case TATU_TYPE_ANALOG:
+                    analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
+                    requisition->cmd.OBJ.ERROR = false;
+                    #ifdef DEBUG
+                    PRINT_DEBUG(SET_PIN);
+                    DEBUG_NL;
+                    #endif
                     break;
+                    
+                break;
             }
             break;
-            /* ADC Modifier */
-            case TATU_TYPE_ANALOG:
-                switch(requisition->cmd.OBJ.TYPE){
-                    case TATU_GET:
-                        //Baseado no código da resposta, decide como a resposta deve ser dada
-                        switch(requisition->cmd.OBJ.CODE){
-                            case TATU_CODE_INFO:
-                                itoa(analogRead(requisition->cmd.OBJ.PIN), response, 10);
-                                break;
-                            case TATU_CODE_VALUE:
-                                value_int = analogRead(requisition->cmd.OBJ.PIN);
-                                break;
-                            case TATU_CODE_STATE:
-                                response_bool = analogRead(requisition->cmd.OBJ.PIN);
-                                break;
-                        }
-                        break;
-                    case TATU_SET:
-                        analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
-                        requisition->cmd.OBJ.ERROR = false;
-                        #ifdef DEBUG
-                        PRINT_DEBUG(SET_PIN);
-                        DEBUG_NL;
-                        #endif
-                        break;
-                }
-                break;
+        }
         /* System functions */
         case TATU_TYPE_SYSTEM:
             #ifdef DEBUG
