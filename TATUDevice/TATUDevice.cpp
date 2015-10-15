@@ -136,33 +136,36 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
 */
 
 // > ONLY GET
-TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code)){
-    get_function = GET_FUNCTION;
+            TATUInterpreter *req, bool (*FUNCTION)(uint32_t hash, void* response, uint8_t code)){
+    get_function = FUNCTION;
+    set_function = NULL;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 // > ONLY SET
-TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, void* request, uint8_t code)){
+            TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request)){
     set_function = SET_FUNCTION;
+    get_function = NULL;
+
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 // > BOTH
-TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code),
-            bool (*SET_FUNCTION)(uint32_t hash, void* request, uint8_t code)){
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code), 
+            bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request)){
     get_function = GET_FUNCTION;
     set_function = SET_FUNCTION;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 // > NONE
-TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
+TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req){
     get_function = NULL;
@@ -199,10 +202,11 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     os_version = (uint8_t) os_v;
     requisition = req;
     
-    /* Set the default callback if the param callback isn't null */
+    /*Deprecated 
+    Set the default callback if the param callback isn't null 
     if (!TATUCallback.info) TATUCallback.info = info_default;
     if (!TATUCallback.value) TATUCallback.value = value_default;
-    if (!TATUCallback.state) TATUCallback.state = state_default;
+    if (!TATUCallback.state) TATUCallback.state = state_default;*/
 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
@@ -272,12 +276,12 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     DEBUG_NL;
     #endif
     
-    void response,request;
+    void *response,*request;
     int aux = last_char;
     bool isString,
-         bool_buffer = false,
+         bool_buffer = false;
     char str_buffer[MAX_SIZE_RESPONSE] = {0};
-    uint16_t int_buffer = 0,            
+    uint16_t int_buffer = 0;         
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
@@ -292,7 +296,6 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             // ISTO AINDA NÃO FOI IMPLEMENTADO
             strcpy_P(OUT_STR, false_body);
             return;
-            break;
     }
 
 
@@ -319,7 +322,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                             response = &bool_buffer;
                             break;
                     }
-                    requisition->cmd.OBJ.ERROR = get(requisition->str_hash,response,requisition->cmd.OBJ.CODE);
+                    requisition->cmd.OBJ.ERROR = !get_function(requisition->str_hash,response,requisition->cmd.OBJ.CODE);
                     break;
                 /* GPIO Modifier */
                 case TATU_TYPE_PIN:
@@ -329,7 +332,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                             itoa(digitalRead(requisition->cmd.OBJ.PIN), str_buffer, 10);
                             break;
                         case TATU_CODE_VALUE:
-                            int_buffer = digitalRead(requis1tion->cmd.OBJ.PIN);
+                            int_buffer = digitalRead(requisition->cmd.OBJ.PIN);
                             break;
                         case TATU_CODE_STATE:
                             bool_buffer = digitalRead(requisition->cmd.OBJ.PIN);
@@ -365,17 +368,18 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     //Baseado no código da resposta, decide qual função do usuário deve ser usada
                     switch(requisition->cmd.OBJ.CODE) {
                         case TATU_CODE_INFO:
-                            requisition = &payload[strlen(payload)+1];
+                            request = &payload[strlen(payload)+1];
                             break;
                         case TATU_CODE_VALUE:
                             int_buffer = atoi(&payload[strlen(payload)+1]);
-                            requisition = &int_buffer;
+                            request = &int_buffer;
                             break;
                         case TATU_CODE_STATE:
-                            requisition = &requisition->cmd.OBJ.STATE;
+                            bool_buffer = requisition->cmd.OBJ.STATE;
+                            request = &bool_buffer;
                             break;
                     }
-                    requisition->cmd.OBJ.ERROR = set(requisition->str_hash,request,requisition->cmd.OBJ.CODE);
+                    requisition->cmd.OBJ.ERROR = !set_function(requisition->str_hash, requisition->cmd.OBJ.CODE, request);
                     break;
                 /* GPIO Modifier */
                 case TATU_TYPE_PIN:
@@ -411,7 +415,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             #endif
             strcpy_P(OUT_STR, null_body);
             return;
-            
+
     }
 
     // Se encontrado qualquer tipo de erro

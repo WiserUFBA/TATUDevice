@@ -22,8 +22,8 @@
 bool lamp;
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 192, 168, 0, 101 };
-byte ip[4]    = { 192, 168, 0, 127}; 
+byte server[] = { 10, 3, 200, 152 };
+byte ip[4]    = { 10, 3, 200, 167}; 
 
 //int t,h,count1,count2;
 unsigned long int time, lastConnect,prevTime,iTime;
@@ -32,14 +32,14 @@ unsigned long int time, lastConnect,prevTime,iTime;
 bool get(uint32_t hash,void* response,uint8_t code){
   
   switch(hash){
-      case H_lamp
+      case H_lamp:
         switch(code){   
-          case TATU_CODE_INFO;
-            if(lamp) strcpy(response,"ON");
-            else strcpy(response,"OFF");
+          case TATU_CODE_INFO:
+            if(lamp) strcpy((char*)response,"ON");
+            else strcpy((char*)response,"OFF");
             break;
-          case TATU_CODE_STATE;
-            *response = lamp;
+          case TATU_CODE_STATE:
+            *(bool*)response = lamp;
             break;
           default:
             return false;
@@ -53,16 +53,16 @@ bool get(uint32_t hash,void* response,uint8_t code){
   return true;
   
 }
-bool set(uint32_t hash,void* req,uin8_t code){
+bool set(uint32_t hash,uint8_t code, void* req){
     switch(hash){
       case H_lamp:
         switch(code){   
-          case TATU_CODE_INFO;
-            if (req[0] == '1'){ligar(LAMP);Serial.println("ON"); lamp = true;}
-            else if (req[0] == '0'){desligar(LAMP);Serial.println("OFF"); lamp = false;}
+          case TATU_CODE_INFO:
+            if (*(char*)req == '1'){ligar(LAMP);Serial.println("ON"); lamp = true;}
+            else if (*(char*)req == '0'){desligar(LAMP);Serial.println("OFF"); lamp = false;}
             break;
-          case TATU_CODE_STATE;
-            if (req){ligar(LAMP);Serial.println("ON"); lamp = true;}
+          case TATU_CODE_STATE:
+            if (*(bool*)req){ligar(LAMP);Serial.println("ON"); lamp = true;}
             else {desligar(LAMP);Serial.println("OFF"); lamp = false;}
             break;
           default:
@@ -72,12 +72,12 @@ bool set(uint32_t hash,void* req,uin8_t code){
       default:
         return false;
   }
-
+  return true;
 }
 // Objects to example that uses ethernet
 EthernetClient EthClient;
 TATUInterpreter interpreter;
-TATUDevice device("rele-pres", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get,set);
+TATUDevice device("lamp", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get, set);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
@@ -91,6 +91,7 @@ void setup() {
   //Trying connect to the broker  
   while(!client.connect(device.name,"device","boteco@wiser"));
   client.subscribe(device.name,1);
+  Serial.println("Conectou ao broker");
 
 }
 void loop() { client.loop(); 
@@ -104,6 +105,5 @@ void loop() { client.loop();
     lastConnect = millis();
   }
 
- 
 }
 

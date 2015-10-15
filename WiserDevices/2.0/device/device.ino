@@ -5,24 +5,27 @@
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <string.h>
+#include <DHT.h>
 
 //Digital pin for the relay
 #define LUMINOSITY 0
 #define MOVE 3
 #define DHTPIN 8
 #define SOUND A1
+#define GAS A0
 
+#define DHTTYPE 11
 
 //Port to connect with the broker 
 #define MQTTPORT 1883
 
 //Hash that represents the attribute "lamp" 
-#define H_lamp 2090464143
 #define H_sound 274653294
 #define H_gas 193492480
 #define H_temp 2090755995
 #define H_ar 5863224
 #define H_move 2090515612
+#define H_luminosity 1516126306
 
 #define ligar(PIN) digitalWrite(PIN,true)
 #define desligar(PIN) digitalWrite(PIN,false)
@@ -30,7 +33,7 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 //variveis
-bool soundReading,movement,gas_amount,t,h,luminosity;
+int soundReading,movement,gas_amount,t,h,luminosity;
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 192, 168, 0, 101 };
@@ -45,83 +48,83 @@ bool get(uint32_t hash,void* response,uint8_t code){
       case H_move:
         switch(code){   
           case TATU_CODE_INFO:
-            itoa(movement,response,10);
+            itoa(movement,(char*)response,10);
             break;
           case TATU_CODE_VALUE:
-            *response = movement;
+            *(int*)response = movement;
             break;
           default:
             return false;
         } 
         movement = 0;
         break;
-      case sound:
-        soundReading=analogRead(SOUND_PIN);
+      case H_sound:
+        soundReading=analogRead(SOUND);
         switch(code){
           case TATU_CODE_INFO:
-            itoa(soundReading,response,10)
+            itoa(soundReading,(char*)response,10);
             break;
           case TATU_CODE_VALUE:
-            *response = soundReading;
+            *(int*)response = soundReading;
             break;
           default:
             return false;
         }
-      case H_temp
+      case H_temp:
         t = (int)dht.readTemperature();
         switch(code){   
           case TATU_CODE_INFO:
-            itoa(t,response,10):
+            itoa(t,(char*)response,10);
             break;
           case TATU_CODE_VALUE:
-            *response = t;
+            *(int*)response = t;
             break;
           default:
             return false;
         } 
         break;
-      case H_ar
+      case H_ar:
         h = (int)dht.readHumidity();
         switch(code){   
           case TATU_CODE_INFO:
-            itoa(h,response,10);
+            itoa(h,(char*)response,10);
             break;
           case TATU_CODE_VALUE:
-            *response = h;
+            *(int*)response = h;
             break;
           default:
             return false;
         } 
         break;
-      case H_luminosity
+      case H_luminosity:
         luminosity = analogRead(LUMINOSITY);
         switch(code){   
           case TATU_CODE_INFO:
-            itoa(luminosity,response,10);
+            itoa(luminosity,(char*)response,10);
             break;
           case TATU_CODE_VALUE:
-            *response = luminosity;
+            *(int*)response = luminosity;
             break;
           default:
             return false;
         } 
         break;
       case H_gas:
-        gas_amount = analogRead(GAS_PIN);
+        gas_amount = analogRead(GAS);
         gas_amount = map (gas_amount,0,1023,0,100);
-        switch(req){   
+        switch(code){   
           case TATU_CODE_INFO:
-            itoa(gas_amount,response,10);
-            aux = strlen(response);
-            response[aux++] = '%';
-            response[aux] = 0;
+            itoa(gas_amount,(char*)response,10);
+            aux = strlen((char*)response);
+            ((char*)response)[aux++] = '%';
+            ((char*)response)[aux] = 0;
             break;
           case TATU_CODE_VALUE:
-            *response = gas_amount;
+            *(int*)response = gas_amount;
             break;
           case TATU_CODE_STATE:
-            if (gas_amount > 55) *response = true;
-            else *response = false;
+            if (gas_amount > 55) *(int*)response = true;
+            else *(int*)response = false;
             break;
         } 
         break;
@@ -146,9 +149,9 @@ void setup() {
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  
-  pinMode(LAMP,OUTPUT);
+  
   pinMode(LUMINOSITY,INPUT);
-  pinMode(GAS_PIN,INPUT);
+  pinMode(GAS,INPUT);
   pinMode(DHTPIN,INPUT);
   pinMode(MOVE, INPUT);
   

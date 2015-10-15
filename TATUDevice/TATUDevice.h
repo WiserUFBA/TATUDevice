@@ -47,7 +47,7 @@ typedef uint8_t byte;
 #define ISEMPTY(VAR) (VAR[0] == 0)
 // Switch topic to the following topic
 // REQ
-#define SWITCH_REQ_TOPIC(TOPIC, )
+//#define SWITCH_REQ_TOPIC(TOPIC, )
 
 // Cria wrapper para a função de callback da classe
 #define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\
@@ -143,7 +143,7 @@ public:
     uint16_t    mqtt_port;
     uint8_t     os_version;
     bool (*get_function)(uint32_t hash, void* response, uint8_t code);
-    bool (*set_function)(uint32_t hash, void* request, uint8_t code);
+    bool (*set_function)(uint32_t hash, uint8_t type, void* request);
 
     // Atributos variaveis
     TATUInterpreter *requisition;
@@ -188,21 +188,21 @@ public:
     // > ONLY GET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type));
+                TATUInterpreter *req, bool (*FUNCTION)(uint32_t hash, void* response, uint8_t type));
     // > ONLY SET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, void* response, void* valor, uint8_t type));
+                TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, uint8_t type, void* request));
     // > BOTH
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type),
-                bool (*SET_FUNCTION)(uint32_t hash, void* response, void* valor, uint8_t type));
+                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type), 
+                bool (*SET_FUNCTION)(uint32_t hash, uint8_t type, void* request));
     // > NONE
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
                 TATUInterpreter *req);
-
+    
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req); 
