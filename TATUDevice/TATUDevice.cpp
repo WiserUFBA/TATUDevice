@@ -138,7 +138,7 @@ TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    con
 // > ONLY GET
 TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type)){
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code)){
     get_function = GET_FUNCTION;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
@@ -146,7 +146,7 @@ TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
 // > ONLY SET
 TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type)){
+            TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, void* request, uint8_t code)){
     set_function = SET_FUNCTION;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
@@ -154,8 +154,8 @@ TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
 // > BOTH
 TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type),
-            bool (*SET_FUNCTION)(uint32_t hash, void* response, char* valor, uint8_t type)){
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code),
+            bool (*SET_FUNCTION)(uint32_t hash, void* request, uint8_t code)){
     get_function = GET_FUNCTION;
     set_function = SET_FUNCTION;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
@@ -272,7 +272,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     DEBUG_NL;
     #endif
     
-    void response;
+    void response,request;
     int aux = last_char;
     bool isString,
          bool_buffer = false,
@@ -329,7 +329,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                             itoa(digitalRead(requisition->cmd.OBJ.PIN), str_buffer, 10);
                             break;
                         case TATU_CODE_VALUE:
-                            int_buffer = digitalRead(requisition->cmd.OBJ.PIN);
+                            int_buffer = digitalRead(requis1tion->cmd.OBJ.PIN);
                             break;
                         case TATU_CODE_STATE:
                             bool_buffer = digitalRead(requisition->cmd.OBJ.PIN);
@@ -375,7 +375,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                             requisition = &requisition->cmd.OBJ.STATE;
                             break;
                     }
-                    requisition->cmd.OBJ.ERROR = set(requisition->str_hash,requisition,requisition->cmd.OBJ.CODE);
+                    requisition->cmd.OBJ.ERROR = set(requisition->str_hash,request,requisition->cmd.OBJ.CODE);
                     break;
                 /* GPIO Modifier */
                 case TATU_TYPE_PIN:
@@ -400,7 +400,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                 break;
             }
             break;
-        }
+        
         /* System functions */
         default:
             #ifdef DEBUG
@@ -411,6 +411,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             #endif
             strcpy_P(OUT_STR, null_body);
             return;
+            
     }
 
     // Se encontrado qualquer tipo de erro
@@ -444,35 +445,35 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     /* Verifica o tipo de resposta esperada, e responde adequadamente*/
     switch(requisition->cmd.OBJ.CODE) {
         case TATU_CODE_INFO:
-            QUOTE; strcpy(OUT_STR, response); aux+=strlen(response); QUOTE;
+            QUOTE; strcpy(OUT_STR, str_buffer); aux+=strlen(str_buffer); QUOTE;
             #ifdef DEBUG
             PRINT_DEBUG(RESPONSE_TYPE_INFO);
             DEBUG_NL;
             PRINT_DEBUG(THE_RESPONSE);
-            Serial.println(response);
+            Serial.println(str_buffer);
             #endif
             break;
         case TATU_CODE_VALUE:
-            itoa(response_int,response,10);
-            strcpy(OUT_STR, response);
-            aux+=strlen(response);
+            itoa(int_buffer,str_buffer,10);
+            strcpy(OUT_STR, str_buffer);
+            aux+=strlen(str_buffer);
             #ifdef DEBUG
             PRINT_DEBUG(RESPONSE_TYPE_VALUE);
             DEBUG_NL;
             PRINT_DEBUG(THE_RESPONSE);
-            Serial.println(response);
+            Serial.println(str_buffer);
             #endif
             break;
         case TATU_CODE_STATE:
-            if (response_bool)  strcpy_P(response, true_str);
-            else strcpy_P(response, false_str);
-            strcpy(OUT_STR, response);
-            aux+=strlen(response);
+            if (bool_buffer)  strcpy_P(str_buffer, true_str);
+            else strcpy_P(str_buffer, false_str);
+            strcpy(OUT_STR, str_buffer);
+            aux+=strlen(str_buffer);
             #ifdef DEBUG
             PRINT_DEBUG(RESPONSE_TYPE_STATE);
             DEBUG_NL;
             PRINT_DEBUG(THE_RESPONSE);
-            Serial.println(response);
+            Serial.println(str_buffer);
             #endif
             break;
     }

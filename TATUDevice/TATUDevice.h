@@ -142,8 +142,8 @@ public:
     char        mqtt_ip[MAX_SIZE_IP];
     uint16_t    mqtt_port;
     uint8_t     os_version;
-    bool (*get_function)(uint32_t hash, void* response, char* valor, uint8_t type);
-    bool (*set_function)(uint32_t hash, void* response, char* valor, uint8_t type);
+    bool (*get_function)(uint32_t hash, void* response, uint8_t code);
+    bool (*set_function)(uint32_t hash, void* request, uint8_t code);
 
     // Atributos variaveis
     TATUInterpreter *requisition;
