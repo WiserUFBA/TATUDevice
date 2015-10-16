@@ -35,11 +35,11 @@ bool get(uint32_t hash,void* response,uint8_t code){
       case H_lamp:
         switch(code){   
           case TATU_CODE_INFO:
-            if(lamp) strcpy((char*)response,"ON");
-            else strcpy((char*)response,"OFF");
+            if(lamp) STOS("ON",response);
+            else STOS("OFF",response);
             break;
           case TATU_CODE_STATE:
-            *(bool*)response = lamp;
+            BTOB(lamp,response);
             break;
           default:
             return false;

@@ -108,6 +108,10 @@ typedef uint8_t byte;
                                             client.subscribe(device.name);} \
                                         else Serial.println("The connection has failed")
 
+#define STOS(STRING1,STRING2) strcpy((char*)STRING2,STRING1)
+#define ITOS(INTEGER,STRING) (itoa(INTEGER,(char*)STRING,10))
+#define ITOI(INTEGER1,INTEGER2) *(int*)INTEGER2 = INTEGER1
+#define BTOB(BOOL1,BOOL2) *(int*)BOOL2 = BOOL1
 /* Callback Struct */
 // REMOVED!
 // typedef struct {
