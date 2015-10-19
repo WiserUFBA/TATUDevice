@@ -507,7 +507,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     Serial.println(output_message);
     #endif
     
-    //publica a mensagem
+    //publish the message
     publish(name, output_message);
     
     #ifdef DEBUG
@@ -515,6 +515,64 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     DEBUG_NL;
     #endif
 
+}
+void TATUDevice::interruption(const char *name, int var,char oper,int trigger){
+    int aux = last_char;
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+    // !IMPORTANT! Suporte para apenas uma variavel ''
+    /* Copia a variavel vinda do payload */
+    QUOTE; strcpy(OUT_STR, name); aux += strlen(name); QUOTE; COLON;
+
+    /* Responde adequadamente*/
+    QUOTE; strcpy(OUT_STR, name); aux+=strlen(name); QUOTE;
+
+     // Fecha o JSON e a STRING
+    BRACE_RIGHT; BRACE_RIGHT;
+    CLOSE_MSG;
+
+     //publish the message
+    publish(name, output_message);
+
+}
+void TATUDevice::interruption(const char *name, char *var,char oper,const char *trigger){
+    int aux = last_char;
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+    // !IMPORTANT! Suporte para apenas uma variavel ''
+    /* Copia a variavel vinda do payload */
+    QUOTE; strcpy(OUT_STR, name); aux += strlen(name); QUOTE; COLON;
+
+    /* Responde adequadamente*/
+    QUOTE; strcpy(OUT_STR, name); aux+=strlen(name); QUOTE;
+
+     // Fecha o JSON e a STRING
+    BRACE_RIGHT; BRACE_RIGHT;
+    CLOSE_MSG;
+
+     //publish the message
+    publish(name, output_message);    
+}
+void TATUDevice::interruption(const char *name, bool var ,char oper,bool trigger){
+    int aux = last_char;
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+    // !IMPORTANT! Suporte para apenas uma variavel ''
+    /* Copia a variavel vinda do payload */
+    QUOTE; strcpy(OUT_STR, name); aux += strlen(name); QUOTE; COLON;
+
+    /* Responde adequadamente*/
+    QUOTE; strcpy(OUT_STR, name); aux+=strlen(name); QUOTE;
+
+     // Fecha o JSON e a STRING
+    BRACE_RIGHT; BRACE_RIGHT;
+    CLOSE_MSG;
+
+     //publish the message
+    publish(name, output_message);
 }
 
 void TATUDevice::loop(){

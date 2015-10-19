@@ -41,6 +41,74 @@ byte ip[4]    = { 10, 3, 200, 167};
 
 unsigned long int time, lastConnect,prevTime,iTime;
 
+bool flow(uint32_t hash, void *response, uint8_t code){
+  
+  switch(hash){
+    case H_sound:
+      soundReading = analogRead(SOUND);
+      Serial.println(soundReading);
+      switch(code){
+        case TATU_CODE_INFO:
+          ITOS(soundReading,response);
+          break;
+        case TATU_CODE_VALUE:
+          ITOI(soundReading,response);
+          break;
+        default:
+          return false;
+     }
+     break;
+  }
+
+  
+  return true;
+}
+
+bool limitedflow(uint32_t hash, void *response, int *limit, uint8_t code){
+  
+  switch(hash){
+    case H_sound:
+      soundReading = analogRead(SOUND);
+      Serial.println(soundReading);
+      switch(code){
+        case TATU_CODE_INFO:
+          ITOS(soundReading,response);
+          break;
+        case TATU_CODE_VALUE:
+          ITOI(soundReading,response);
+          break;
+        default:
+          return false;
+     }
+     break;
+  }
+
+  
+  return true;
+}
+
+bool interrupt(uint32_t hash, void *response, uint8_t code){
+  
+  switch(hash){
+    case H_sound: 
+      soundReading = analogRead(SOUND);
+      if (soundReading < 550)
+        return false; 
+      switch(code){
+        case TATU_CODE_INFO:
+          ITOS(soundReading,response);
+          break;
+        case TATU_CODE_VALUE:
+          ITOI(soundReading,response);
+          break;
+        default:
+          return false;
+       }
+       break;
+  }
+  
+  return true;
+}
 
 bool get(uint32_t hash,void* response,uint8_t code){
   
@@ -99,10 +167,15 @@ bool get(uint32_t hash,void* response,uint8_t code){
         } 
         break;
       case H_luminosity:
-        luminosity = analogRead(LUMINOSITY);
+        luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
+        
         switch(code){   
           case TATU_CODE_INFO:
+            luminosity = map (luminosity,0,1023,0,100);
             ITOS(luminosity,response);
+            aux = strlen((char*)response);
+            ((char*)response)[aux++] = '%';
+            ((char*)response)[aux] = 0;
             break;
           case TATU_CODE_VALUE:
             ITOI(luminosity,response);
@@ -173,9 +246,20 @@ void loop() { client.loop();
     client.subscribe(device.name,1);
     lastConnect = millis();
   }
-
+  interruption_lamp();
+  interruption_luminosity();
+  interruption_ar();
  
 }
+interruption_lamp(){
+  device.interruption(lamp,'=',true);
+}
+interruption_luminosity(){
+  luminosity = map (luminosity,0,1023,0,100);
+  ITOS(luminosity,response);
+  device.interruption("luminosidade",luminosity,'=',"100%");
+}
+
 void mexeu()
 {
   movement++;

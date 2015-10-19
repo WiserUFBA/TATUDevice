@@ -111,7 +111,29 @@ typedef uint8_t byte;
 #define STOS(STRING1,STRING2) strcpy((char*)STRING2,STRING1)
 #define ITOS(INTEGER,STRING) (itoa(INTEGER,(char*)STRING,10))
 #define ITOI(INTEGER1,INTEGER2) *(int*)INTEGER2 = INTEGER1
-#define BTOB(BOOL1,BOOL2) *(int*)BOOL2 = BOOL1
+#define BTOB(BOOL1,BOOL2) *(bool*)BOOL2 = BOOL1
+int x, y;
+x = y
+
+#define RESPONSE_CONSTRUCT(NAME_VAR) {
+    int aux = last_char;
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+    // !IMPORTANT! Suporte para apenas uma variavel ''
+    /* Copia a variavel vinda do payload */
+    QUOTE; strcpy(OUT_STR, NAME); aux += strlen(NAME); QUOTE; COLON;
+
+    /* Responde adequadamente*/
+    QUOTE; strcpy(OUT_STR, NAME); aux+=strlen(NAME); QUOTE;
+
+     // Fecha o JSON e a STRING
+    BRACE_RIGHT; BRACE_RIGHT;
+    CLOSE_MSG;
+
+     //publish the message
+    publish(name, output_message);
+}
 /* Callback Struct */
 // REMOVED!
 // typedef struct {
@@ -210,6 +232,9 @@ public:
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req); 
+    void interruption(const char *name, int var,char oper,int trigger);
+    void interruption(const char *name, char *var,char oper,const char *trigger);
+    void interruption(const char *name, bool var ,char oper,bool trigger);
 
     void generateHeader();
     void generateBody(char *payload, uint8_t length);
