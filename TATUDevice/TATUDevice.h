@@ -210,9 +210,12 @@ public:
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req); 
+    
     void interruption(const char *name, int var,char oper,int trigger);
     void interruption(const char *name, char *var,char oper,const char *trigger);
     void interruption(const char *name, bool var ,char oper,bool trigger);
+    
+    void interrupt(const char *var_name, char *var);
 
     void generateHeader();
     void generateBody(char *payload, uint8_t length);

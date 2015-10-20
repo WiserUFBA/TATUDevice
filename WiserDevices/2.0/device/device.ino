@@ -188,17 +188,21 @@ void loop() { client.loop();
 void interruption_lamp(){
   device.interruption("lamp",lamp,'=',true);
 }
+/*
 void interruption_luminosidade(){
+  luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
   itoa(luminosity,str,10);
-  device.interruption("luminosity",luminosity,'<',"23%");
-}
+  device.interruption("luminosity",str,'=',"23%");
+}*/
 void interruption_luminosity(){
+  luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
   device.interruption("luminosity",luminosity,'<',35);
 }
 void mexeu()
 {
+  device.interrupt("move","mexeu");
   movement++;
   Serial.println("mexeu");
 }
