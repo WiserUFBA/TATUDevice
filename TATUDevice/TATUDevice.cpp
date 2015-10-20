@@ -51,6 +51,7 @@ const char body_str[]   PROGMEM = "\"BODY\":{";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
 const char pin_str[]    PROGMEM = "PIN";
+const char dev_str[] PROGMEM = "dev/";
 
 const char int_str[]    PROGMEM = "INT";
 const char res_str[]    PROGMEM = "RES";
@@ -184,6 +185,9 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     i = strlen(name_d);
     len_name = i;
     STRCPY(name_d, name);
+
+    strcpy_P(aux_topic_name,dev_str);
+    strcpy(&aux_topic_name[strlen(aux_topic_name)],name_d);
 
     // REMOVED, NOT NEEDED
     // STRCPY(name, subscribe_topic);
@@ -508,71 +512,95 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     #endif
     
     //publish the message
-    publish(name, output_message);
-    
+    publish(aux_topic_name, output_message);
+
     #ifdef DEBUG
     PRINT_DEBUG(PUBLISHED);
     DEBUG_NL;
     #endif
 
 }
-void TATUDevice::interruption(const char *name, int var,char oper,int trigger){
+void TATUDevice::interruption(const char *var_name, int var,char oper,int trigger){
     int aux = last_char;
-    /* Coloca o BODY na resposta */
-    strcpy_P(OUT_STR, body_str);
-    aux += 8;
-    // !IMPORTANT! Suporte para apenas uma variavel ''
-    /* Copia a variavel vinda do payload */
-    QUOTE; strcpy(OUT_STR, name); aux += strlen(name); QUOTE; COLON;
-
-    /* Responde adequadamente*/
-    QUOTE; strcpy(OUT_STR, name); aux+=strlen(name); QUOTE;
-
-     // Fecha o JSON e a STRING
-    BRACE_RIGHT; BRACE_RIGHT;
-    CLOSE_MSG;
-
-     //publish the message
-    publish(name, output_message);
-
+    char str_buffer[MAX_SIZE_RESPONSE];
+    switch (oper){
+        case '=':
+            if(var == trigger) 
+                break;
+            return;
+        case '>':
+            if(var > trigger)
+                break;
+            return;
+        case '<':
+            if(var < trigger)
+                break;
+            return;
+        case '!':
+            if(var != trigger)
+                break;
+            return;
+        default:
+            return;
+    }
+    /* Coloca o BODY na resposta */ 
+    strcpy_P(OUT_STR, body_str); 
+    aux += 8; 
+    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */
+    itoa(var,str_buffer,10);
+    strcpy(OUT_STR, str_buffer);
+    aux+=strlen(str_buffer);
+    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
+    CLOSE_MSG; 
+    publish_test(name, output_message); //publish the message 
+    //RESPONSE_CONSTRUCT(var_name);
 }
-void TATUDevice::interruption(const char *name, char *var,char oper,const char *trigger){
+void TATUDevice::interruption(const char *var_name, char *var,char oper,const char *trigger){
     int aux = last_char;
-    /* Coloca o BODY na resposta */
-    strcpy_P(OUT_STR, body_str);
-    aux += 8;
-    // !IMPORTANT! Suporte para apenas uma variavel ''
-    /* Copia a variavel vinda do payload */
-    QUOTE; strcpy(OUT_STR, name); aux += strlen(name); QUOTE; COLON;
-
-    /* Responde adequadamente*/
-    QUOTE; strcpy(OUT_STR, name); aux+=strlen(name); QUOTE;
-
-     // Fecha o JSON e a STRING
-    BRACE_RIGHT; BRACE_RIGHT;
-    CLOSE_MSG;
-
-     //publish the message
-    publish(name, output_message);    
+    switch (oper){
+        case '=':
+            if(!strcmp(var,trigger)) 
+                break;
+            return;
+        case '!':
+            if(strcmp(var,trigger))
+                break;
+            return;
+        default:
+            return;
+    }
+    /* Coloca o BODY na resposta */ 
+    strcpy_P(OUT_STR, body_str); 
+    aux += 8; 
+    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */ 
+    QUOTE; strcpy(OUT_STR, var); aux+=strlen(var); QUOTE;
+    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
+    CLOSE_MSG; 
+    publish_test(name, output_message); //publish the message 
+    //RESPONSE_CONSTRUCT(var_name);
 }
-void TATUDevice::interruption(const char *name, bool var ,char oper,bool trigger){
+void TATUDevice::interruption(const char *var_name, bool var ,char oper,bool trigger){
     int aux = last_char;
-    /* Coloca o BODY na resposta */
-    strcpy_P(OUT_STR, body_str);
-    aux += 8;
-    // !IMPORTANT! Suporte para apenas uma variavel ''
-    /* Copia a variavel vinda do payload */
-    QUOTE; strcpy(OUT_STR, name); aux += strlen(name); QUOTE; COLON;
-
-    /* Responde adequadamente*/
-    QUOTE; strcpy(OUT_STR, name); aux+=strlen(name); QUOTE;
-
-     // Fecha o JSON e a STRING
-    BRACE_RIGHT; BRACE_RIGHT;
-    CLOSE_MSG;
-
-     //publish the message
-    publish(name, output_message);
+    switch (oper){
+        case '=':
+            if(var == trigger) 
+                break;
+            return;
+        case '!':
+            if(var != trigger)
+                break;
+            return;
+        default:
+            return;
+    }
+    /* Coloca o BODY na resposta */ 
+    strcpy_P(OUT_STR, body_str); 
+    aux += 8; 
+    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */ 
+    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
+    CLOSE_MSG; 
+    publish_test(name, output_message); //publish the message 
+   //RESPONSE_CONSTRUCT(var_name);
 }
 
 void TATUDevice::loop(){

@@ -34,81 +34,14 @@ DHT dht(DHTPIN, DHTTYPE);
 
 //variveis
 volatile int soundReading,movement,gas_amount,t,h,luminosity;
+bool lamp;
+char str[20];
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 10, 3, 200, 152 };
-byte ip[4]    = { 10, 3, 200, 167}; 
+byte server[] = { 10, 41, 0, 93 };
+byte ip[4]    = { 10, 41, 0, 97}; 
 
 unsigned long int time, lastConnect,prevTime,iTime;
-
-bool flow(uint32_t hash, void *response, uint8_t code){
-  
-  switch(hash){
-    case H_sound:
-      soundReading = analogRead(SOUND);
-      Serial.println(soundReading);
-      switch(code){
-        case TATU_CODE_INFO:
-          ITOS(soundReading,response);
-          break;
-        case TATU_CODE_VALUE:
-          ITOI(soundReading,response);
-          break;
-        default:
-          return false;
-     }
-     break;
-  }
-
-  
-  return true;
-}
-
-bool limitedflow(uint32_t hash, void *response, int *limit, uint8_t code){
-  
-  switch(hash){
-    case H_sound:
-      soundReading = analogRead(SOUND);
-      Serial.println(soundReading);
-      switch(code){
-        case TATU_CODE_INFO:
-          ITOS(soundReading,response);
-          break;
-        case TATU_CODE_VALUE:
-          ITOI(soundReading,response);
-          break;
-        default:
-          return false;
-     }
-     break;
-  }
-
-  
-  return true;
-}
-
-bool interrupt(uint32_t hash, void *response, uint8_t code){
-  
-  switch(hash){
-    case H_sound: 
-      soundReading = analogRead(SOUND);
-      if (soundReading < 550)
-        return false; 
-      switch(code){
-        case TATU_CODE_INFO:
-          ITOS(soundReading,response);
-          break;
-        case TATU_CODE_VALUE:
-          ITOI(soundReading,response);
-          break;
-        default:
-          return false;
-       }
-       break;
-  }
-  
-  return true;
-}
 
 bool get(uint32_t hash,void* response,uint8_t code){
   
@@ -220,7 +153,9 @@ MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
+
 void setup() {
+  device.publish_test = &bridge;
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  
@@ -248,18 +183,20 @@ void loop() { client.loop();
   }
   interruption_lamp();
   interruption_luminosity();
-  interruption_ar();
  
 }
-interruption_lamp(){
-  device.interruption(lamp,'=',true);
+void interruption_lamp(){
+  device.interruption("lamp",lamp,'=',true);
 }
-interruption_luminosity(){
+void interruption_luminosidade(){
   luminosity = map (luminosity,0,1023,0,100);
-  ITOS(luminosity,response);
-  device.interruption("luminosidade",luminosity,'=',"100%");
+  itoa(luminosity,str,10);
+  device.interruption("luminosity",luminosity,'<',"23%");
 }
-
+void interruption_luminosity(){
+  luminosity = map (luminosity,0,1023,0,100);
+  device.interruption("luminosity",luminosity,'<',35);
+}
 void mexeu()
 {
   movement++;

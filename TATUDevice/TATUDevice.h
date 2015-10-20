@@ -41,6 +41,8 @@ typedef uint8_t byte;
 //#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; i < LEN; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
 // Copiar uma string para a outra
 #define STRCPY(INPUT, OUTPUT) do{ for(i = 0;INPUT[i] != 0; ++i) OUTPUT[i] = INPUT[i]; OUTPUT[i] = 0; }while(0)
+#define STRCPY_I(INPUT, OUTPUT, INDEX) do{ for(i = INDEX;INPUT[i - INDEX] != 0; ++i) OUTPUT[i] = INPUT[i - INDEX]; OUTPUT[i] = 0; }while(0)
+
 // Gera o body tendo o OBJETO dispositivo
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
 // Verifica se uma STRING está vazia
@@ -55,6 +57,9 @@ typedef uint8_t byte;
                                         {OBJ.mqtt_callback(topic, payload, length, BRIDGE);}
 #define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *topic, char *out)\
                                   { OBJ.publish(topic,out); }
+
+#define MQTT_PUBLISH2(OBJ, BRIDGE) OBJ.publish_test = &BRIDGE;
+
 
 // Constrói o dispositivo e o cliente 
 #define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK, CLIENT) \
@@ -112,43 +117,16 @@ typedef uint8_t byte;
 #define ITOS(INTEGER,STRING) (itoa(INTEGER,(char*)STRING,10))
 #define ITOI(INTEGER1,INTEGER2) *(int*)INTEGER2 = INTEGER1
 #define BTOB(BOOL1,BOOL2) *(bool*)BOOL2 = BOOL1
-int x, y;
-x = y
 
-#define RESPONSE_CONSTRUCT(NAME_VAR) {
-    int aux = last_char;
-    /* Coloca o BODY na resposta */
-    strcpy_P(OUT_STR, body_str);
-    aux += 8;
-    // !IMPORTANT! Suporte para apenas uma variavel ''
-    /* Copia a variavel vinda do payload */
-    QUOTE; strcpy(OUT_STR, NAME); aux += strlen(NAME); QUOTE; COLON;
+//#define RESPONSE_CONSTRUCT(NAME_VAR)/* Coloca o BODY na resposta */ \
+                                    //strcpy_P(OUT_STR, body_str); \
+                                    //aux += 8; \
+                                    //QUOTE; strcpy(OUT_STR, NAME_VAR); aux += strlen(NAME_VAR); QUOTE; COLON;  /* Copia a variavel vinda do payload */ \
+                                    //BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ \
+                                    //CLOSE_MSG; \
+                                    //publish(name, output_message) //publish the message 
 
-    /* Responde adequadamente*/
-    QUOTE; strcpy(OUT_STR, NAME); aux+=strlen(NAME); QUOTE;
 
-     // Fecha o JSON e a STRING
-    BRACE_RIGHT; BRACE_RIGHT;
-    CLOSE_MSG;
-
-     //publish the message
-    publish(name, output_message);
-}
-/* Callback Struct */
-// REMOVED!
-// typedef struct {
-//     bool (*info)(uint32_t, char*, char*, uint8_t);          /* Info Callback */
-//     bool (*value)(uint32_t, uint16_t*, uint16_t, uint8_t);  /* Value Callback */
-//     bool (*state)(uint32_t, bool*, bool, uint8_t);          /* State Callback */
-// }Callback;
-
-// Essas funções tem como objetivo serem usadas como padrão, quando elas não são definidas pelo usuário
-// INFO
-// bool info_default(uint32_t, char*, char*, uint8_t);
-// VALUE
-// bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t);
-// STATE
-// bool state_default(uint32_t, bool*, bool, uint8_t);
 
 /* Utilidades */
 int freeRAM();
@@ -160,7 +138,7 @@ public:
     // Atributos do sistema
     char        name[MAX_SIZE_NAME];
     int         len_name;
-    char        aux_topic_name[MAX_SIZE_NAME + 5];
+    char        aux_topic_name[MAX_SIZE_NAME + 15];
     char        ip[MAX_SIZE_IP];
     uint8_t     id;
     uint8_t     pan;
@@ -170,7 +148,7 @@ public:
     uint8_t     os_version;
     bool (*get_function)(uint32_t hash, void* response, uint8_t code);
     bool (*set_function)(uint32_t hash, uint8_t type, void* request);
-
+    void (*publish_test)(char *, char *);
     // Atributos variaveis
     TATUInterpreter *requisition;
 
