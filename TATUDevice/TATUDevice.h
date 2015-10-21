@@ -35,7 +35,7 @@ typedef uint8_t byte;
 #define CLOSE_MSG   output_message[aux]=0
 
 // DOD - Device Object Description 
-#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{name:" NAME ",mqtt_address:/dev/" NAME \
+#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{name:" NAME ",mqtt_address:dev/" NAME \
                                                 ",sensors:[" SENSORS "]," \
                                                 "actuators:{" ACTUATORS "}"
 
@@ -45,6 +45,7 @@ typedef uint8_t byte;
 #define ADD_LAST_ACTUATOR(NAME, TYPE, PIN)      ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
 #define ADD_SENSORS(NAME, TYPE, PIN)            ADD_SINGLE_SENSOR(NAME,TYPE,PIN) ","
 #define ADD_ACTUATORS(NAME, TYPE, PIN)          ADD_SINGLE_SENSOR(NAME,TYPE,PIN) ","
+#define ADD_NONE()                              ""
 
 // Constantes do Sistema
 #define SAMPLE_NUMBER 0
@@ -161,6 +162,8 @@ public:
     void (*publish_test)(char *, char *);
     // Atributos variaveis
     TATUInterpreter *requisition;
+
+    PGM_P DOD;
 
     /* TEORICO */
     /* uint8_t reset_counter;

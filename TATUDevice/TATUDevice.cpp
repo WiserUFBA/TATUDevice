@@ -51,7 +51,7 @@ const char body_str[]   PROGMEM = "\"BODY\":{";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
 const char pin_str[]    PROGMEM = "PIN";
-const char dev_str[]    PROGMEM = "/dev/";
+const char dev_str[]    PROGMEM = "dev/";
 
 const char int_str[]    PROGMEM = "/INT";
 const char res_str[]    PROGMEM = "/RES";
@@ -119,7 +119,7 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
 
     // Define os atributos básicos
     i = strlen(name_d);
-    len_name = i + 5;
+    len_name = i + 4;
     STRCPY(name_d, name);
 
     strcpy_P(aux_topic_name,dev_str);
@@ -208,7 +208,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     void *response,*request;
     int aux = last_char;
     bool isString,
-         bool_buffer = false;requisition->cmd.OBJ.CODE
+         bool_buffer = false;
     char str_buffer[MAX_SIZE_RESPONSE] = {0};
     uint16_t int_buffer = 0;         
 

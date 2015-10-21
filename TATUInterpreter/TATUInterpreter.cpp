@@ -83,14 +83,14 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             j = 9;
             
             switch(string[4]){
-                case CODE_DADL:
+                case CODE_DOD:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_DOD);
                     DEBUG_NL;
                     //PRINT_DEBUG(ALL_ERROR);
                     //DEBUG_NL;
                     #endif
-                    cmd.OBJ.CODE = TATU_CODE_DADL;
+                    cmd.OBJ.CODE = TATU_CODE_DOD;
                     return false;
                 case CODE_INFO:
                     #ifdef DEBUG

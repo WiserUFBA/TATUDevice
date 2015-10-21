@@ -7,13 +7,14 @@
 #include <string.h>
 #include <DHT.h>
 
-//Digital pin for the relay
+// Digital pins used
 #define LUMINOSITY A3
 #define MOVE 3
 #define DHTPIN 8
 #define SOUND A1
 #define GAS A0
 
+// DHT TYPE
 #define DHTTYPE 11
 
 //Port to connect with the broker 
@@ -37,14 +38,13 @@ volatile int soundReading,movement,gas_amount,t,h,luminosity;
 bool lamp;
 char str[20];
 int aux;
-byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 10, 41, 0, 93 };
-byte ip[4]    = { 10, 41, 0, 97}; 
+byte mac[]    = {  0xDE, 0xDD, 0xBA, 0xCC, 0xAC, 0xDC };
+byte server[] = { 192, 168, 10, 21 };
+byte ip[]     = { 192, 168, 10, 13 }; 
 
-unsigned long int time, lastConnect,prevTime,iTime;
+unsigned long int time, lastConnect, prevTime, iTime;
 
 bool get(uint32_t hash,void* response,uint8_t code){
-  
   switch(hash){
       case H_move:
         switch(code){   
@@ -139,10 +139,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
       default:
         return false;
   }
-
-  
-  return true;
-  
+  return true; 
 }
 
 // Objects to example that uses ethernet
@@ -153,8 +150,24 @@ MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
+// This is obrigatory, and defines this DEVICE
+CREATE_DOD("device",
+  ADD_SENSORS("luminosity", "ldr", "A3")
+  ADD_SENSORS("move", "pir", "3")
+  ADD_SENSORS("temp", "dht11", "8")
+  ADD_SENSORS("gas", "mq2", "A0")
+  ADD_SENSORS("sound", "mic", "A1")
+  ADD_LAST_SENSOR("ar", "dht11", "3"),
+  ADD_NONE()
+);
 
 void setup() {
+  // Disable interrupts and setup the devices
+  //cli();
+  //delay(5000);
+  //sei();
+  //device.DOD = DOD;
+  
   device.publish_test = &bridge;
   char aux[16];  
   Serial.begin(9600);
@@ -163,16 +176,25 @@ void setup() {
   pinMode(DHTPIN,INPUT);
   pinMode(MOVE, INPUT);
   
-  digitalWrite(MOVE, HIGH);
-  attachInterrupt(1, mexeu, FALLING);
+  //digitalWrite(MOVE, HIGH);
+  //attachInterrupt(1, mexeu, FALLING);
+
+  Serial.println("Inicializando");
 
   //Trying connect to the broker  
   while(!client.connect(device.name,"device","boteco@wiser"));
-  client.subscribe(device.name,1);
+  client.subscribe(device.name);
   Serial.println("Conectado");
+  
+  // Re-enable all interrupts
+  //sei();
 }
-void loop() { client.loop(); 
+
+void loop() {
+  client.loop();
+  
   //Watchdog for connection with the broker
+  // This is really fucking annoying, AND NEED A FIX WITH URGENCY!
   time = millis();
   if (time - lastConnect > 600000) {
     Serial.println("reconectando");
@@ -181,27 +203,31 @@ void loop() { client.loop();
     client.subscribe(device.name,1);
     lastConnect = millis();
   }
+  
   interruption_lamp();
   interruption_luminosity();
- 
 }
+
 void interruption_lamp(){
   device.interruption("lamp",lamp,'=',true);
 }
+
 /*
 void interruption_luminosidade(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
   itoa(luminosity,str,10);
   device.interruption("luminosity",str,'=',"23%");
-}*/
+}
+*/
+
 void interruption_luminosity(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
   device.interruption("luminosity",luminosity,'<',35);
 }
-void mexeu()
-{
+
+void mexeu(){
   device.interrupt("move","mexeu");
   movement++;
   Serial.println("mexeu");
