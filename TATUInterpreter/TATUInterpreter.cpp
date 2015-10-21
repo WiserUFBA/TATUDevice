@@ -91,7 +91,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
                     //DEBUG_NL;
                     #endif
                     cmd.OBJ.CODE = TATU_CODE_DOD;
-                    return false;
+                    break;
                 case CODE_INFO:
                     #ifdef DEBUG
                     PRINT_DEBUG(FOUND_INFO);

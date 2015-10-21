@@ -444,8 +444,12 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     Serial.println(output_message);
     #endif
     
+    strcpy_P(&aux_topic_name[len_name],res_str);
+    
     //publish the message
     publish(aux_topic_name, output_message);
+
+    aux_topic_name[len_name] = 0;
 
     #ifdef DEBUG
     PRINT_DEBUG(PUBLISHED);

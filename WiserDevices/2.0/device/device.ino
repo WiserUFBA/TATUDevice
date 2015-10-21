@@ -163,6 +163,7 @@ CREATE_DOD("device",
 
 void setup() {
   cli();
+  Serial.println("Inicializando!");
   device.publish_test = &bridge;
   char aux[16];  
   Serial.begin(9600);
@@ -171,14 +172,17 @@ void setup() {
   pinMode(DHTPIN,INPUT);
   pinMode(MOVE, INPUT);
   
+  device.DOD = DOD;
+  
   digitalWrite(MOVE, HIGH);
   attachInterrupt(1, mexeu, FALLING);
 
   //Trying connect to the broker  
   while(!client.connect(device.name,"device","boteco@wiser"));
-  client.subscribe(device.name);
-  Serial.println("Conectado");
+  client.subscribe(device.aux_topic_name);
+  client.subscribe("dev");
   sei();
+  Serial.println("Conectado");
 }
 void loop() { 
   //client.loop(); 
@@ -191,15 +195,12 @@ void loop() {
     client.subscribe(device.name,1);
     lastConnect = millis();
   }*/
-  if(!EthClient.connected()){
-    Serial.println("reconectando");
-    while(!EthClient.connect(ip,1883));
-  }
-  if (!client.loop()) {
+  if (!(client.loop() && client.connected())) {
     Serial.println("reconectando");
     client.disconnect();
     while(!client.connect(device.name,"device","boteco@wiser"));
-    client.subscribe(device.name,1);
+    client.subscribe(device.aux_topic_name);
+    client.subscribe("dev");
     lastConnect = millis();
   }
   interruption_lamp();
