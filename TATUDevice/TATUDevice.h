@@ -35,7 +35,7 @@ typedef uint8_t byte;
 #define CLOSE_MSG   output_message[aux]=0
 
 // DOD - Device Object Description 
-#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{name:" NAME ",mqtt_address:dev/" NAME \
+#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{name:" NAME ",mqtt_address:/dev/" NAME \
                                                 ",sensors:[" SENSORS "]," \
                                                 "actuators:{" ACTUATORS "}"
 
