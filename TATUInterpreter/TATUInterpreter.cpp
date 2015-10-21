@@ -10,7 +10,7 @@ const char START_PARSE[]        PROGMEM = "[DEBUG] Starting Parse";
 const char FOUND_GET[]          PROGMEM = "[DEBUG] Found GET";
 const char FOUND_SET[]          PROGMEM = "[DEBUG] Found SET";
 const char FOUND_NUM[]          PROGMEM = "[DEBUG] Is Pin";
-const char FOUND_ALL[]          PROGMEM = "[DEBUG] Found ALL";
+const char FOUND_DOD[]          PROGMEM = "[DEBUG] Found DOD";
 const char FOUND_EDIT[]         PROGMEM = "[DEBUG] Found EDIT";
 const char FOUND_POST[]         PROGMEM = "[DEBUG] Found POST";
 const char FOUND_INFO[]         PROGMEM = "[DEBUG] Found INFO";
@@ -83,14 +83,14 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             j = 9;
             
             switch(string[4]){
-                case CODE_DADL:
+                case CODE_DOD:
                     #ifdef DEBUG
-                    PRINT_DEBUG(FOUND_ALL);
+                    PRINT_DEBUG(FOUND_DOD);
                     DEBUG_NL;
-                    PRINT_DEBUG(ALL_ERROR);
-                    DEBUG_NL;
+                    //PRINT_DEBUG(ALL_ERROR);
+                    //DEBUG_NL;
                     #endif
-                    cmd.OBJ.CODE = TATU_CODE_DADL;
+                    cmd.OBJ.CODE = TATU_CODE_DOD;
                     return false;
                 case CODE_INFO:
                     #ifdef DEBUG

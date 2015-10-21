@@ -34,6 +34,19 @@ typedef uint8_t byte;
 #define BRACE_RIGHT output_message[aux++]='}'
 #define CLOSE_MSG   output_message[aux]=0
 
+// DOD - Device Object Description 
+#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{name:" NAME ",mqtt_address:dev/" NAME \
+                                                ",sensors:[" SENSORS "]," \
+                                                "actuators:{" ACTUATORS "}"
+
+#define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{name:" NAME ",type:" TYPE ",pin:" TYPE "}"
+#define ADD_SINGLE_ACTUATOR(NAME, TYPE, PIN)    ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
+#define ADD_LAST_SENSOR(NAME, TYPE, PIN)        ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
+#define ADD_LAST_ACTUATOR(NAME, TYPE, PIN)      ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
+#define ADD_SENSORS(NAME, TYPE, PIN)            ADD_SINGLE_SENSOR(NAME,TYPE,PIN) ","
+#define ADD_ACTUATORS(NAME, TYPE, PIN)          ADD_SINGLE_SENSOR(NAME,TYPE,PIN) ","
+#define ADD_NONE()                              ""
+
 // Constantes do Sistema
 #define SAMPLE_NUMBER 0
 
@@ -126,8 +139,6 @@ typedef uint8_t byte;
                                     //CLOSE_MSG; \
                                     //publish(name, output_message) //publish the message 
 
-
-
 /* Utilidades */
 int freeRAM();
 void ipToString(byte *ip, char *str);
@@ -152,6 +163,8 @@ public:
     // Atributos variaveis
     TATUInterpreter *requisition;
 
+    PGM_P DOD;
+
     /* TEORICO */
     /* uint8_t reset_counter;
     uint8_t start_counter; */
@@ -164,35 +177,12 @@ public:
     // Callback MQTT
     void mqtt_callback(char *, byte *, unsigned int, void (*publish)(char *, char *));
     
-    // REMOVED!
-    // Callback Criado pelo usuario
-    // Callback TATUCallback;
-
-    // Metodos públicos
-    // REMOVIDO CONSTRUTORES REDUNDANTES
-    /*
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req,Callback callback_struct);
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t));
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t));
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t));
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req);
-    */
     // NOVA ARQUITETURA DE CALLBACK
     // ONLY GET AND SET ARE NEEDED
     // > ONLY GET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*FUNCTION)(uint32_t hash, void* response, uint8_t type));
+                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type));
     // > ONLY SET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                 const int sample_d, byte *ip_m, const int port_m, const int os_v,

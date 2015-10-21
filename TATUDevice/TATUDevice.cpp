@@ -51,7 +51,7 @@ const char body_str[]   PROGMEM = "\"BODY\":{";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
 const char pin_str[]    PROGMEM = "PIN";
-const char dev_str[] PROGMEM = "dev/";
+const char dev_str[]    PROGMEM = "dev/";
 
 const char int_str[]    PROGMEM = "/INT";
 const char res_str[]    PROGMEM = "/RES";
@@ -72,75 +72,11 @@ void ipToString(byte *ip, char *str){
     str[j-1] = 0;
 }
 
-/*
-// INFO
-bool info_default(uint32_t, char*, char*, uint8_t){
-    return false;
-}
-// VALUE
-bool value_default(uint32_t, uint16_t*, uint16_t, uint8_t){
-    return false;
-}
-// STATE
-bool state_default(uint32_t, bool*, bool, uint8_t){
-    return false;
-}
-*/
-
-/* Construct the TATUDevice Class passing the object callback */
-/*
-TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,    const int pan_d,
-                        const int sample_d, byte *ip_m, const int port_m, const int os_v,
-                        TATUInterpreter *req,Callback callback_struct){
-    TATUCallback = callback_struct;
-    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-}
-*/
-
-/* Construct the TATUDevice Class with only the info callback*/
-/*
-TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
-                        const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
-                        TATUInterpreter *req, bool (*callback_con)(uint32_t, char*, char*, uint8_t)){
-    TATUCallback.info = callback_con;
-    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-}
-*/
-
-/* Construct the TATUDevice Class with only the value callback*/
-/*
-TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
-                        const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
-                        TATUInterpreter *req, bool (*callback_con)(uint32_t, uint16_t*, uint16_t, uint8_t)){
-    TATUCallback.value = callback_con;
-    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-}
-*/
-
-/* Construct the TATUDevice Class with only the state callback*/
-/*
-TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
-                        const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
-                        TATUInterpreter *req, bool (*callback_con)(uint32_t, bool*, bool, uint8_t)){
-    TATUCallback.state = callback_con;
-    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-}
-*/
-
-/* Construct the TATUDevice Class without define a callback*/
-/*
-TATUDevice::TATUDevice( const char *name_d,   byte *ip_d, const int id_d,    const int pan_d,
-                        const int sample_d,   byte *ip_m, const int port_m,  const int os_v,
-                        TATUInterpreter *req){
-    init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
-}
-*/
-
-// > ONLY GET
+/* Construct the TATUDevice Class with only the GET callback */
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*FUNCTION)(uint32_t hash, void* response, uint8_t code)){
-    get_function = FUNCTION;
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code)){
+    get_function = GET_FUNCTION;
     set_function = NULL;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
@@ -189,12 +125,6 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
 
     strcpy_P(aux_topic_name,dev_str);
     strcpy(&aux_topic_name[strlen(aux_topic_name)],name_d);
-
-    // REMOVED, NOT NEEDED
-    // STRCPY(name, subscribe_topic);
-    // STRCPY(name, publish_topic);
-    // strcpy_P(&subscribe_topic[i], diso_str);
-    // strcpy_P(&publish_topic[i], dosi_str);
     
     ipToString(ip_d, aux);
     STRCPY(aux, ip);
@@ -206,12 +136,6 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     mqtt_port = (uint16_t) port_m;
     os_version = (uint8_t) os_v;
     requisition = req;
-    
-    /*Deprecated 
-    Set the default callback if the param callback isn't null 
-    if (!TATUCallback.info) TATUCallback.info = info_default;
-    if (!TATUCallback.value) TATUCallback.value = value_default;
-    if (!TATUCallback.state) TATUCallback.state = state_default;*/
 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
@@ -260,6 +184,7 @@ void TATUDevice::generateHeader(){
     // COMMA;
     
     /* Coloca o IP */
+    // Comment this out to PUT IP on header
     /*
     strcpy_P(OUT_STR, ip_str);
     aux += 6;
@@ -314,6 +239,12 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             PRINT_DEBUG(CALLBACK_GET);
             DEBUG_NL;
             #endif
+
+            if(requisition->cmd.OBJ.CODE == TATU_CODE_DOD){
+                strcpy_P(output_message, DOD);
+                return;
+            }
+
             switch(requisition->cmd.OBJ.VAR){
                 case TATU_TYPE_ALIAS:
                     //Baseado no código da resposta, decide qual função do usuário deve ser usada

@@ -7,13 +7,14 @@
 #include <string.h>
 #include <DHT.h>
 
-//Digital pin for the relay
+// Digital pins used
 #define LUMINOSITY A3
 #define MOVE 3
 #define DHTPIN 8
 #define SOUND A1
 #define GAS A0
 
+// DHT TYPE
 #define DHTTYPE 11
 
 //Port to connect with the broker 
@@ -44,7 +45,6 @@ byte ip[4]    = { 10, 41, 0, 97};
 unsigned long int time, lastConnect,prevTime,iTime;
 
 bool get(uint32_t hash,void* response,uint8_t code){
-  
   switch(hash){
       case H_move:
         switch(code){   
@@ -139,10 +139,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
       default:
         return false;
   }
-
-  
-  return true;
-  
+  return true; 
 }
 
 // Objects to example that uses ethernet
@@ -153,6 +150,16 @@ MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
+// This is obrigatory, and defines this DEVICE
+CREATE_DOD("device",
+  ADD_SENSORS("luminosity", "ldr", "A3")
+  ADD_SENSORS("move", "pir", "3")
+  ADD_SENSORS("temp", "dht11", "8")
+  ADD_SENSORS("gas", "mq2", "A0")
+  ADD_SENSORS("sound", "mic", "A1")
+  ADD_LAST_SENSOR("ar", "dht11", "3"),
+  ADD_NONE()
+);
 
 void setup() {
   cli();
@@ -169,7 +176,7 @@ void setup() {
 
   //Trying connect to the broker  
   while(!client.connect(device.name,"device","boteco@wiser"));
-  client.subscribe(device.name,1);
+  client.subscribe(device.name);
   Serial.println("Conectado");
   sei();
 }
@@ -197,25 +204,28 @@ void loop() {
   }
   interruption_lamp();
   interruption_luminosity();
- 
 }
+
 void interruption_lamp(){
   device.interruption("lamp",lamp,'=',true);
 }
+
 /*
 void interruption_luminosidade(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
   itoa(luminosity,str,10);
   device.interruption("luminosity",str,'=',"23%");
-}*/
+}
+*/
+
 void interruption_luminosity(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
   device.interruption("luminosity",luminosity,'<',35);
 }
-void mexeu()
-{
+
+void mexeu(){
   device.interrupt("move","mexeu");
   movement++;
   Serial.println("mexeu");
