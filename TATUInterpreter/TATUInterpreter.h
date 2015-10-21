@@ -20,7 +20,7 @@
 #define TATU_EDIT   3
 
 // TATU Protocol available properties
-#define TATU_CODE_DADL  0
+#define TATU_CODE_DOD   0
 #define TATU_CODE_INFO  1
 #define TATU_CODE_VALUE 2
 #define TATU_CODE_STATE 3
@@ -33,7 +33,7 @@
 #define TATU_TYPE_ANALOG 3
 
 // Char that represents the TATU Protocol commands
-#define CODE_DADL  'D'
+#define CODE_DOD   'D'
 #define CODE_INFO  'I'
 #define CODE_VALUE 'V'
 #define CODE_STATE 'S'
