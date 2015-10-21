@@ -178,6 +178,7 @@ TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const 
 void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
                         const int sample_d, byte *ip_m, const int port_m, const int os_v,
                         TATUInterpreter *req){
+    cli();
     int i;
     char aux[20];
 
@@ -214,6 +215,7 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
+    sei();
 }
 
 /* Generate the header post */

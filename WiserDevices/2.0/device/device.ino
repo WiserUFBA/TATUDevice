@@ -155,6 +155,7 @@ MQTT_PUBLISH(bridge, client);
 
 
 void setup() {
+  cli();
   device.publish_test = &bridge;
   char aux[16];  
   Serial.begin(9600);
@@ -170,11 +171,24 @@ void setup() {
   while(!client.connect(device.name,"device","boteco@wiser"));
   client.subscribe(device.name,1);
   Serial.println("Conectado");
+  sei();
 }
-void loop() { client.loop(); 
+void loop() { 
+  //client.loop(); 
   //Watchdog for connection with the broker
-  time = millis();
-  if (time - lastConnect > 600000) {
+  //time = millis();
+  /*if (time - lastConnect > 600000) {
+    Serial.println("reconectando");
+    client.disconnect();
+    while(!client.connect(device.name,"device","boteco@wiser"));
+    client.subscribe(device.name,1);
+    lastConnect = millis();
+  }*/
+  if(!EthClient.connected()){
+    Serial.println("reconectando");
+    while(!EthClient.connect(ip,1883));
+  }
+  if (!client.loop()) {
     Serial.println("reconectando");
     client.disconnect();
     while(!client.connect(device.name,"device","boteco@wiser"));
