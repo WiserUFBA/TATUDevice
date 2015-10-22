@@ -19,8 +19,10 @@
 #define H_temp 2090755995
 #define H_ar 5863224
 
-DHT dht(DHTPIN, DHTTYPE);
+#define MQTT_USER  "device"
+#define MQTT_PASS  "boteco@wiser"
 
+DHT dht(DHTPIN, DHTTYPE);
 
 //variveis
 int t,h,aux;
@@ -91,15 +93,26 @@ void setup() {
 }
 void loop() { client.loop(); 
   //Watchdog for connection with the broker
-  time = millis();
-  if (time - lastConnect > 600000) {
-    Serial.println("reconectando");
-    client.disconnect();
-    while(!client.connect(device.name,"device","boteco@wiser"));
-    client.subscribe(device.name,1);
-    lastConnect = millis();
+  if (!client.connected()) {
+    reconnect();
   }
-
  
 }
 
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.publish("dev",device.name)) {
+      Serial.println("connected");
+    } 
+    else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}

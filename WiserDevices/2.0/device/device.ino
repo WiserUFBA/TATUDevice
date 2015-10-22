@@ -31,12 +31,15 @@
 #define ligar(PIN) digitalWrite(PIN,true)
 #define desligar(PIN) digitalWrite(PIN,false)
 
+#define MQTT_USER  "device"
+#define MQTT_PASS  "boteco@wiser"
+
 DHT dht(DHTPIN, DHTTYPE);
 
 //variveis
 volatile int soundReading,movement,gas_amount,t,h,luminosity;
 bool lamp;
-char str[20];
+char str[20];1
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 10, 41, 0, 93 };
@@ -61,7 +64,6 @@ bool get(uint32_t hash,void* response,uint8_t code){
         break;
       case H_sound:
         soundReading = analogRead(SOUND);
-        Serial.println(soundReading);
         switch(code){
           case TATU_CODE_INFO:
             ITOS(soundReading,response);
@@ -163,7 +165,7 @@ CREATE_DOD("device",
 
 void setup() {
   cli();
-  Serial.println("Inicializando!");
+
   device.publish_test = &bridge;
   char aux[16];  
   Serial.begin(9600);
@@ -178,39 +180,21 @@ void setup() {
   attachInterrupt(1, mexeu, FALLING);
 
   //Trying connect to the broker  
-  while(!client.connect(device.name,"device","boteco@wiser"));
+  while(!client.connect(device.name,MQTT_PASS,MQTT_USER));
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
   sei();
-  Serial.println("Conectado");
+  Serial.println("Conected");
 }
 void loop() { 
-  //client.loop(); 
+  client.loop(); 
   //Watchdog for connection with the broker
-  //time = millis();
-  /*if (time - lastConnect > 600000) {
-    Serial.println("reconectando");
-    client.disconnect();
-    while(!client.connect(device.name,"device","boteco@wiser"));
-    client.subscribe(device.name,1);
-    lastConnect = millis();
-  }*/
-  if (!(client.loop() && client.connected())) {
-    Serial.println("reconectando");
-    client.disconnect();
-    while(!client.connect(device.name,"device","boteco@wiser"));
-    client.subscribe(device.aux_topic_name);
-    client.subscribe("dev");
-    lastConnect = millis();
+  if (!client.connected()) {
+    reconnect();
   }
-  interruption_lamp();
+  
   interruption_luminosity();
 }
-
-void interruption_lamp(){
-  device.interruption("lamp",lamp,'=',true);
-}
-
 /*
 void interruption_luminosidade(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
@@ -219,7 +203,6 @@ void interruption_luminosidade(){
   device.interruption("luminosity",str,'=',"23%");
 }
 */
-
 void interruption_luminosity(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
@@ -231,3 +214,21 @@ void mexeu(){
   movement++;
   Serial.println("mexeu");
 }
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.publish("dev",device.name)) {
+      Serial.println("connected");
+    } 
+    else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
