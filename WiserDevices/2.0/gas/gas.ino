@@ -6,61 +6,70 @@
 #include <TATUInterpreter.h>
 #include <string.h>
 
-//Analogic pin for the photosensor
-#define LUMINOSITY 0
+//Analogic pin for the gas sensor
+#define GAS A0
 
 // Constants to connection with the broker
-#define DEVICE_NAME "luminosity"
+#define DEVICE_NAME "gas"
 #define MQTT_USER  "device"
 #define MQTT_PASS  "boteco@wiser"
 #define MQTTPORT 1883
 
-//Hash that represents the attribute "luminosity" 
-#define H_luminosity 1516126306
+//Hash that represents the attribute "gas" 
+#define H_gas 193492480
 
 // Message for annoucement of connection
 const char hello[] PROGMEM = DEVICE_NAME " has connected";
 
 //variveis
-int aux,luminosity;
+int gas_amount,aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 192, 168, 0, 101 };
 byte ip[4]    = { 192, 168, 0, 127}; 
 
+//int t,h,count1,count2;
 unsigned long int time, lastConnect,prevTime,iTime;
 
+
 bool get(uint32_t hash,void* response,uint8_t code){
+  
   switch(hash){
-      case H_luminosity:
-        luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
+      case H_gas:
+        gas_amount = analogRead(GAS);
+        gas_amount = map (gas_amount,0,1023,0,100);
         switch(code){   
           case TATU_CODE_INFO:
-            luminosity = map (luminosity,0,1023,0,100);
-            ITOS(luminosity,response);
+            ITOS(gas_amount,response);
             aux = strlen((char*)response);
             ((char*)response)[aux++] = '%';
             ((char*)response)[aux] = 0;
             break;
           case TATU_CODE_VALUE:
-            ITOI(luminosity,response);
+            ITOI(gas_amount,response);
+            break;
+          case TATU_CODE_STATE:
+            if (gas_amount > 55) BTOB(true,response);
+            else BTOB(false,response);
             break;
           default:
             return false;
-        } 
-        break;
-     default:
-      return false;
-  } 
+        }
+      default:
+        return false;
+  }
+
+  
   return true;
+  
 }
 
 // This is obrigatory, and defines this DEVICE
 CREATE_DOD(DEVICE_NAME,
-  ADD_LAST_SENSOR("luminosity", "ldr", "A3"),
+  ADD_LAST_SENSOR("gas", "mq2", "A0"),
   ADD_NONE()
 );
 
-// Objects to example that uses ethernet
+// Objetos para exemplo usando interface internet
 EthernetClient EthClient;
 TATUInterpreter interpreter;
 TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
@@ -68,12 +77,13 @@ MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
+/* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
 void setup() {
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  
-  pinMode(LUMINOSITY, INPUT);
-
+ 
+  
   //Trying connect to the broker  
   while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
   client.publish("dev/CONNECTIONS",hello);
@@ -109,4 +119,3 @@ void reconnect() {
     }
   }
 }
-

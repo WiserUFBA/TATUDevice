@@ -5,6 +5,7 @@
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <string.h>
+#include <DHT.h>
 
 //Digital pin for the dht sensor
 #define DHTPIN 8
@@ -12,17 +13,20 @@
 //Dht sensor version
 #define DHTTYPE DHT11  
 
-//Port to connect with the broker 
+// Constants to connection with the broker
+#define DEVICE_NAME "dht11"
+#define MQTT_USER  "device"
+#define MQTT_PASS  "boteco@wiser"
 #define MQTTPORT 1883
 
 //Hash's that represents the attributes "temp" and "ar"
 #define H_temp 2090755995
 #define H_ar 5863224
 
-#define MQTT_USER  "device"
-#define MQTT_PASS  "boteco@wiser"
-
 DHT dht(DHTPIN, DHTTYPE);
+
+// Message for annoucement of connection
+const char hello[] PROGMEM = DEVICE_NAME " has connected";
 
 //variveis
 int t,h,aux;
@@ -37,27 +41,27 @@ unsigned long int time, lastConnect,prevTime,iTime;
 bool get(uint32_t hash,void* response,uint8_t code){
   
   switch(hash){
-      case H_temp
+      case H_temp:
         t = (int)dht.readTemperature();
         switch(code){   
-          case TATU_CODE_INFO;
-            itoa(t,response,10);
+          case TATU_CODE_INFO:
+            ITOS(t,response);
             break;
-          case TATU_CODE_VALUE;
-            *response = t;
+          case TATU_CODE_VALUE:
+            ITOI(t,response);
             break;
           default:
             return false;
         } 
         break;
-      case H_ar
+      case H_ar:
         h = (int)dht.readHumidity();
         switch(code){   
-          case TATU_CODE_INFO;
-            itoa(h,response,10);
+          case TATU_CODE_INFO:
+            ITOS(h,response);
             break;
-          case TATU_CODE_VALUE;
-            *response = h;
+          case TATU_CODE_VALUE:
+            ITOI(h,response);
             break;
           default:
             return false;
@@ -72,10 +76,17 @@ bool get(uint32_t hash,void* response,uint8_t code){
   
 }
 
+// This is obrigatory, and defines this DEVICE
+CREATE_DOD(DEVICE_NAME,
+  ADD_SENSORS("temp", "dht11", "8")
+  ADD_LAST_SENSOR("ar", "dht11", "8"),
+  ADD_NONE()
+);
+
 // Objects to example that uses ethernet
 EthernetClient EthClient;
 TATUInterpreter interpreter;
-TATUDevice device("rele-pres", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
@@ -86,9 +97,13 @@ void setup() {
   Ethernet.begin(mac, ip);  
   pinMode(DHTPIN,INPUT);
 
-  //Trying connect to the broker  
-  while(!client.connect(device.name,"device","boteco@wiser"));
-  client.subscribe(device.name,1);
+    //Trying connect to the broker  
+  while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
+  client.publish("dev/CONNECTIONS",hello);
+  client.subscribe(device.aux_topic_name);
+  client.subscribe("dev");
+  
+  Serial.println("Conected");
 
 }
 void loop() { client.loop(); 

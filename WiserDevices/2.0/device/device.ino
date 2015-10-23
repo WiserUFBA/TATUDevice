@@ -7,7 +7,7 @@
 #include <string.h>
 #include <DHT.h>
 
-// Digital pins used
+// Pins used
 #define LUMINOSITY A3
 #define MOVE 3
 #define DHTPIN 8
@@ -23,7 +23,7 @@
 #define MQTT_PASS  "boteco@wiser"
 #define MQTTPORT 1883
 
-//Hash that represents the attribute "lamp" 
+//Hash that represents the attributes
 #define H_sound 274653294
 #define H_gas 193492480
 #define H_temp 2090755995
@@ -31,15 +31,8 @@
 #define H_move 2090515612
 #define H_luminosity 1516126306
 
-#define ligar(PIN) digitalWrite(PIN,true)
-#define desligar(PIN) digitalWrite(PIN,false)
-
 // Message for annoucement of connection
-const char hello [] PROGMEM = 
-{
-  DEVICE_NAME \
-  " has connected" \
-};
+const char hello[] PROGMEM = DEVICE_NAME " has connected";
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -51,8 +44,6 @@ int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 10, 41, 0, 93 };
 byte ip[4]    = { 10, 41, 0, 97}; 
-
-unsigned long int time, lastConnect,prevTime,iTime;
 
 bool get(uint32_t hash,void* response,uint8_t code){
   switch(hash){
@@ -166,12 +157,14 @@ CREATE_DOD(DEVICE_NAME,
   ADD_SENSORS("temp", "dht11", "8")
   ADD_SENSORS("gas", "mq2", "A0")
   ADD_SENSORS("sound", "mic", "A1")
-  ADD_LAST_SENSOR("ar", "dht11", "3"),
+  ADD_LAST_SENSOR("ar", "dht11", "8"),
   ADD_NONE()
 );
 
 void setup() {
-  cli();
+  //In order to avoid problems caused by external interruptions,
+  //is recomended disable the interruption when using the attachInterrupt function;
+  cli();//disable interruptions
 
   device.publish_test = &bridge;
 
@@ -189,7 +182,7 @@ void setup() {
   client.publish("dev/CONNECTIONS",hello);
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
-  sei();
+  sei();//unable interruptions
   Serial.println("Conected");
 }
 void loop() { 
@@ -237,3 +230,4 @@ void reconnect() {
     }
   }
 }
+

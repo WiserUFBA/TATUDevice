@@ -9,12 +9,17 @@
 //Digital pin for the pir sensor
 #define MOVE 3
 
-//Port to connect with the broker 
+// Constants to connection with the broker
+#define DEVICE_NAME "move"
+#define MQTT_USER  "device"
+#define MQTT_PASS  "boteco@wiser"
 #define MQTTPORT 1883
 
 //Hash that represents the attribute "move" 
 #define H_move 2090515612
 
+// Message for annoucement of connection
+const char hello[] PROGMEM = DEVICE_NAME " has connected";
 
 //variveis
 int aux,movement;
@@ -22,20 +27,17 @@ byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 192, 168, 0, 101 };
 byte ip[4]    = { 192, 168, 0, 127}; 
 
-//int t,h,count1,count2;
-unsigned long int time, lastConnect,prevTime,iTime;
-
 
 bool get(uint32_t hash,void* response,uint8_t code){
   
   switch(hash){
       case H_move:
         switch(code){   
-          case TATU_CODE_INFO;
-            itoa(movement,response,10);
+          case TATU_CODE_INFO:
+            ITOS(movement,response);
             break;
-          case TATU_CODE_VALUE;
-            *response = movement;
+          case TATU_CODE_VALUE:
+            ITOI(movement,response);
             break;
           default:
             return false;
@@ -51,15 +53,26 @@ bool get(uint32_t hash,void* response,uint8_t code){
   
 }
 
+// This is obrigatory, and defines this DEVICE
+CREATE_DOD(DEVICE_NAME,
+  ADD_LAST_SENSOR("move", "pir", "3"),
+  ADD_NONE()
+);
+
 // Objects to example that uses ethernet
 EthernetClient EthClient;
 TATUInterpreter interpreter;
-TATUDevice device("rele-pres", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
 void setup() {
+  //In order to avoid problems caused by external interruptions,
+  //is recomended disable the interruption when using the attachInterrupt function;
+  cli();//disable interrupts
+  
+  device.publish_test = &bridge;
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);
@@ -68,26 +81,43 @@ void setup() {
   attachInterrupt(1, mexeu, FALLING);
   
   //Trying connect to the broker  
-  while(!client.connect(device.name,"device","boteco@wiser"));
-  client.subscribe(device.name,1);
+  while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
+  client.publish("dev/CONNECTIONS",hello);
+  client.subscribe(device.aux_topic_name);
+  client.subscribe("dev");
+  sei();//unable innterrupts
+  Serial.println("Conected");
 
 }
 void loop() { client.loop(); 
   //Watchdog for connection with the broker
-  time = millis();
-  if (time - lastConnect > 600000) {
-    Serial.println("reconectando");
-    client.disconnect();
-    while(!client.connect(device.name,"device","boteco@wiser"));
-    client.subscribe(device.name,1);
-    lastConnect = millis();
+  if (!client.connected()) {
+    reconnect();
   }
 
  
 }
-void mexeu()
-{
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.publish("dev",device.name)) {
+      Serial.println("connected");
+    } 
+    else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void mexeu(){
+  device.interrupt("move","mexeu");
   movement++;
   Serial.println("mexeu");
 }
-
