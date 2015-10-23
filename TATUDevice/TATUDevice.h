@@ -35,11 +35,12 @@ typedef uint8_t byte;
 #define CLOSE_MSG   output_message[aux]=0
 
 // DOD - Device Object Description 
-#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   extern const char DOD[] PROGMEM = "POST " NAME ":{name:" NAME ",mqtt_address:dev/" NAME \
-                                                ",sensors:[" SENSORS "]," \
-                                                "actuators:{" ACTUATORS "}"
+#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{\"name\":\"" NAME "\"" \
+                                                ",\"mqtt_address\":\"dev/" NAME "\""\
+                                                ",\"sensors\":[" SENSORS "]," \
+                                                "\"actuators\":[" ACTUATORS "]}"
 
-#define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{name:" NAME ",type:" TYPE ",pin:" TYPE "}"
+#define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{\"name\":\"" NAME "\",\"type\":\"" TYPE "\",\"pin\":" PIN "}"
 #define ADD_SINGLE_ACTUATOR(NAME, TYPE, PIN)    ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
 #define ADD_LAST_SENSOR(NAME, TYPE, PIN)        ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
 #define ADD_LAST_ACTUATOR(NAME, TYPE, PIN)      ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
@@ -166,8 +167,6 @@ public:
     void (*publish_test)(char *, char *);
     // Atributos variaveis
     TATUInterpreter *requisition;
-
-    PGM_P DOD;
 
     /* TEORICO */
     /* uint8_t reset_counter;

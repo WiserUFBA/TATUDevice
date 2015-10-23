@@ -22,8 +22,8 @@
 #define MQTTPORT 1883
 
 // Network properties
-#define WLAN_SSID       "wiser"           // cannot be longer than 32 characters!
-#define WLAN_PASS       "wiser2014"
+#define WLAN_SSID       "PiratasDoValeDoCanela"           // cannot be longer than 32 characters!
+#define WLAN_PASS       "naovaqueebarril"
 // Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 #define IDLE_TIMEOUT_MS  3000      // Amount of time to wait (in milliseconds) with no data 
@@ -41,9 +41,9 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
                                                                                  SPI_CLOCK_DIVIDER); // you can change this clock speed
 
 // System properties
-byte ip[4]    = { 0 }; // Null array to avoid erros
-IPAddress server(192, 168, 0, 101); // If you aren't using the patched version of the CC3000 library, so put the IP in reverse order
-byte server_b[4]    = { 192, 168, 0, 101 };
+byte ip[4]        = { 0 }; // Null array to avoid erros
+byte server_b[4]  = { 192, 168, 10, 20 };
+IPAddress         server(192, 168, 10, 20 ); // If you aren't using the patched version of the CC3000 library, so put the IP in reverse order
 
 bool lamp;
 int luminosity;
