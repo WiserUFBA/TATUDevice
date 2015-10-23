@@ -207,6 +207,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     DEBUG_NL;
     #endif
     
+    if(dod_used){
+        dod_used = false;
+        generateHeader();
+    }
+
     void *response,*request;
     int aux = last_char;
     bool isString,
@@ -241,6 +246,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             #endif
 
             if(requisition->cmd.OBJ.CODE == TATU_CODE_DOD){
+                dod_used = true;
                 strcpy_P(output_message, DOD);
                 return;
             }
