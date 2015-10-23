@@ -17,7 +17,10 @@
 // DHT TYPE
 #define DHTTYPE 11
 
-//Port to connect with the broker 
+// Constants to connection with the broker
+#define DEVICE_NAME "device"
+#define MQTT_USER  "device"
+#define MQTT_PASS  "boteco@wiser"
 #define MQTTPORT 1883
 
 //Hash that represents the attribute "lamp" 
@@ -31,15 +34,19 @@
 #define ligar(PIN) digitalWrite(PIN,true)
 #define desligar(PIN) digitalWrite(PIN,false)
 
-#define MQTT_USER  "device"
-#define MQTT_PASS  "boteco@wiser"
+// Message for annoucement of connection
+const char hello [] PROGMEM = 
+{
+  DEVICE_NAME \
+  " has connected" \
+};
 
 DHT dht(DHTPIN, DHTTYPE);
 
 //variveis
 volatile int soundReading,movement,gas_amount,t,h,luminosity;
 bool lamp;
-char str[20];1
+char str[20];  
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 10, 41, 0, 93 };
@@ -147,13 +154,13 @@ bool get(uint32_t hash,void* response,uint8_t code){
 // Objects to example that uses ethernet
 EthernetClient EthClient;
 TATUInterpreter interpreter;
-TATUDevice device("device", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
 // This is obrigatory, and defines this DEVICE
-CREATE_DOD("device",
+CREATE_DOD(DEVICE_NAME,
   ADD_SENSORS("luminosity", "ldr", "A3")
   ADD_SENSORS("move", "pir", "3")
   ADD_SENSORS("temp", "dht11", "8")
@@ -167,20 +174,19 @@ void setup() {
   cli();
 
   device.publish_test = &bridge;
-  char aux[16];  
+
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  
   
   pinMode(DHTPIN,INPUT);
   pinMode(MOVE, INPUT);
   
-  device.DOD = DOD;
-  
   digitalWrite(MOVE, HIGH);
   attachInterrupt(1, mexeu, FALLING);
 
   //Trying connect to the broker  
   while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
+  client.publish("dev/CONNECTIONS",hello);
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
   sei();
@@ -219,7 +225,7 @@ void reconnect() {
   while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.publish("dev",device.name)) {
+    if (client.publish("dev/CONNECTIONS",hello)) {
       Serial.println("connected");
     } 
     else {
@@ -231,4 +237,3 @@ void reconnect() {
     }
   }
 }
-

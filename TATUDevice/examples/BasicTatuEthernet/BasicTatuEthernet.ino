@@ -13,20 +13,28 @@
 #define DEVICE_SAMPLE 0
 #define DEVICE_ID 121
 #define DEVICE_PAN_ID 88
-#define MQTTPORT 1883
 
 // Device pins
 #define LAMP 8
 #define LUMINOSITY A0
 
 // Information for connection with broker
+#define DEVICE_NAME ""
 #define MQTT_USER  ""
 #define MQTT_PASS  ""
+#define MQTTPORT 1883
 
 #define on(PIN) digitalWrite(PIN,true)
 #define off(PIN) digitalWrite(PIN,false)
 
-// Propriedades do sistema
+// Message for annoucement of connection
+const char hello [] PROGMEM = 
+{
+  DEVICE_NAME \
+  " has connected" \
+};
+
+// System properties
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
 byte server[] = { 192, 168, 25, 20 };
 byte ip[]     = { 192, 168, 25, 40 };
@@ -104,13 +112,13 @@ bool set(uint32_t hash, uint8_t code,void* request){
 // Objetos para exemplo usando interface internet
 EthernetClient ethClient;
 TATUInterpreter interpreter;
-TATUDevice device("device", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get, set);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get, set);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , ethClient);
 MQTT_PUBLISH(bridge, client);
 
-// DOD construction
-CREATE_DOD("device_name",
+// Constructs the JSON that describes the device
+CREATE_DOD(DEVICE_NAME,
   ADD_LAST_SENSOR("sensor_name", "type", "pin"),
   ADD_NONE()
 );
@@ -121,12 +129,10 @@ void setup() {
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  
-  
-  //JSON that describes the device
-  device.DOD = DOD;
 
   //Trying connect to the broker  
   while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
+  client.publish("dev/CONNECTIONS",hello);
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
 
@@ -146,7 +152,7 @@ void reconnect() {
   while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.publish("dev",device.name)) {
+    if (client.publish("dev/CONNECTIONS",hello)) {
       Serial.println("connected");
     } 
     else {
