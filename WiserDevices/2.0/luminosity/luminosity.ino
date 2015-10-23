@@ -15,40 +15,33 @@
 //Hash that represents the attribute "luminosity" 
 #define H_luminosity 1516126306
 
-
 //variveis
 int aux,luminosity;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 192, 168, 0, 101 };
 byte ip[4]    = { 192, 168, 0, 127}; 
 
-//int t,h,count1,count2;
 unsigned long int time, lastConnect,prevTime,iTime;
 
-
 bool get(uint32_t hash,void* response,uint8_t code){
-  
-  switch(hash){
-      case H_luminosity
-        luminosity = analogRead(LUMINOSITY);
-        switch(code){   
-          case TATU_CODE_INFO;
-            itoa(luminosity,response,10);
-            break;
-          case TATU_CODE_VALUE;
-            *response = luminosity;
-            break;
-          default:
-            return false;
-        } 
-        break;
-      default:
-        return false;
-  }
-
-  
-  return true;
-  
+	switch(hash){
+			case H_luminosity
+				luminosity = analogRead(LUMINOSITY);
+				switch(code){   
+					case TATU_CODE_INFO;
+						itoa(luminosity,response,10);
+						break;
+					case TATU_CODE_VALUE;
+						*response = luminosity;
+						break;
+					default:
+						return false;
+				} 
+				break;
+			default:
+				return false;
+	} 
+	return true;
 }
 
 // Objects to example that uses ethernet
@@ -60,27 +53,24 @@ PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
 void setup() {
-  char aux[16];  
-  Serial.begin(9600);
-  Ethernet.begin(mac, ip);  
-  pinMode(LUMINOSITY, INPUT);
+	char aux[16];  
+	Serial.begin(9600);
+	Ethernet.begin(mac, ip);  
+	pinMode(LUMINOSITY, INPUT);
 
-  //Trying connect to the broker  
-  while(!client.connect(device.name,"device","boteco@wiser"));
-  client.subscribe(device.name,1);
-
+	//Trying connect to the broker  
+	while(!client.connect(device.name,"device","boteco@wiser"));
+	client.subscribe(device.name,1);
 }
 void loop() { client.loop(); 
-  //Watchdog for connection with the broker
-  time = millis();
-  if (time - lastConnect > 600000) {
-    Serial.println("reconectando");
-    client.disconnect();
-    while(!client.connect(device.name,"device","boteco@wiser"));
-    client.subscribe(device.name,1);
-    lastConnect = millis();
-  }
-
- 
+	//Watchdog for connection with the broker
+	time = millis();
+	if (time - lastConnect > 600000) {
+		Serial.println("reconectando");
+		client.disconnect();
+		while(!client.connect(device.name,"device","boteco@wiser"));
+		client.subscribe(device.name,1);
+		lastConnect = millis();
+	}
 }
 

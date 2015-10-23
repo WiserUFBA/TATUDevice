@@ -35,6 +35,7 @@ const char PARAM_ERROR[]            PROGMEM = "[DEBUG] Param Error!";
 const char RESPONSE_TYPE_INFO[]     PROGMEM = "[DEBUG] The response type is INFO";
 const char RESPONSE_TYPE_VALUE[]    PROGMEM = "[DEBUG] The response type is VALUE";
 const char RESPONSE_TYPE_STATE[]    PROGMEM = "[DEBUG] The response type is STATE";
+const char DOD_RETURN[]    PROGMEM = "[DEBUG] Returning the following DOD Object";
 #endif
 
 // Constantes
@@ -140,6 +141,8 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
     // Gera o header padrão e coloca no output_message atualizando a posição final do header
     generateHeader();
     sei();
+
+    dod_used = false;
 }
 
 /* Generate the header post */
@@ -207,6 +210,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     DEBUG_NL;
     #endif
     
+    if(dod_used){
+        dod_used = false;
+        generateHeader();
+    }
+
     void *response,*request;
     int aux = last_char;
     bool isString,
@@ -219,16 +227,15 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     // DEPRECATED //
     if(requisition->cmd.OBJ.TYPE == TATU_POST){ strcpy_P(OUT_STR, false_body); return; }
     if (requisition->cmd.OBJ.VAR == TATU_TYPE_SYSTEM){
-            #ifdef DEBUG
-            PRINT_DEBUG(SYSTEM);
-            DEBUG_NL;
-            #endif
-            /** MODIFICA PROPRIEDADE **/
-            // ISTO AINDA NÃO FOI IMPLEMENTADO
-            strcpy_P(OUT_STR, false_body);
-            return;
+        #ifdef DEBUG
+        PRINT_DEBUG(SYSTEM);
+        DEBUG_NL;
+        #endif
+        /** MODIFICA PROPRIEDADE **/
+        // ISTO AINDA NÃO FOI IMPLEMENTADO
+        strcpy_P(OUT_STR, false_body);
+        return;
     }
-
 
     /* Check the variable type */
     switch(requisition->cmd.OBJ.TYPE){
@@ -241,7 +248,16 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             #endif
 
             if(requisition->cmd.OBJ.CODE == TATU_CODE_DOD){
+                dod_used = true;
                 strcpy_P(output_message, DOD);
+
+                #ifdef DEBUG
+                PRINT_DEBUG(DOD_RETURN);
+                DEBUG_NL;
+                PRINT_DEBUG(DOD);
+                DEBUG_NL;
+                #endif
+
                 return;
             }
 

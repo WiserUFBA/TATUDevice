@@ -35,11 +35,12 @@ typedef uint8_t byte;
 #define CLOSE_MSG   output_message[aux]=0
 
 // DOD - Device Object Description 
-#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{name:" NAME ",mqtt_address:dev/" NAME \
-                                                ",sensors:[" SENSORS "]," \
-                                                "actuators:{" ACTUATORS "}"
+#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{\"name\":\"" NAME "\"" \
+                                                ",\"mqtt_address\":\"dev/" NAME "\""\
+                                                ",\"sensors\":[" SENSORS "]," \
+                                                "\"actuators\":[" ACTUATORS "]}"
 
-#define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{name:" NAME ",type:" TYPE ",pin:" TYPE "}"
+#define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{\"name\":\"" NAME "\",\"type\":\"" TYPE "\",\"pin\":" PIN "}"
 #define ADD_SINGLE_ACTUATOR(NAME, TYPE, PIN)    ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
 #define ADD_LAST_SENSOR(NAME, TYPE, PIN)        ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
 #define ADD_LAST_ACTUATOR(NAME, TYPE, PIN)      ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
@@ -143,6 +144,9 @@ typedef uint8_t byte;
 int freeRAM();
 void ipToString(byte *ip, char *str);
 
+// Extern Variables
+extern const char DOD[] PROGMEM;
+
 class TATUDevice{
 public:
     // Atributos públicos
@@ -157,13 +161,12 @@ public:
     char        mqtt_ip[MAX_SIZE_IP];
     uint16_t    mqtt_port;
     uint8_t     os_version;
+    bool        dod_used;
     bool (*get_function)(uint32_t hash, void* response, uint8_t code);
     bool (*set_function)(uint32_t hash, uint8_t type, void* request);
     void (*publish_test)(char *, char *);
     // Atributos variaveis
     TATUInterpreter *requisition;
-
-    PGM_P DOD;
 
     /* TEORICO */
     /* uint8_t reset_counter;
