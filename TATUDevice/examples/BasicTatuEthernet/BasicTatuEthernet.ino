@@ -28,11 +28,7 @@
 #define off(PIN) digitalWrite(PIN,false)
 
 // Message for annoucement of connection
-const char hello [] PROGMEM = 
-{
-  DEVICE_NAME \
-  " has connected" \
-};
+const char hello[] PROGMEM = DEVICE_NAME " has connected";
 
 // System properties
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
