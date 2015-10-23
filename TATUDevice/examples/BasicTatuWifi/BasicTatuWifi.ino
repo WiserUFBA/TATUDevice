@@ -6,12 +6,13 @@
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 
-
+// Atributte hashs
 #define H_lamp 2090464143
 #define H_luminosity 1516126306
 
+// Device pins
+#define LAMP 8
 #define LUMINOSITY A3
-
 
 // Device constants
 #define DEVICE_SAMPLE 0
@@ -19,8 +20,8 @@
 #define DEVICE_PAN_ID 88
 
 // Constants to connection with the broker
-#define MQTT_USER  "device"
-#define MQTT_PASS  "boteco@wiser"
+#define MQTT_USER  ""
+#define MQTT_PASS  ""
 #define MQTTPORT 1883
 
 // Network properties
@@ -50,16 +51,25 @@ byte server_b[4]    = { 192, 168, 0, 101 };
 bool lamp;
 int luminosity;
 
+// The get function is called when a information is required
 bool get(uint32_t hash,void* response,uint8_t code){
+  
+  // With the hash we know what atributte
   switch(hash){
       case H_luminosity:
         luminosity = analogRead(LUMINOSITY);
-        switch(code){   
+        //Using the code we know what is the type of the information required
+        switch(code){
+          //INFO means that the response must be a string 
           case TATU_CODE_INFO:
-            ITOS(luminosity,response);
+            ITOS(luminosity,response);// This macro uses a integer to reply a request for a string  
             break;
+          //VALUE means that the response must be a integer
           case TATU_CODE_VALUE:
-            ITOI(luminosity,response);
+            ITOI(luminosity,response);// This macro uses a integer to reply a request for a integer
+            break;
+          //STATE means that the response must be a boolean
+          case TATU_CODE_STATE:
             break;
           default:
             return false;
@@ -67,12 +77,36 @@ bool get(uint32_t hash,void* response,uint8_t code){
         break;
       case H_lamp:
         switch(code){   
-          case TATU_CODE_INFO:
-            //if(lamp) ITOS("ON",response);
-            //else ITOS("OFF",response);
-            break;
           case TATU_CODE_STATE:
-            BTOB(lamp,response);
+            BTOB(lamp,response);// This macro uses a boolean to reply a request for a boolean
+            break;
+          default:
+            return false;
+        } 
+        break;
+      default:
+        return false;
+  }
+  return true; 
+}
+// The set function is called when a modification is required
+// Notice that the order of the parameters is diferent from the get function
+bool set(uint32_t hash, uint8_t code,void* request){
+  
+  // With the hash we know what atributte
+  switch(hash){
+      case H_luminosity:
+        switch(code){
+          default:
+            return false;
+        } 
+        break;
+      case H_lamp:
+        switch(code){   
+          case TATU_CODE_STATE:
+            // Using the value of the request, we can change the value of a atrubutte and/or interact with a actuator
+            if((bool*)request){ on(LAMP);lamp = true; }
+            else { off(LAMP); lamp = false; }
             break;
           default:
             return false;
@@ -92,8 +126,8 @@ MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , wifiClient);
 MQTT_PUBLISH(bridge, client);
 
-CREATE_DOD("device",
-  ADD_LAST_SENSOR("ar", "dht11", "3"),
+CREATE_DOD("device_name",
+  ADD_LAST_SENSOR("sensor_name", "type", "pin"),
   ADD_NONE()
 );
 
@@ -101,9 +135,7 @@ CREATE_DOD("device",
 /* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
 void setup() {
     
-  //cli();
   Serial.println("Inicializando!");
-  device.publish_test = &bridge;
   char aux[16];  
   Serial.begin(9600);  
   
@@ -137,7 +169,7 @@ void setup() {
   }
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
-  //sei();
+
   Serial.println("Conected");
   
 }

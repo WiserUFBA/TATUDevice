@@ -180,7 +180,7 @@ void setup() {
   attachInterrupt(1, mexeu, FALLING);
 
   //Trying connect to the broker  
-  while(!client.connect(device.name,MQTT_PASS,MQTT_USER));
+  while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
   sei();
