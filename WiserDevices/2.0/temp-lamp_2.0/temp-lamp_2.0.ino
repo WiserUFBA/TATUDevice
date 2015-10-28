@@ -12,7 +12,6 @@
 #define DOOR 6
 #define DHTPIN 8
 #define LAMP 9
-#define MQTTPORT 1883
 #define MOVE 20
 
 // DHT TYPE
@@ -22,7 +21,7 @@
 #define DEVICE_NAME "temp-lamp"
 #define MQTT_USER  "device"
 #define MQTT_PASS  "boteco@wiser"
-#define MQTTPORT 18
+#define MQTTPORT 1883
 
 //Hash that represents the attributes
 #define H_gas 193492480
@@ -47,6 +46,103 @@ byte server[] = { 192, 168, 0, 101 };
 byte ip[4]    = { 192, 168, 0, 68 };
 
 int t,h,count;
+
+bool get(uint32_t hash,void* response,uint8_t code){
+  switch(hash){
+      case H_move:
+        switch(code){   
+          case TATU_CODE_INFO:
+            ITOS(movement,response);
+            break;
+          case TATU_CODE_VALUE:
+            ITOI(movement,response);
+            break;
+          default:
+            return false;
+        } 
+        movement = 0;
+        break;
+      case H_sound:
+        soundReading = analogRead(SOUND);
+        switch(code){
+          case TATU_CODE_INFO:
+            ITOS(soundReading,response);
+            break;
+          case TATU_CODE_VALUE:
+            ITOI(soundReading,response);
+            break;
+          default:
+            return false;
+        }
+        break;
+      case H_temp:
+        t = (int)dht.readTemperature();
+        switch(code){   
+          case TATU_CODE_INFO:
+            ITOS(t,response);
+            break;
+          case TATU_CODE_VALUE:
+            ITOI(t,response);
+            break;
+          default:
+            return false;
+        } 
+        break;
+      case H_ar:
+        h = (int)dht.readHumidity();
+        switch(code){   
+          case TATU_CODE_INFO:
+            ITOS(h,response);
+            break;
+          case TATU_CODE_VALUE:
+            ITOI(h,response);
+            break;
+          default:
+            return false;
+        } 
+        break;
+      case H_luminosity:
+        luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
+        
+        switch(code){   
+          case TATU_CODE_INFO:
+            luminosity = map (luminosity,0,1023,0,100);
+            ITOS(luminosity,response);
+            aux = strlen((char*)response);
+            ((char*)response)[aux++] = '%';
+            ((char*)response)[aux] = 0;
+            break;
+          case TATU_CODE_VALUE:
+            ITOI(luminosity,response);
+            break;
+          default:
+            return false;
+        } 
+        break;
+      case H_gas:
+        gas_amount = analogRead(GAS);
+        gas_amount = map (gas_amount,0,1023,0,100);
+        switch(code){   
+          case TATU_CODE_INFO:
+            ITOS(gas_amount,response);
+            aux = strlen((char*)response);
+            ((char*)response)[aux++] = '%';
+            ((char*)response)[aux] = 0;
+            break;
+          case TATU_CODE_VALUE:
+            ITOI(gas_amount,response);
+            break;
+          case TATU_CODE_STATE:
+            if (gas_amount > 55) BTOB(true,response);
+            else BTOB(false,response);
+            break;
+        } 
+        break;
+      default:
+        return false;
+  }
+  return true; 
+}
 
 // Funçao do usuario para variaveis do TATU
 bool info(uint32_t hash,char* response,char* valor,uint8_t type) {
@@ -185,7 +281,7 @@ Callback callback = {
 // Objetos para exemplo usando interface internet
 EthernetClient EthClient;
 TATUInterpreter interpreter;
-TATUDevice device("temp-lamp", ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, callback);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, callback);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);

@@ -74,6 +74,56 @@ typedef uint8_t byte;
 
 #define MQTT_PUBLISH2(OBJ, BRIDGE) OBJ.publish_test = &BRIDGE;
 
+// Macro para interrupções
+#define INTERRUPTION_VALUE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){ \
+        case '=': \
+            if(VAR == TRIGGER) \
+                break; \
+            return; \
+        case '>': \
+            if(VAR > TRIGGER) \
+                break; \
+            return; \
+        case '<': \
+            if(VAR < TRIGGER) \
+                break; \
+            return; \
+        case '!': \
+            if(VAR != TRIGGER) \
+                break; \
+            return; \
+        default: \
+            return; \
+    } \
+    DEVICE.interruption(VAR_NAME,VAR);
+
+#define INTERRUPTION_STATE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){ \
+        case '=': \
+            if(VAR == TRIGGER) \
+                break; \
+            return; \
+        case '!': \
+            if(VAR != TRIGGER) \
+                break; \
+            return; \
+        default: \
+            return; \
+    } \
+    DEVICE.interruption(VAR_NAME,VAR);
+
+#define INTERRUPTION_INFO(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){ \
+        case '=': \
+            if(!strcmp(VAR,TRIGGER)) \
+                break; \
+            return; \
+        case '!': \
+            if(strcmp(VAR,TRIGGER)) \
+                break; \
+            return; \
+        default: \
+            return; \
+    } \
+    DEVICE.interruption(VAR_NAME,VAR);
 
 // Constrói o dispositivo e o cliente 
 #define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK, CLIENT) \
@@ -113,6 +163,55 @@ typedef uint8_t byte;
             PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT); \
             MQTT_PUBLISH(bridge, client)
 
+#define FLUXO(DEVICE, HASH, ATT1, ACTIVE) \
+        switch(HASH){ \
+            case ATT1: \
+              if (ACTIVE) DEVICE.bits.ATT.FLOW1 = true; \
+              else DEVICE.bits.ATT.FLOW1 = false; \
+              break; \
+            default: \
+              return false; \
+        } \
+        return true;
+#define FLUXO(DEVICE, HASH, ATT1, ATT2, ACTIVE) \
+        switch(HASH){ \
+            case ATT1: \
+              if (ACTIVE) DEVICE.bits.ATT.FLOW1 = true; \
+              else DEVICE.bits.ATT.FLOW1 = false; \
+              break; \
+            default: \
+              return false; \
+            case ATT2: \
+              if (ACTIVE) DEVICE.bits.ATT.FLOW2 = true; \
+              else DEVICE.bits.ATT.FLOW2 = false; \
+              break; \
+            default: \
+              return false; \
+        } \
+        return true;
+#define FLUXO(DEVICE, HASH, ATT1, ATT2, ATT3, ACTIVE) \
+        switch(HASH){ \
+            case ATT1: \
+              if (ACTIVE) DEVICE.bits.ATT.FLOW1 = true; \
+              else DEVICE.bits.ATT.FLOW1 = false; \
+              break; \
+            default: \
+              return false; \
+            case ATT2: \
+              if (ACTIVE) DEVICE.bits.ATT.FLOW2 = true; \
+              else DEVICE.bits.ATT.FLOW2 = false; \
+              break; \
+            default: \
+              return false; \
+            case ATT3: \
+              if (ACTIVE) DEVICE.bits.ATT.FLOW3 = true; \
+              else DEVICE.bits.ATT.FLOW3 = false; \
+              break; \
+            default: \
+              return false; \
+        } \
+        return true
+
 // Conecta o cliente mqtt
 #define DEVICECONNECT() Serial.println("Trying to connect to the broker"); \
                         if(client.connect(device.name)){ \
@@ -147,10 +246,27 @@ void ipToString(byte *ip, char *str);
 // Extern Variables
 extern const char DOD[] PROGMEM;
 
+    typedef union {
+        struct {
+            uint8_t FLOW1 : 2;
+            uint8_t FLOW2 : 2;
+            uint8_t FLOW3 : 2;
+            uint8_t FLOW4 : 2;
+            uint8_t FLOW5 : 2;
+            uint8_t FLOW6 : 2;
+            uint8_t FLOW7 : 2;
+            uint8_t FLOW8 : 2;
+        } ATT;
+        uint16_t STRUCTURE;
+    } Bitflow;
+
 class TATUDevice{
 public:
     // Atributos públicos
     // Atributos do sistema
+
+
+    Bitflow bits;
     char        name[MAX_SIZE_NAME];
     int         len_name;
     char        aux_topic_name[MAX_SIZE_NAME + 15];
@@ -204,9 +320,9 @@ public:
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req); 
     
-    void interruption(const char *name, int var,char oper,int trigger);
-    void interruption(const char *name, char *var,char oper,const char *trigger);
-    void interruption(const char *name, bool var ,char oper,bool trigger);
+    void interruption(const char *name, int var);
+    void interruption(const char *name, char *var);
+    void interruption(const char *name, bool var);
     
     void interrupt(const char *var_name, char *var);
 

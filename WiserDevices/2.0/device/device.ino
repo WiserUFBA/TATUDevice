@@ -31,8 +31,12 @@
 #define H_move 2090515612
 #define H_luminosity 1516126306
 
+
+
 // Message for annoucement of connection
-const char hello[] PROGMEM = DEVICE_NAME " has connected";
+const char hello[] PROGMEM = 
+  DEVICE_NAME
+  " has connected";
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -42,7 +46,7 @@ bool lamp;
 char str[20];  
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 10, 41, 0, 93 };
+byte server[] = { 10, 41, 0, 92 };
 byte ip[4]    = { 10, 41, 0, 97}; 
 
 bool get(uint32_t hash,void* response,uint8_t code){
@@ -205,8 +209,13 @@ void interruption_luminosidade(){
 void interruption_luminosity(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
-  device.interruption("luminosity",luminosity,'<',35);
+  //device.interruption("luminosity",luminosity,'<',50);
+  INTERRUPTION_VALUE(device,"luminosity",luminosity,'<',50);
 }
+/*void flow_temp(){
+  t = (int)dht.readTemperature();
+  device.flow("luminosity",luminosity,'<',35);
+}*/
 
 void mexeu(){
   device.interrupt("move","mexeu");
@@ -229,5 +238,9 @@ void reconnect() {
       delay(5000);
     }
   }
+}
+
+bool flow(int hash,bool ativar){
+ // FLUXO(device,H_gas,H_temp,ativar);
 }
 

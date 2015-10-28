@@ -473,29 +473,10 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     #endif
 
 }
-void TATUDevice::interruption(const char *var_name, int var,char oper,int trigger){
+void TATUDevice::interruption(const char *var_name, int var){
     int aux = last_char;
     char str_buffer[MAX_SIZE_RESPONSE];
-    switch (oper){
-        case '=':
-            if(var == trigger) 
-                break;
-            return;
-        case '>':
-            if(var > trigger)
-                break;
-            return;
-        case '<':
-            if(var < trigger)
-                break;
-            return;
-        case '!':
-            if(var != trigger)
-                break;
-            return;
-        default:
-            return;
-    }
+
     /* Coloca o BODY na resposta */ 
     strcpy_P(OUT_STR, body_str); 
     aux += 8; 
@@ -510,20 +491,9 @@ void TATUDevice::interruption(const char *var_name, int var,char oper,int trigge
     aux_topic_name[len_name] = 0;
     //RESPONSE_CONSTRUCT(var_name);
 }
-void TATUDevice::interruption(const char *var_name, char *var,char oper,const char *trigger){
+void TATUDevice::interruption(const char *var_name, char *var){
     int aux = last_char;
-    switch (oper){
-        case '=':
-            if(!strcmp(var,trigger)) 
-                break;
-            return;
-        case '!':
-            if(strcmp(var,trigger))
-                break;
-            return;
-        default:
-            return;
-    }
+
     /* Coloca o BODY na resposta */ 
     strcpy_P(OUT_STR, body_str); 
     aux += 8; 
@@ -536,20 +506,9 @@ void TATUDevice::interruption(const char *var_name, char *var,char oper,const ch
     aux_topic_name[len_name] = 0;
     //RESPONSE_CONSTRUCT(var_name);
 }
-void TATUDevice::interruption(const char *var_name, bool var ,char oper,bool trigger){
+void TATUDevice::interruption(const char *var_name, bool var){
     int aux = last_char;
-    switch (oper){
-        case '=':
-            if(var == trigger) 
-                break;
-            return;
-        case '!':
-            if(var != trigger)
-                break;
-            return;
-        default:
-            return;
-    }
+
     /* Coloca o BODY na resposta */ 
     strcpy_P(OUT_STR, body_str); 
     aux += 8; 
