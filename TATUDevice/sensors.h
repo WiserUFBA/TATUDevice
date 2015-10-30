@@ -61,7 +61,7 @@
           default: \
             return false; \
         } 
-#define IV_analog_sensor(PIN,VAR,RESPONSE,CODE) \
+#define I_V_analog_sensor(PIN,VAR,RESPONSE,CODE) \
         VAR = analogRead(PIN); \
         switch(CODE){ \ 
           case TATU_CODE_INFO: \
@@ -73,7 +73,7 @@
           default: \
             return false; \
         }
-#define IV_sensor(VAR,RESPONSE,CODE) \
+#define I_V_sensor(VAR,RESPONSE,CODE) \
         switch(CODE){ \ 
           case TATU_CODE_INFO: \
             ITOS(VAR,RESPONSE); \
