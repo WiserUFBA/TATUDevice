@@ -4,6 +4,7 @@
 #include <avr/wdt.h>
 #include <stdint.h>
 #include <TATUInterpreter.h>
+#include "sensors.h"
 
 typedef uint8_t byte;
 

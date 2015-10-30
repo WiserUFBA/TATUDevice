@@ -45,102 +45,35 @@ bool lamp;
 char str[20];  
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-//localtest
-//byte server[] = { 10, 41, 0, 92 };
-//byte ip[4]    = { 10, 41, 0, 97}; 
 byte server[] = { 192, 168, 0, 101 };
 byte ip[4]    = { 192, 168, 0, 73 };
 
 bool get(uint32_t hash,void* response,uint8_t code){
   switch(hash){
       case H_move:
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(movement,response);
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(movement,response);
-            break;
-          default:
-            return false;
-        } 
+        //The I_V_sensor supports INFO and VALUE requests for any integer variable.
+        I_V_sensor(movement,response,code);
         movement = 0;
-        break;
+        break;IV_analog_sensor
       case H_sound:
-        soundReading = analogRead(SOUND);
-        switch(code){
-          case TATU_CODE_INFO:
-            ITOS(soundReading,response);
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(soundReading,response);
-            break;
-          default:
-            return false;
-        }
+        //The I_V_analog_sensor supports INFO and VALUE requests for any integer variable.
+        I_V_analog_sensor(SOUND,soundReading,response,code);
         break;
       case H_temp:
-        t = (int)dht.readTemperature();
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(t,response);
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(t,response);
-            break;
-          default:
-            return false;
-        } 
+        //The dht_temperatures_sensor supports INFO and VALUE requests.
+        dht_temperature_sensor(dht,t,response,code);
         break;
       case H_humid:
-        h = (int)dht.readHumidity();
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(h,response);
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(h,response);
-            break;
-          default:
-            return false;
-        } 
+        //The dht_humidity_sensor supports INFO and VALUE requests.
+        dht_humidity_sensor(dht,h,response,code);
         break;
       case H_luminosity:
-        luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
-        
-        switch(code){   
-          case TATU_CODE_INFO:
-            luminosity = map (luminosity,0,1023,0,100);
-            ITOS(luminosity,response);
-            aux = strlen((char*)response);
-            ((char*)response)[aux++] = '%';
-            ((char*)response)[aux] = 0;
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(luminosity,response);
-            break;
-          default:
-            return false;
-        } 
+        //The lumisity_sensor supports INFO and VALUE,requests. 
+        luminosity_sensor(LUMINOSITY,luminosity,response,code);
         break;
       case H_gas:
-        gas_amount = analogRead(GAS);
-        gas_amount = map (gas_amount,0,1023,0,100);
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(gas_amount,response);
-            aux = strlen((char*)response);
-            ((char*)response)[aux++] = '%';
-            ((char*)response)[aux] = 0;
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(gas_amount,response);
-            break;
-          case TATU_CODE_STATE:
-            if (gas_amount > 55) BTOB(true,response);
-            else BTOB(false,response);
-            break;
-        } 
+        //The gas_sensor supports INFO,VALUE and STATE requests.
+        gas_sensor(GAS,gas_amount,response,code);
         break;
       default:
         return false;
@@ -193,6 +126,7 @@ void setup() {
   sei();//unable interruptions
   Serial.println("Conected");
 }
+//LOOP
 void loop() { 
   client.loop(); 
   //Watchdog for connection with the broker
@@ -202,14 +136,8 @@ void loop() {
   
   interruption_luminosity();
 }
-/*
-void interruption_luminosidade(){
-  luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
-  luminosity = map (luminosity,0,1023,0,100);
-  itoa(luminosity,str,10);
-  device.interruption("luminosity",str,'=',"23%");
-}
-*/
+
+//PERSONAL FUNCTIONS
 void interruption_luminosity(){
   luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
   luminosity = map (luminosity,0,1023,0,100);
