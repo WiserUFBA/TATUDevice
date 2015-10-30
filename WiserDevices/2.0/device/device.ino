@@ -27,10 +27,9 @@
 #define H_sound 274653294
 #define H_gas 193492480
 #define H_temp 2090755995
-#define H_ar 5863224
 #define H_move 2090515612
 #define H_luminosity 1516126306
-
+#define H_humid 261814908
 
 
 // Message for annoucement of connection
@@ -46,8 +45,11 @@ bool lamp;
 char str[20];  
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 10, 41, 0, 92 };
-byte ip[4]    = { 10, 41, 0, 97}; 
+//localtest
+//byte server[] = { 10, 41, 0, 92 };
+//byte ip[4]    = { 10, 41, 0, 97}; 
+byte server[] = { 192, 168, 0, 101 };
+byte ip[4]    = { 192, 168, 0, 73 };
 
 bool get(uint32_t hash,void* response,uint8_t code){
   switch(hash){
@@ -90,7 +92,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
             return false;
         } 
         break;
-      case H_ar:
+      case H_humid:
         h = (int)dht.readHumidity();
         switch(code){   
           case TATU_CODE_INFO:
@@ -183,7 +185,9 @@ void setup() {
 
   //Trying connect to the broker  
   while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
-  client.publish("dev/CONNECTIONS",hello);
+  client.publish(device.name,hello);
+ 
+  //client.subscribe(device.name);
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
   sei();//unable interruptions

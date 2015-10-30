@@ -21,7 +21,7 @@
 
 //Hash's that represents the attributes "temp" and "ar"
 #define H_temp 2090755995
-#define H_ar 5863224
+#define H_humid 261814908
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -54,7 +54,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
             return false;
         } 
         break;
-      case H_ar:
+      case H_humid:
         h = (int)dht.readHumidity();
         switch(code){   
           case TATU_CODE_INFO:
