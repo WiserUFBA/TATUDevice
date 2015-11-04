@@ -29,7 +29,6 @@ env:
     - PLATFORMIO_CI_SRC=WiserDevices/2.0/device/device.ino
 
 install:
-    - pip install -U pip setuptools
     - pip install -U platformio
     # Libraries installing
     - platformio lib install 17 19 89
