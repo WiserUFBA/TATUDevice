@@ -1,0 +1,38 @@
+language: python
+python:
+    - "2.7"
+
+# Cache PlatformIO packages using Travis CI container-based infrastructure
+sudo: false
+cache:
+    directories:
+        - "~/.platformio"
+
+env:
+    # Use this little line of shell script to generate list of files to compile
+    # for x in $(echo $(find WiserDevices -type f) | cat); echo "  - PLATFORMIO_CI_SRC="$x
+    - PLATFORMIO_CI_SRC=WiserDevices/window/window.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/temp-lamp/temp-lamp.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/servo/servo.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/rele-temp/rele-temp.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/rele-pres_2.0/rele-pres_2.0.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/rele-pres/rele-pres.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/ar_adafruit/ar_adafruit.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/air/air.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/WindowDevice/WindowDevice.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/2.0/device2/device2.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/2.0/temp-lamp_2.0/temp-lamp_2.0.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/2.0/movement/movement.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/2.0/luminosity/luminosity.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/2.0/gas/gas.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/2.0/dht11/dht11.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/2.0/device/device.ino
+
+install:
+    - pip install -U platformio
+    
+    # Libraries installing
+    platformio lib install 17 19 89
+
+script:
+    - platformio ci --lib="./TATUConfig" --lib="./TATUDevice" --lib="./TATUInterpreter" --lib="./TATUOS" --board=uno --board=miniatmega328 --board=pro16MHzatmega328 --board=megaatmega2560 --board=megaatmega1280
