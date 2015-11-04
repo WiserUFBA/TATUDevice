@@ -30,7 +30,6 @@ env:
 
 install:
     - pip install -U platformio
-    
     # Libraries installing
     - platformio lib install 17 19 89
 
