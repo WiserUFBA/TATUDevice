@@ -1,15 +1,16 @@
+#define MQ2_SENSOR A0 
+#define DHT11_SENSOR 8
+#define LDR_SENSOR A3
+
 #include <stdint.h>
 #include <SPI.h>
 #include <PubSubClient.h>
-#include <Ethernet.h>
+#include <Adafruit_CC3000.h>
+#include <ccspi.h>
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <string.h>
 #include <DHT.h>
-
-//#define MQ2_SENSOR A0 
-//#define DHT_SENSOR 8
-//#define LDR_SENSOR A3
 
 // Pins used
 #define LUMINOSITY A3
@@ -19,7 +20,7 @@
 #define GAS A0
 
 // DHT TYPE
-#define DHTTYPE 11
+//#define DHTTYPE 11
 
 // Constants to connection with the broker
 #define DEVICE_NAME "ufbaino"
@@ -35,23 +36,43 @@
 #define H_luminosity 1516126306
 #define H_humid 261814908
 
+// Network properties
+#define WLAN_SSID       "baixo"           // cannot be longer than 32 characters!
+#define WLAN_PASS       "EuEsqueci"
+// Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
+#define WLAN_SECURITY   WLAN_SEC_WPA2
+#define IDLE_TIMEOUT_MS  3000      // Amount of time to wait (in milliseconds) with no data 
+                                   // received before closing the connection.  If you know the server
+                                   // you're accessing is quick to respond, you can reduce this value.
+
+// These are the interrupt and control pins
+#define ADAFRUIT_CC3000_IRQ   2  // MUST be an interrupt pin!
+// These can be any two pins
+#define ADAFRUIT_CC3000_VBAT  7
+#define ADAFRUIT_CC3000_CS    10
+// Use hardware SPI for the remaining pins
+
+// On an UNO, SCK = 13, MISO = 12, and MOSI = 11
+Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
+                                         SPI_CLOCK_DIVIDER); // you can change this clock speed
+
 
 // Message for annoucement of connection
 const char hello[] PROGMEM = 
   DEVICE_NAME
   " has connected";
 
-DHT dht(DHTPIN, DHTTYPE);
+//DHT dht(DHTPIN, DHTTYPE);
 
 //variveis
-volatile int soundReading,movement,gas_amount,t,h,luminosity;
+//volatile int soundReading,movement,gas_amount,t,h,luminosity;
 bool lamp;
 char str[20];  
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 10, 41, 0, 92 };
+byte server[] = { 192, 168, 0, 139 };
 byte ip[4]    = { 10, 41 , 0 , 97 };
-  
+  /*
   bool get(uint32_t hash,void* response,uint8_t code){
     switch(hash){
         case H_move:
@@ -83,14 +104,14 @@ byte ip[4]    = { 10, 41 , 0 , 97 };
           return false;
     }
     return true; 
-  }
+  }*/
 
 // Objects to example that uses ethernet
-EthernetClient EthClient;
+Adafruit_CC3000_Client wifiClient = Adafruit_CC3000_Client();
 TATUInterpreter interpreter;
 TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, aux_get);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
-PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
+PubSubClient client(server, MQTTPORT, mqtt_callback , wifiClient);
 MQTT_PUBLISH(bridge, client);
 
 // This is obrigatory, and defines this DEVICE
@@ -109,28 +130,49 @@ CREATE_DOD(DEVICE_NAME,
 void setup() {
   //In order to avoid problems caused by external interruptions,
   //is recomended disable the interruption when using the attachInterrupt function;
-  cli();//disable interruptions
+  //cli();//disable interruptions
 
   device.publish_test = &bridge;
 
-  Serial.begin(9600);
-  Ethernet.begin(mac, ip);  
+  Serial.println("Inicializando!");
+  char aux[16];  
+  Serial.begin(9600);  
+  
+  Serial.println(F("\nInitializing..."));
+  if (!cc3000.begin())
+  {
+    Serial.println(F("Couldn't begin()! Check your wiring?"));
+    while(1);
+  }
+  
+  Serial.print(F("\nAttempting to connect to ")); Serial.println(WLAN_SSID);
+  if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
+    Serial.println(F("Failed!"));
+    while(1);
+  }
+   
+  Serial.println(F("Connected!"));
+  
+  /* Wait for DHCP to complete */
+  Serial.println(F("Request DHCP"));
+  while (!cc3000.checkDHCP()) { delay(100); }  
+ 
+  Serial.println(F("Initialization complete"));
+  
   
   pinMode(DHTPIN,INPUT);
-  pinMode(MOVE, INPUT);
+  //pinMode(MOVE, INPUT);
   
-  digitalWrite(MOVE, HIGH);
-  attachInterrupt(1, mexeu, FALLING);
+  //digitalWrite(MOVE, HIGH);
+  //attachInterrupt(1, mexeu, FALLING);
 
   //Trying connect to the broker
   Serial.println("Trying connect to the broker");  
   while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
-  client.publish(device.name,hello);
- 
-  //client.subscribe(device.name);
-  client.subscribe(device.name);
-  //client.subscribe("dev");
-  sei();//unable interruptions
+  client.publish("dev/CONNECTIONS",hello);
+  client.subscribe(device.aux_topic_name);
+  client.subscribe("dev");
+  //sei();//unable interruptions
   Serial.println("Conected");
 }
 
@@ -155,12 +197,12 @@ void interruption_luminosity(){
   //device.interruption("luminosity",luminosity,'<',50);
   INTERRUPTION_VALUE(device,"luminosity",luminosity,'<',50);
 }
-
+/*
 void mexeu(){
   device.interrupt("move","mexeu");
   movement++;
   Serial.println("mexeu");
-}
+}*/
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {

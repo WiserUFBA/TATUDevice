@@ -32,16 +32,8 @@ bool get(uint32_t hash,void* response,uint8_t code){
   
   switch(hash){
       case H_move:
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(movement,response);
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(movement,response);
-            break;
-          default:
-            return false;
-        } 
+        //The I_V_sensor supports INFO and VALUE requests for any integer variable.
+        I_V_sensor(movement,response,code);
         movement = 0;
         break;
       default:

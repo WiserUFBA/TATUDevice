@@ -35,25 +35,9 @@ bool get(uint32_t hash,void* response,uint8_t code){
   
   switch(hash){
       case H_gas:
-        gas_amount = analogRead(GAS);
-        gas_amount = map (gas_amount,0,1023,0,100);
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(gas_amount,response);
-            aux = strlen((char*)response);
-            ((char*)response)[aux++] = '%';
-            ((char*)response)[aux] = 0;
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(gas_amount,response);
-            break;
-          case TATU_CODE_STATE:
-            if (gas_amount > 55) BTOB(true,response);
-            else BTOB(false,response);
-            break;
-          default:
-            return false;
-        }
+        //The gas_sensor supports INFO,VALUE and STATE requests.
+        gas_sensor(GAS,gas_amount,response,code);
+        break;
       default:
         return false;
   }

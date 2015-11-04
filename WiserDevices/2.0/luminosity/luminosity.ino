@@ -32,21 +32,8 @@ unsigned long int time, lastConnect,prevTime,iTime;
 bool get(uint32_t hash,void* response,uint8_t code){
   switch(hash){
       case H_luminosity:
-        luminosity = (analogRead(LUMINOSITY) - 1023) * (-1);
-        switch(code){   
-          case TATU_CODE_INFO:
-            luminosity = map (luminosity,0,1023,0,100);
-            ITOS(luminosity,response);
-            aux = strlen((char*)response);
-            ((char*)response)[aux++] = '%';
-            ((char*)response)[aux] = 0;
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(luminosity,response);
-            break;
-          default:
-            return false;
-        } 
+        //The lumisity_sensor supports INFO and VALUE,requests. 
+        luminosity_sensor(LUMINOSITY,luminosity,response,code);
         break;
      default:
       return false;

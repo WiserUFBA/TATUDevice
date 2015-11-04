@@ -42,30 +42,12 @@ bool get(uint32_t hash,void* response,uint8_t code){
   
   switch(hash){
       case H_temp:
-        t = (int)dht.readTemperature();
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(t,response);
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(t,response);
-            break;
-          default:
-            return false;
-        } 
+        //The dht_temperatures_sensor supports INFO and VALUE requests.
+        dht_temperature_sensor(dht,t,response,code);
         break;
       case H_humid:
-        h = (int)dht.readHumidity();
-        switch(code){   
-          case TATU_CODE_INFO:
-            ITOS(h,response);
-            break;
-          case TATU_CODE_VALUE:
-            ITOI(h,response);
-            break;
-          default:
-            return false;
-        } 
+        //The dht_humidity_sensor supports INFO and VALUE requests.
+        dht_humidity_sensor(dht,h,response,code);
         break;
       default:
         return false;
