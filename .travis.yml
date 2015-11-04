@@ -32,7 +32,7 @@ install:
     - pip install -U platformio
     
     # Libraries installing
-    platformio lib install 17 19 89
+    - platformio lib install 17 19 89
 
 script:
     - platformio ci --lib="./TATUConfig" --lib="./TATUDevice" --lib="./TATUInterpreter" --lib="./TATUOS" --board=uno --board=miniatmega328 --board=pro16MHzatmega328 --board=megaatmega2560 --board=megaatmega1280
