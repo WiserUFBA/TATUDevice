@@ -32,6 +32,9 @@ install:
     - pip install -U platformio
     # Libraries installing
     - platformio lib install 17 19 89
+    # Force PubSubClient install
+    - wget https://github.com/knolleary/pubsubclient/archive/master.zip -O /tmp/lib.zip
+    - unzip /tmp/lib.zip -d /tmp
 
 script:
-    - platformio ci --lib="./TATUConfig" --lib="./TATUDevice" --lib="./TATUInterpreter" --lib="./TATUOS" --board=uno --board=miniatmega328 --board=pro16MHzatmega328 --board=megaatmega2560 --board=megaatmega1280
+    - platformio ci --lib="./TATUConfig" --lib="./TATUDevice" --lib="/tmp/lib/src" --lib="./TATUInterpreter" --lib="./TATUOS" --board=uno --board=miniatmega328 --board=pro16MHzatmega328 --board=megaatmega2560 --board=megaatmega1280
