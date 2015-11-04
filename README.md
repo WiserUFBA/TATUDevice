@@ -1,6 +1,8 @@
 # TATUDevice
 Biblioteca para a implementação do sistema operacional dos dispositvos TATU
 --
+[![Build Status](https://magnum.travis-ci.com/WiserUFBA/TATUDevice.svg?token=9bNq5p5MKERJTo9DstR2)](https://magnum.travis-ci.com/WiserUFBA/TATUDevice)
+
 ### Introdução
 A biblioteca TATUDevice tem como o objetivo a implementação do sitema operacional TOS(Thing Operating System), sistema operacional criado, para facilitar e padroniza o desenvolvimento de dispositvos IoT da plataforma TATU.A Plataforma TATU ultiliza o protocolo TPI(Thing Protocol for Internet), um protocolo para comunicação entre dispositvos e foi desenvolvida pela equipe de hardware do projeto [SmartUFBA](http://wiki.dcc.ufba.br/SmartUFBA). 
 
