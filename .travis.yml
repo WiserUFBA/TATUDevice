@@ -11,6 +11,7 @@ cache:
 env:
     # Use this little line of shell script to generate list of files to compile
     # for x in $(echo $(find WiserDevices -type f) | cat); echo "  - PLATFORMIO_CI_SRC="$x
+    # --- General devices ---
     - PLATFORMIO_CI_SRC=WiserDevices/window/window.ino
     - PLATFORMIO_CI_SRC=WiserDevices/temp-lamp/temp-lamp.ino
     - PLATFORMIO_CI_SRC=WiserDevices/servo/servo.ino
@@ -27,6 +28,11 @@ env:
     - PLATFORMIO_CI_SRC=WiserDevices/2.0/gas/gas.ino
     - PLATFORMIO_CI_SRC=WiserDevices/2.0/dht11/dht11.ino
     - PLATFORMIO_CI_SRC=WiserDevices/2.0/device/device.ino
+    # Library Test
+    - PLATFORMIO_CI_SRC=TATUDevice/examples/BasicTatuEthernet
+    - PLATFORMIO_CI_SRC=TATUDevice/examples/BasicTatuWifi
+    - PLATFORMIO_CI_SRC=TATUDevice/examples/DeviceTest
+    - PLATFORMIO_CI_SRC=TATUDevice/examples/InterpreterTest
 
 install:
     - pip install -U platformio
