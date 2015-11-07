@@ -69,6 +69,10 @@ volatile int soundReading,movement,gas_amount,t,h;
           //The gas_sensor supports INFO,VALUE and STATE requests.
           gas_sensor(GAS,gas_amount,response,code);
           break;
+        case H_lamp:
+          S_sensor(lamp,response,code);
+        case H_door:
+          *(bool*)response = digitalRead(DOOR);
         default:
           return false;
     }
@@ -77,111 +81,18 @@ volatile int soundReading,movement,gas_amount,t,h;
 bool set(uint32_t hash,uint8_t code,void* response){
   switch(hash){
     case H_lamp:
-      if (*(bool*)response){ON(LAMP);Serial.println("ON"); lamp = true;}
-      else {OFF(LAMP);Serial.println("OFF"); lamp = false;}
-      break;
+      switch(code){\ 
+        case TATU_CODE_STATE:\
+          if (*(bool*)response){ON(LAMP);Serial.println("ON"); lamp = true;}
+          else {OFF(LAMP);Serial.println("OFF"); lamp = false;}
+          break;
+        default:\
+          return false;\
+      } 
     default:
       return false;
     }
     return true; 
-}
-// Funçao do usuario para variaveis do TATU
-bool info(uint32_t hash,char* response,char* valor,uint8_t type) {
-  
-  Serial.print("Hash :");
-  Serial.println(hash);
-  
-  switch(type){  
-    case TATU_GET:
-      switch(hash){
-        case H_lamp:
-          if(lamp) strcpy(response,"ON");
-          else strcpy(response,"OFF");
-          break;
-        case H_temp:
-          t = (int)dht.readTemperature();
-          itoa(t,response,10);
-          break;  
-        case H_humid:
-          h = (int)dht.readHumidity();
-          itoa(h,response,10);
-          break;
-        case H_gas:
-          gas_amount = analogRead(GAS);
-          gas_amount = map (gas_amount,0,1023,0,100);
-          itoa(gas_amount,response,10);
-          aux = strlen(response);
-          response[aux++] = '%';
-          response[aux] = 0;
-          break;
-        case H_door:
-          if (digitalRead(DOOR) == true)
-            strcpy(response,"Aberta");
-          else
-            strcpy(response,"Fechada");
-          break;
-        default:
-          return false;
-      }
-      break;
-    case TATU_SET:
-      switch(hash){
-        case H_lamp:
-          if (valor[0] == '1'){ON(LAMP);Serial.println("ON"); lamp = true;}
-          else if (valor[0] == '0'){OFF(LAMP);Serial.println("OFF"); lamp = false;}
-          break;
-        default:
-          return false;
-      } 
-      //Serial.println(valor);
-      break;
-  } 
-  return true;
-
-}
-
-//STATE
-bool state(uint32_t hash,bool* response,bool valor,uint8_t type){
-  
-  Serial.print("Hash :");
-  Serial.println(hash);
-  
-  switch(type){  
-    case TATU_GET:
-      Serial.println("akiGET");
-      switch(hash){
-          Serial.println("akiHASH");
-          case H_lamp:
-            Serial.println("akiLAMP");
-            *response = lamp;
-            break;
-          case H_gas:
-            gas_amount = analogRead(GAS);
-            gas_amount = map (gas_amount,0,1023,0,100);
-            Serial.print("Gas amount: ");
-            Serial.println(gas_amount);
-            if (gas_amount > 55) *response = true;
-            else *response = false;
-            break;
-          case H_door:
-            *response = digitalRead(DOOR);
-            break;
-          default:
-            return false;
-      }
-      break;
-    case TATU_SET:
-      switch(hash){
-          case H_lamp:
-            if (valor){ON(LAMP);Serial.println("ON"); lamp = true;}
-            else {OFF(LAMP);Serial.println("OFF"); lamp = false;}
-            break;
-          default:
-            return false;
-      } 
-      break;  
-  }
-  return true;
 }
 
 

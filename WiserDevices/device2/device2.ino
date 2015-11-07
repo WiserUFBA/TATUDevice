@@ -69,7 +69,6 @@ const char hello[] PROGMEM =
 //volatile int soundReading,movement,gas_amount,t,h,luminosity;
 bool lamp;
 char str[20];  
-int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 192, 168, 0, 141 };
 byte ip[4]    = { 10, 41 , 0 , 97 };
