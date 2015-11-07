@@ -1,3 +1,5 @@
+//#define LIB <Servo.h>
+
 #include <stdint.h>
 #include <SPI.h>
 #include <PubSubClient.h>

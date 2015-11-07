@@ -5,8 +5,9 @@
 #include <stdint.h>
 #include <SPI.h>
 #include <PubSubClient.h>
-#include <Adafruit_CC3000.h>
-#include <ccspi.h>
+#include <Ethernet.h>
+//#include <Adafruit_CC3000.h>
+//#include <ccspi.h>
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <sensors.h>
@@ -36,7 +37,7 @@
 #define H_move 2090515612
 #define H_luminosity 1516126306
 #define H_humid 261814908
-
+/*
 // Network properties
 #define WLAN_SSID       "wiser"           // cannot be longer than 32 characters!
 #define WLAN_PASS       "wiser2014"
@@ -55,7 +56,7 @@
 
 // On an UNO, SCK = 13, MISO = 12, and MOSI = 11
 Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
-                                         SPI_CLOCK_DIVIDER); // you can change this clock speed
+                                         SPI_CLOCK_DIVIDER); // you can change this clock speed*/
 
 
 // Message for annoucement of connection
@@ -70,8 +71,8 @@ const char hello[] PROGMEM =
 bool lamp;
 char str[20];  
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 192, 168, 0, 141 };
-byte ip[4]    = { 10, 41 , 0 , 97 };
+byte server[] = { 192, 168, 1, 14};
+byte ip[4]    = { 192, 168 , 1 , 23 };
   /*
   bool get(uint32_t hash,void* response,uint8_t code){
     switch(hash){
@@ -107,11 +108,12 @@ byte ip[4]    = { 10, 41 , 0 , 97 };
   }*/
 
 // Objects to example that uses ethernet
-Adafruit_CC3000_Client wifiClient = Adafruit_CC3000_Client();
+//Adafruit_CC3000_Client wifiClient = Adafruit_CC3000_Client();
+EthernetClient EthClient;
 TATUInterpreter interpreter;
 TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, aux_get);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
-PubSubClient client(server, MQTTPORT, mqtt_callback , wifiClient);
+PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
 // This is obrigatory, and defines this DEVICE
@@ -134,10 +136,10 @@ void setup() {
 
   device.publish_test = &bridge;
 
-  Serial.println("Inicializando!");
+  Ethernet.begin(mac,ip);
   char aux[16];  
   Serial.begin(9600);  
-  
+  /*Serial.println("Inicializando!");
   Serial.println(F("\nInitializing..."));
   if (!cc3000.begin())
   {
@@ -154,11 +156,11 @@ void setup() {
   Serial.println(F("Connected!"));
   
   /* Wait for DHCP to complete */
-  Serial.println(F("Request DHCP"));
+  /*Serial.println(F("Request DHCP"));
   while (!cc3000.checkDHCP()) { delay(100); }  
  
   Serial.println(F("Initialization complete"));
-  
+  */
   
   pinMode(DHTPIN,INPUT);
   //pinMode(MOVE, INPUT);
