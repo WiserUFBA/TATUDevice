@@ -9,6 +9,7 @@
 #include <ccspi.h>
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
+#include <sensors.h>
 #include <string.h>
 #include <DHT.h>
 
@@ -37,8 +38,8 @@
 #define H_humid 261814908
 
 // Network properties
-#define WLAN_SSID       "baixo"           // cannot be longer than 32 characters!
-#define WLAN_PASS       "EuEsqueci"
+#define WLAN_SSID       "wiser"           // cannot be longer than 32 characters!
+#define WLAN_PASS       "wiser2014"
 // Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 #define IDLE_TIMEOUT_MS  3000      // Amount of time to wait (in milliseconds) with no data 
@@ -70,7 +71,7 @@ bool lamp;
 char str[20];  
 int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 192, 168, 0, 139 };
+byte server[] = { 192, 168, 0, 141 };
 byte ip[4]    = { 10, 41 , 0 , 97 };
   /*
   bool get(uint32_t hash,void* response,uint8_t code){

@@ -1,7 +1,12 @@
+#ifndef SENSORS_H
+#define SENSORS_H
+
 #include <stdint.h>
 #include "Arduino.h"
+#include <TATUDevice.h>
 
 #ifdef MQ2_SENSOR
+#define MQ2_SENSOR2 MQ2_SENSOR
 #define H_gas 193492480
 volatile int gas_amount;
 #endif
@@ -12,36 +17,16 @@ volatile int gas_amount;
 #define DHTTYPE 11
 #define H_temp 2090755995
 #define H_humid 261814908
-DHT dht(DHT11_SENSOR, DHTTYPE);
+DHT dht(DHT11_SENSOR_, DHTTYPE);
 volatile int h,t;
 #endif
 
 #ifdef LDR_SENSOR
 #define H_luminosity 1516126306
 volatile int luminosity;
+//int aux;
+//har aux[20];
 #endif
-
-bool aux_get(uint32_t hash,void* response,uint8_t code);
-/*bool test_get(uint32_t hash,void* response,uint8_t code){
-	switch(hash){
-
-		#ifdef MQ2_SENSOR
-	    case H_gas:
-	      //The gas_sensor supports INFO,VALUE and STATE requests.
-	      gas_sensor(MQ2_SENSOR,gas_amount,response,code);
-	      break;
-	    #endif
-
-	    default:
-	      return false;
-	}
-	return true; 
-}*/
-/*void testando(){
-	int i;
-	for(i = 0; i < 3;i++);
-	return;
-}*/
 
 
 #define gas_sensor(PIN,VAR,RESPONSE,CODE) \
@@ -63,7 +48,7 @@ bool aux_get(uint32_t hash,void* response,uint8_t code);
             break; \
         }
 
-#define luminosity_sensor(PIN,VAR,RESPONSE,CODE)  \
+/*#define luminosity_sensor(PIN,VAR,RESPONSE,CODE)  \
         VAR = (analogRead(PIN) - 1023) * (-1); \
         switch(CODE){ \
           case TATU_CODE_INFO: \
@@ -78,7 +63,7 @@ bool aux_get(uint32_t hash,void* response,uint8_t code);
             break; \
           default: \
             return false; \
-        } 
+        }*/
 
 #define dht_temperature_sensor(DHT,VAR,RESPONSE,CODE) \
         VAR = (int)DHT.readTemperature(); \
@@ -128,60 +113,7 @@ bool aux_get(uint32_t hash,void* response,uint8_t code);
             return false; \
         } 
 
-/*#ifdef
-bool get(uint32_t hash,void* response,uint8_t code){
-	switch(hash){
-		#ifdef DHT_SENSOR
-		case H_temp:
-	      	//The dht_temperatures_sensor supports INFO and VALUE requests.
-	        dht_temperature_sensor(dht,t,response,code);
-	        break;
-	    #endif
-	    case H_humid:
-	        //The dht_humidity_sensor supports INFO and VALUE requests.
-	        dht_humidity_sensor(dht,h,response,code);
-	        break;
-	    case H_luminosity:
-	        //The lumisity_sensor supports INFO and VALUE,requests. 
-	        luminosity_sensor(LUMINOSITY,luminosity,response,code);
-	        break;
-	    case H_gas:
-	        //The gas_sensor supports INFO,VALUE and STATE requests.
-	        gas_sensor(GAS,gas_amount,response,code);
-	        break;
-	    default:
-	        return false;
-	}
-	return true; 
-}
-#endif*/
-/*#define CASO(RESOURCE) 1 \
-	#ifdef RESOURCE \
-	case HASH: \
-	  	//The dht_temperatures_sensor supports INFO and VALUE requests. \
-	    dht_temperature_sensor(dht,t,response,code); \
-	    break; \
-	#endif 
+bool aux_get(uint32_t hash,void* response,uint8_t code);
+//bool luminosity_sensor(uint8_t PIN,int VAR,char *RESPONSE,uint8_t CODE);
 
-
-#ifdef algo
-#define resources \
-	#ifdef DHT_SENSOR \
-	case H_temp: \
-	  	//The dht_temperatures_sensor supports INFO and VALUE requests. \
-	    dht_temperature_sensor(dht,t,response,code); \
-	    break; \
-	#endif \
-	case H_humid: \
-	    //The dht_humidity_sensor supports INFO and VALUE requests. \
-	    dht_humidity_sensor(dht,h,response,code); \
-	    break; \
-	case H_luminosity: \
-	    //The lumisity_sensor supports INFO and VALUE,requests. \
-	    luminosity_sensor(LUMINOSITY,luminosity,response,code); \
-	    break; \
-	case H_gas: \
-	    //The gas_sensor supports INFO,VALUE and STATE requests. \
-	    gas_sensor(GAS,gas_amount,response,code); \
-	    break; 
-#endif*/
+#endif

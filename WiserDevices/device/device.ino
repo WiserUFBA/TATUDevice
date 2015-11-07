@@ -1,15 +1,16 @@
+#define MQ2_SENSOR A0 
+#define DHT_SENSOR 8
+#define LDR_SENSOR A3
+
 #include <stdint.h>
 #include <SPI.h>
 #include <PubSubClient.h>
 #include <Ethernet.h>
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
+#include <sensors.h>
 #include <string.h>
 #include <DHT.h>
-
-//#define MQ2_SENSOR A0 
-//#define DHT_SENSOR 8
-//#define LDR_SENSOR A3
 
 // Pins used
 #define LUMINOSITY A3
@@ -44,15 +45,15 @@ const char hello[] PROGMEM =
 DHT dht(DHTPIN, DHTTYPE);
 
 //variveis
-volatile int soundReading,movement,gas_amount,t,h,luminosity;
+//volatile int soundReading,movement,gas_amount,t,h,luminosity;
+volatile int movement;
 bool lamp;
 char str[20];  
-int aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 10, 41, 0, 92 };
+byte server[] = { 10, 41, 0, 10 };
 byte ip[4]    = { 10, 41 , 0 , 97 };
   
-  bool get(uint32_t hash,void* response,uint8_t code){
+  /*bool get(uint32_t hash,void* response,uint8_t code){
     switch(hash){
         case H_move:
           //The I_V_sensor supports INFO and VALUE requests for any integer variable.
@@ -83,7 +84,7 @@ byte ip[4]    = { 10, 41 , 0 , 97 };
           return false;
     }
     return true; 
-  }
+  }*/
 
 // Objects to example that uses ethernet
 EthernetClient EthClient;
@@ -109,6 +110,7 @@ CREATE_DOD(DEVICE_NAME,
 void setup() {
   //In order to avoid problems caused by external interruptions,
   //is recomended disable the interruption when using the attachInterrupt function;
+  Serial.println("Trying connect to the broker");  
   cli();//disable interruptions
 
   device.publish_test = &bridge;
@@ -123,15 +125,13 @@ void setup() {
   attachInterrupt(1, mexeu, FALLING);
 
   //Trying connect to the broker
-  Serial.println("Trying connect to the broker");  
+  //Serial.println("Trying connect to the broker");  
   while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
-  client.publish(device.name,hello);
- 
-  //client.subscribe(device.name);
-  client.subscribe(device.name);
-  //client.subscribe("dev");
+  client.publish("dev/CONNECTIONS",hello);
+  client.subscribe(device.aux_topic_name);
+  client.subscribe("dev");
   sei();//unable interruptions
-  Serial.println("Conected");
+  Serial.println("Conected!!");
 }
 
 
