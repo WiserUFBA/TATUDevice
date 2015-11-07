@@ -76,9 +76,9 @@ volatile int soundReading,movement,gas_amount,t,h;
   }
 bool set(uint32_t hash,uint8_t code,void* response){
   switch(hash){
-    case H_gas:
-      //The gas_sensor supports INFO,VALUE and STATE requests.
-      gas_sensor(GAS,gas_amount,response,code);
+    case H_lamp:
+      if (*(bool*)response){ON(LAMP);Serial.println("ON"); lamp = true;}
+      else {OFF(LAMP);Serial.println("OFF"); lamp = false;}
       break;
     default:
       return false;
