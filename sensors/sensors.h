@@ -24,7 +24,7 @@ volatile int h,t;
 #ifdef LDR_SENSOR
 #define H_luminosity 1516126306
 volatile int luminosity;
-//int aux;
+int aux;
 //har aux[20];
 #endif
 
@@ -48,7 +48,8 @@ volatile int luminosity;
             break; \
         }
 
-/*#define luminosity_sensor(PIN,VAR,RESPONSE,CODE)  \
+
+#define luminosity_sensor(PIN,VAR,RESPONSE,CODE)  \
         VAR = (analogRead(PIN) - 1023) * (-1); \
         switch(CODE){ \
           case TATU_CODE_INFO: \
@@ -63,7 +64,7 @@ volatile int luminosity;
             break; \
           default: \
             return false; \
-        }*/
+        }
 
 #define dht_temperature_sensor(DHT,VAR,RESPONSE,CODE) \
         VAR = (int)DHT.readTemperature(); \
