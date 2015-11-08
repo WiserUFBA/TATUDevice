@@ -66,19 +66,23 @@ bool get(uint32_t hash,void* response,uint8_t code){
   switch(hash){
       case H_luminosity:
         luminosity = analogRead(LUMINOSITY);
-        //Using the code we know what is the type of the information required
+        //Using the "code" variable we know what is the type of the information required
         switch(code){
           //INFO means that the response must be a string 
           case TATU_CODE_INFO:
             ITOS(luminosity,response);// This macro uses a integer to reply a request for a string  
+            //That is what this macro acttualy means: (itoa(luminosity,(char*)response,10))
             break;
           //VALUE means that the response must be a integer
           case TATU_CODE_VALUE:
             ITOI(luminosity,response);// This macro uses a integer to reply a request for a integer
+            //That is what this macro acttualy means: *(int*)INTEGER2 = INTEGER1
             break;
           //STATE means that the response must be a boolean
           case TATU_CODE_STATE:
+            return false;
             break;
+          //A "false" return means that the device was'nt able to resolve the request
           default:
             return false;
         } 
@@ -126,7 +130,7 @@ bool set(uint32_t hash, uint8_t code,void* request){
   return true; 
 }
 
-// Objects to example that uses cc_3000
+// Essential objects and macros
 Adafruit_CC3000_Client wifiClient = Adafruit_CC3000_Client();
 TATUInterpreter interpreter;
 TATUDevice device("device", ip, 121, 88, 0, server_b, MQTTPORT, 1, &interpreter, get);
@@ -140,7 +144,7 @@ CREATE_DOD("device_name",
 );
 
 
-/* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
+/* Is just necessary to edit lines below if you modifies some variable*/
 void setup() {
     
   Serial.println("Inicializando!");
