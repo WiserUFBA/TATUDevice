@@ -5,8 +5,16 @@
 #include "Arduino.h"
 #include <TATUDevice.h>
 
+#ifdef LDR_SENSOR
+#define LDR 1
+volatile int luminosity;
+#define H_luminosity 1516126306
+int aux;
+#endif
+
 #define gas_sensor(PIN,VAR,RESPONSE,CODE)\
-		VAR = analogRead(PIN);\
+      do{
+		    VAR = analogRead(PIN);\
         VAR = map (VAR,0,1023,0,100);\
         switch(CODE){\
           case TATU_CODE_INFO:\
@@ -23,9 +31,11 @@
             else BTOB(false,RESPONSE);\
             break;\
         }
+      }while(false)
 
 
-#define luminosity_sensor(PIN,VAR,RESPONSE,CODE) \
+#define luminosity_sensor(PIN,VAR,RESPONSE,CODE)\
+      do{
         VAR = (analogRead(PIN) - 1023) * (-1);\
         switch(CODE){\
           case TATU_CODE_INFO:\
@@ -41,8 +51,10 @@
           default:\
             return false;\
         }
+      while(false)
 
 #define dht_temperature_sensor(DHT,VAR,RESPONSE,CODE)\
+      do{
         VAR = (int)DHT.readTemperature();\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
@@ -54,7 +66,9 @@
           default:\
             return false;\
         } 
+      }while(false)
 #define dht_humidity_sensor(DHT,VAR,RESPONSE,CODE)\
+      do{
         VAR = (int)DHT.readHumidity();\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
@@ -65,8 +79,10 @@
             break;\
           default:\
             return false;\
-        } 
+        }
+      }while(false)
 #define sensor(PIN,VAR,RESPONSE,CODE)\
+      do{
         VAR = analogRead(PIN);\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
@@ -78,7 +94,9 @@
           default:\
             return false;\
         }
+      }while(false)
 #define att_sensor(VAR,RESPONSE,CODE)\
+      do{
         switch(CODE){\ 
           case TATU_CODE_INFO:\
             ITOS(VAR,RESPONSE);\
@@ -89,7 +107,9 @@
           default:\
             return false;\
         }
+      }while(false)
 #define bool_sensor(VAR,RESPONSE,CODE)\
+      do{
         switch(CODE){\ 
           case TATU_CODE_INFO:\
             BTOS(VAR,RESPONSE);\
@@ -99,7 +119,8 @@
             break;\
           default:\
             return false;\
-        } 
+        }
+      while(false)
 
 
 //bool luminosity_sensor(uint8_t PIN,int VAR,char *RESPONSE,uint8_t CODE);

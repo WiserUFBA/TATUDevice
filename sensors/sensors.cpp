@@ -1,40 +1,10 @@
 #include "sensors.h"
 
-char *str_aux = "rapaz";
-/*#ifdef LDR
-//const int LDR = LDR_SENSOR;
-#define H_luminosity 1516126306
-volatile int luminosity;
-int aux;
-//har aux[20];
-#endif*/
-
-/*bool  luminosity_sensor(uint8_t PIN,int VAR,char *RESPONSE,uint8_t CODE){
-  VAR = (analogRead(PIN) - 1023) * (-1); 
-  switch(CODE){ 
-    case TATU_CODE_INFO: 
-      VAR = map (VAR,0,1023,0,100); 
-      ITOS(VAR,RESPONSE); 
-      aux = strlen((char*)RESPONSE); 
-      ((char*)RESPONSE)[aux++] = '%'; 
-      ((char*)RESPONSE)[aux] = 0; 
-      break; 
-    case TATU_CODE_VALUE: 
-      ITOI(VAR,RESPONSE); 
-      break; 
-    default: 
-      return false; 
-  }
-  return true;
-}*/
-
 bool aux_get(uint32_t hash,void* response,uint8_t code){
 	/*#ifdef GAS
 	    Serial.println("GAS");
 	#endif*/
 	Serial.println(hash);
-	//itoa(hash,str_aux,10);
-	//Serial.println(str_aux);
 	switch(hash){
 		/*#ifdef GAS
 	    case H_gas:
