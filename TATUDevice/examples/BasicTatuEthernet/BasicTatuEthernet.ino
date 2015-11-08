@@ -55,7 +55,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
           //VALUE means that the response must be a integer
           case TATU_CODE_VALUE:
             ITOI(luminosity,response);// This macro uses a integer to reply a request for a integer
-            //That is what this macro acttualy means: *(int*)INTEGER2 = INTEGER1
+            //That is what this macro acttualy means: *(int*)response = luminosity
             break;
           //STATE means that the response must be a boolean
           case TATU_CODE_STATE:

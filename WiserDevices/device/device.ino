@@ -18,6 +18,9 @@
 // DHT TYPE
 #define DHTTYPE 11
 
+//
+#define INTTIME 1
+
 // Constants to connection with the broker
 #define DEVICE_NAME "ufbaino"
 #define MQTT_USER  "device"
@@ -38,11 +41,12 @@ const char hello[] PROGMEM =
   DEVICE_NAME
   " has connected";
 
-DHT dht(DHTPIN, DHTTYPE);
+DHT dht(DHTPIN, DHTTYPE); 
 
 //variveis
 volatile int soundReading,movement,gas_amount,t,h,luminosity;
 int aux;
+long long int time,nextTime;
 char str[20];  
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
 byte server[] = { 192, 168, 1, 14 };
@@ -131,13 +135,16 @@ void setup() {
 
 //LOOP
 void loop() { 
+  time = millis();
   client.loop(); 
   //Watchdog for connection with the broker
   if (!client.connected()) {
     reconnect();
   }
-  
-  interruption_luminosity();
+  if(time > nextTime ){
+    interruption_luminosity();
+    nextTime = time + (INTTIME*1000);
+  }
 }
 
 

@@ -75,155 +75,129 @@ typedef uint8_t byte;
 #define MQTT_PUBLISH2(OBJ, BRIDGE) OBJ.publish_test = &BRIDGE;
 
 // Macro para interrupções
-#define INTERRUPTION_VALUE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){ \
-        case '=': \
-            if(VAR == TRIGGER) \
-                break; \
-            return; \
-        case '>': \
-            if(VAR > TRIGGER) \
-                break; \
-            return; \
-        case '<': \
-            if(VAR < TRIGGER) \
-                break; \
-            return; \
-        case '!': \
-            if(VAR != TRIGGER) \
-                break; \
-            return; \
-        default: \
-            return; \
-    } \
+#define INTERRUPTION_VALUE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){\
+        case '=':\
+            if(VAR == TRIGGER)\
+                break;\
+            return;\
+        case '>':\
+            if(VAR > TRIGGER)\
+                break;\
+            return;\
+        case '<':\
+            if(VAR < TRIGGER)\
+                break;\
+            return;\
+        case '!':\
+            if(VAR != TRIGGER)\
+                break;\
+            return;\
+        default:\
+            return;\
+    }\
     DEVICE.interruption(VAR_NAME,VAR);
 
-#define INTERRUPTION_STATE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){ \
-        case '=': \
-            if(VAR == TRIGGER) \
-                break; \
-            return; \
-        case '!': \
-            if(VAR != TRIGGER) \
-                break; \
-            return; \
-        default: \
-            return; \
-    } \
+#define INTERRUPTION_STATE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){\
+        case '=':\
+            if(VAR == TRIGGER)\
+                break;\
+            return;\
+        case '!':\
+            if(VAR != TRIGGER)\
+                break;\
+            return;\
+        default:\
+            return;\
+    }\
     DEVICE.interruption(VAR_NAME,VAR);
 
-#define INTERRUPTION_INFO(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){ \
-        case '=': \
-            if(!strcmp(VAR,TRIGGER)) \
-                break; \
-            return; \
-        case '!': \
-            if(strcmp(VAR,TRIGGER)) \
-                break; \
-            return; \
-        default: \
-            return; \
-    } \
+#define INTERRUPTION_INFO(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){\
+        case '=':\
+            if(!strcmp(VAR,TRIGGER))\
+                break;\
+            return;\
+        case '!':\
+            if(strcmp(VAR,TRIGGER))\
+                break;\
+            return;\
+        default:\
+            return;\
+    }\
     DEVICE.interruption(VAR_NAME,VAR);
 
 // Constrói o dispositivo e o cliente 
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK, CLIENT) \
-            TATUInterpreter interpreter; \
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK); \
-            MQTT_CALLBACK( bridge, device, mqtt_callback); \
-            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT); \
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK, CLIENT)\
+            TATUInterpreter interpreter;\
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK);\
+            MQTT_CALLBACK( bridge, device, mqtt_callback);\
+            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT);\
             MQTT_PUBLISH(bridge, client)
 
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK_GET, CALLBACK_SET, CLIENT) \
-            TATUInterpreter interpreter; \
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET); \
-            MQTT_CALLBACK( bridge, device, mqtt_callback); \
-            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT); \
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK_GET, CALLBACK_SET, CLIENT)\
+            TATUInterpreter interpreter;\
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET);\
+            MQTT_CALLBACK( bridge, device, mqtt_callback);\
+            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT);\
             MQTT_PUBLISH(bridge, client)
 
 // -----------
 // Omite a porta padrão do MQTT
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK, CLIENT) \
-            TATUInterpreter interpreter; \
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK); \
-            MQTT_CALLBACK( bridge, device, mqtt_callback); \
-            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT); \
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK, CLIENT)\
+            TATUInterpreter interpreter;\
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK);\
+            MQTT_CALLBACK( bridge, device, mqtt_callback);\
+            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT);\
             MQTT_PUBLISH(bridge, client)
 
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK_GET, CALLBACK_SET, CLIENT) \
-            TATUInterpreter interpreter; \
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET); \
-            MQTT_CALLBACK( bridge, device, mqtt_callback); \
-            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT); \
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK_GET, CALLBACK_SET, CLIENT)\
+            TATUInterpreter interpreter;\
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET);\
+            MQTT_CALLBACK( bridge, device, mqtt_callback);\
+            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT);\
             MQTT_PUBLISH(bridge, client)
 
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CLIENT) \
-            TATUInterpreter interpreter; \
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter); \
-            MQTT_CALLBACK( bridge, device, mqtt_callback); \
-            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT); \
+#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CLIENT)\
+            TATUInterpreter interpreter;\
+            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter);\
+            MQTT_CALLBACK( bridge, device, mqtt_callback);\
+            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT);\
             MQTT_PUBLISH(bridge, client)
 
-#define FLUXO(DEVICE, HASH, ATT1, ACTIVE) \
-        switch(HASH){ \
-            case ATT1: \
-              if (ACTIVE) DEVICE.bits.ATT.FLOW1 = true; \
-              else DEVICE.bits.ATT.FLOW1 = false; \
-              break; \
-            default: \
-              return false; \
-        } \
-        return true;
-#define FLUXO(DEVICE, HASH, ATT1, ATT2, ACTIVE) \
-        switch(HASH){ \
-            case ATT1: \
-              if (ACTIVE) DEVICE.bits.ATT.FLOW1 = true; \
-              else DEVICE.bits.ATT.FLOW1 = false; \
-              break; \
-            default: \
-              return false; \
-            case ATT2: \
-              if (ACTIVE) DEVICE.bits.ATT.FLOW2 = true; \
-              else DEVICE.bits.ATT.FLOW2 = false; \
-              break; \
-            default: \
-              return false; \
-        } \
-        return true;
-#define FLUXO(DEVICE, HASH, ATT1, ATT2, ATT3, ACTIVE) \
-        switch(HASH){ \
-            case ATT1: \
-              if (ACTIVE) DEVICE.bits.ATT.FLOW1 = true; \
-              else DEVICE.bits.ATT.FLOW1 = false; \
-              break; \
-            default: \
-              return false; \
-            case ATT2: \
-              if (ACTIVE) DEVICE.bits.ATT.FLOW2 = true; \
-              else DEVICE.bits.ATT.FLOW2 = false; \
-              break; \
-            default: \
-              return false; \
-            case ATT3: \
-              if (ACTIVE) DEVICE.bits.ATT.FLOW3 = true; \
-              else DEVICE.bits.ATT.FLOW3 = false; \
-              break; \
-            default: \
-              return false; \
-        } \
+#define FLUXO(DEVICE, HASH, ATT1, ATT2, ATT3, ACTIVE)\
+        switch(HASH){\
+            case ATT1:\
+              if (ACTIVE) DEVICE.bits.ATT.FLOW1 = true;\
+              else DEVICE.bits.ATT.FLOW1 = false;\
+              break;\
+            default:\
+              return false;\
+            case ATT2:\
+              if (ACTIVE) DEVICE.bits.ATT.FLOW2 = true;\
+              else DEVICE.bits.ATT.FLOW2 = false;\
+              break;\
+            default:\
+              return false;\
+            case ATT3:\
+              if (ACTIVE) DEVICE.bits.ATT.FLOW3 = true;\
+              else DEVICE.bits.ATT.FLOW3 = false;\
+              break;\
+            default:\
+              return false;\
+        }\
         return true
 
 // Conecta o cliente mqtt
-#define DEVICECONNECT() Serial.println("Trying to connect to the broker"); \
-                        if(client.connect(device.name)){ \
-                            Serial.println("The connection has suceeded"); \
-                            client.subscribe(device.subscribe_topic);} \
+#define DEVICECONNECT() Serial.println("Trying to connect to the broker");\
+                        if(client.connect(device.name)){\
+                            Serial.println("The connection has suceeded");\
+                            client.subscribe(device.subscribe_topic);}\
                         else Serial.println("The connection has failed")
 
 // Conecta o cliente mqtt usando usuário e senha
-#define SECURE_DEVICECONNECT(USER,PASS) Serial.println("Trying to connect to the broker"); \
-                                        if(client.connect(device.name,USER,PASS)){ \
-                                            Serial.println("The connection has suceed"); \
-                                            client.subscribe(device.name);} \
+#define SECURE_DEVICECONNECT(USER,PASS) Serial.println("Trying to connect to the broker");\
+                                        if(client.connect(device.name,USER,PASS)){\
+                                            Serial.println("The connection has suceed");\
+                                            client.subscribe(device.name);}\
                                         else Serial.println("The connection has failed")
 
 #define STOS(STRING1,STRING2) strcpy((char*)STRING2,STRING1)

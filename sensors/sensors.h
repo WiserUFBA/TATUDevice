@@ -5,32 +5,6 @@
 #include "Arduino.h"
 #include <TATUDevice.h>
 
-#ifdef MQ2_SENSOR
-#define GAS 1
-#define H_gas 193492480
-volatile int gas_amount;
-#endif
-
-#ifdef DHT11_SENSOR
-#define DHT_ 1
-#define DHTTYPE 11
-#define H_temp 2090755995
-#define H_humid 261814908
-#include <DHT.h>
-DHT dht(DHT11_SENSOR, DHTTYPE);
-volatile int h,t;
-#endif
-
-#ifdef LDR_SENSOR
-#define LDR 1
-volatile int luminosity;
-//const int LDR = LDR_SENSOR;
-#define H_luminosity 1516126306
-int aux;
-//har aux[20];
-#endif
-
-
 #define gas_sensor(PIN,VAR,RESPONSE,CODE)\
 		VAR = analogRead(PIN);\
         VAR = map (VAR,0,1023,0,100);\
