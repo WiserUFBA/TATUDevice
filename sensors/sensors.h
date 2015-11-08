@@ -13,7 +13,7 @@ int aux;
 #endif
 
 #define gas_sensor(PIN,VAR,RESPONSE,CODE)\
-      do{
+      do{\
 		    VAR = analogRead(PIN);\
         VAR = map (VAR,0,1023,0,100);\
         switch(CODE){\
@@ -30,12 +30,12 @@ int aux;
             if (VAR > 55) BTOB(true,RESPONSE);\
             else BTOB(false,RESPONSE);\
             break;\
-        }
+        }\
       }while(false)
 
 
 #define luminosity_sensor(PIN,VAR,RESPONSE,CODE)\
-      do{
+      do{\
         VAR = (analogRead(PIN) - 1023) * (-1);\
         switch(CODE){\
           case TATU_CODE_INFO:\
@@ -50,11 +50,11 @@ int aux;
             break;\
           default:\
             return false;\
-        }
+        }\
       while(false)
 
 #define dht_temperature_sensor(DHT,VAR,RESPONSE,CODE)\
-      do{
+      do{\
         VAR = (int)DHT.readTemperature();\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
@@ -65,10 +65,10 @@ int aux;
             break;\
           default:\
             return false;\
-        } 
+        }\ 
       }while(false)
 #define dht_humidity_sensor(DHT,VAR,RESPONSE,CODE)\
-      do{
+      do{\
         VAR = (int)DHT.readHumidity();\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
@@ -79,10 +79,10 @@ int aux;
             break;\
           default:\
             return false;\
-        }
+        }\
       }while(false)
 #define sensor(PIN,VAR,RESPONSE,CODE)\
-      do{
+      do{\
         VAR = analogRead(PIN);\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
@@ -93,10 +93,10 @@ int aux;
             break;\
           default:\
             return false;\
-        }
+        }\
       }while(false)
 #define att_sensor(VAR,RESPONSE,CODE)\
-      do{
+      do{\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
             ITOS(VAR,RESPONSE);\
@@ -106,10 +106,10 @@ int aux;
             break;\
           default:\
             return false;\
-        }
+        }\
       }while(false)
 #define bool_sensor(VAR,RESPONSE,CODE)\
-      do{
+      do{\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
             BTOS(VAR,RESPONSE);\
@@ -119,7 +119,7 @@ int aux;
             break;\
           default:\
             return false;\
-        }
+        }\
       while(false)
 
 
