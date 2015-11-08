@@ -1,6 +1,13 @@
 #include "sensors.h"
 
 char *str_aux = "rapaz";
+/*#ifdef LDR
+//const int LDR = LDR_SENSOR;
+#define H_luminosity 1516126306
+volatile int luminosity;
+int aux;
+//har aux[20];
+#endif*/
 
 /*bool  luminosity_sensor(uint8_t PIN,int VAR,char *RESPONSE,uint8_t CODE){
   VAR = (analogRead(PIN) - 1023) * (-1); 
@@ -22,14 +29,14 @@ char *str_aux = "rapaz";
 }*/
 
 bool aux_get(uint32_t hash,void* response,uint8_t code){
-	#ifdef GAS
+	/*#ifdef GAS
 	    Serial.println("GAS");
-	#endif
+	#endif*/
 	Serial.println(hash);
 	//itoa(hash,str_aux,10);
 	//Serial.println(str_aux);
 	switch(hash){
-		#ifdef GAS
+		/*#ifdef GAS
 	    case H_gas:
 	      	//The gas_sensor supports INFO,VALUE and STATE requests.
 	      	gas_sensor(gas_amount,response,code);
@@ -45,7 +52,7 @@ bool aux_get(uint32_t hash,void* response,uint8_t code){
           	//The dht_humidity_sensor supports INFO and VALUE requests.
           	dht_humidity_sensor(dht,h,response,code);
           	break;
-        #endif
+        #endif*/
 
 		#ifdef LDR
        

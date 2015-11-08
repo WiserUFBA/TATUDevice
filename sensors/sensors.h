@@ -23,15 +23,16 @@ volatile int h,t;
 
 #ifdef LDR_SENSOR
 #define LDR 1
-#define H_luminosity 1516126306
 volatile int luminosity;
+//const int LDR = LDR_SENSOR;
+#define H_luminosity 1516126306
 int aux;
 //har aux[20];
 #endif
 
 
-#define gas_sensor(VAR,RESPONSE,CODE)\
-		VAR = analogRead(MQ2_SENSOR);\
+#define gas_sensor(PIN,VAR,RESPONSE,CODE)\
+		VAR = analogRead(PIN);\
         VAR = map (VAR,0,1023,0,100);\
         switch(CODE){\
           case TATU_CODE_INFO:\
@@ -50,8 +51,8 @@ int aux;
         }
 
 
-#define luminosity_sensor(VAR,RESPONSE,CODE) \
-        VAR = (analogRead(LDR_SENSOR) - 1023) * (-1);\
+#define luminosity_sensor(PIN,VAR,RESPONSE,CODE) \
+        VAR = (analogRead(PIN) - 1023) * (-1);\
         switch(CODE){\
           case TATU_CODE_INFO:\
             VAR = map (VAR,0,1023,0,100);\
@@ -123,8 +124,9 @@ int aux;
             return false;\
         } 
 
-bool aux_get(uint32_t hash,void* response,uint8_t code);
+
 //bool luminosity_sensor(uint8_t PIN,int VAR,char *RESPONSE,uint8_t CODE);
+bool aux_get(uint32_t hash,void* response,uint8_t code);
 
 
 #endif
