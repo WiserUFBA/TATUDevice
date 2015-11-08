@@ -120,7 +120,7 @@ int aux;
           default:\
             return false;\
         }\
-      while(false)
+      }while(false)
 
 
 //bool luminosity_sensor(uint8_t PIN,int VAR,char *RESPONSE,uint8_t CODE);
