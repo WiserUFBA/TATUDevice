@@ -51,7 +51,7 @@ int aux;
           default:\
             return false;\
         }\
-      while(false)
+      }while(false)
 
 #define dht_temperature_sensor(DHT,VAR,RESPONSE,CODE)\
       do{\
