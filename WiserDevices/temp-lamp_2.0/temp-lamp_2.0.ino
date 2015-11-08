@@ -5,6 +5,7 @@
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <sensors.h>
+#include <actuators.h>
 #include <string.h>
 #include <DHT.h>
 
@@ -44,8 +45,8 @@ DHT dht(DHTPIN, DHTTYPE);
 //variveis
 bool lamp = 0,aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 0, 101 };
-byte ip[4]    = { 192, 168, 0, 68 };
+byte server[] = { 192, 168, 1, 14 };
+byte ip[4]    = { 192, 168, 1, 27 };
 
 //int t,h,count;
 volatile int soundReading,movement,gas_amount,t,h;
@@ -54,7 +55,7 @@ volatile int soundReading,movement,gas_amount,t,h;
     switch(hash){
         case H_move:
           //The I_V_sensor supports INFO and VALUE requests for any integer variable.
-          I_V_sensor(movement,response,code);
+          att_sensor(movement,response,code);
           movement = 0;
           break;
         case H_temp:
@@ -70,7 +71,7 @@ volatile int soundReading,movement,gas_amount,t,h;
           gas_sensor(GAS,gas_amount,response,code);
           break;
         case H_lamp:
-          S_sensor(lamp,response,code);
+          bool_sensor(lamp,response,code);
         case H_door:
           *(bool*)response = digitalRead(DOOR);
         default:
@@ -81,14 +82,8 @@ volatile int soundReading,movement,gas_amount,t,h;
 bool set(uint32_t hash,uint8_t code,void* response){
   switch(hash){
     case H_lamp:
-      switch(code){\ 
-        case TATU_CODE_STATE:\
-          if (*(bool*)response){ON(LAMP);Serial.println("ON"); lamp = true;}
-          else {OFF(LAMP);Serial.println("OFF"); lamp = false;}
-          break;
-        default:\
-          return false;\
-      } 
+      bool_actuator(LAMP,lamp,response,code);
+      break;
     default:
       return false;
     }

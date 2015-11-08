@@ -230,6 +230,7 @@ typedef uint8_t byte;
 #define STOS(STRING1,STRING2) strcpy((char*)STRING2,STRING1)
 #define ITOS(INTEGER,STRING) (itoa(INTEGER,(char*)STRING,10))
 #define ITOI(INTEGER1,INTEGER2) *(int*)INTEGER2 = INTEGER1
+#define BTOS(BOOL1,STRING) if (BOOL1) strcpy((char*)STRING,"T"); else strcpy((char*)STRING,"F");
 #define BTOB(BOOL1,BOOL2) *(bool*)BOOL2 = BOOL1
 
 //#define RESPONSE_CONSTRUCT(NAME_VAR)/* Coloca o BODY na resposta */ \

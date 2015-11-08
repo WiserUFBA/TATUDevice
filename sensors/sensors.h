@@ -92,7 +92,7 @@ int aux;
           default:\
             return false;\
         } 
-#define I_V_analog_sensor(PIN,VAR,RESPONSE,CODE)\
+#define sensor(PIN,VAR,RESPONSE,CODE)\
         VAR = analogRead(PIN);\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
@@ -104,7 +104,7 @@ int aux;
           default:\
             return false;\
         }
-#define I_V_sensor(VAR,RESPONSE,CODE)\
+#define att_sensor(VAR,RESPONSE,CODE)\
         switch(CODE){\ 
           case TATU_CODE_INFO:\
             ITOS(VAR,RESPONSE);\
@@ -115,8 +115,11 @@ int aux;
           default:\
             return false;\
         }
-#define S_sensor(VAR,RESPONSE,CODE)\
+#define bool_sensor(VAR,RESPONSE,CODE)\
         switch(CODE){\ 
+          case TATU_CODE_INFO:\
+            BTOS(VAR,RESPONSE);\
+            break;\
           case TATU_CODE_STATE:\
             BTOB(VAR,RESPONSE);\
             break;\

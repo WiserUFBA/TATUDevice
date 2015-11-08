@@ -1,5 +1,3 @@
-//#define LIB <Servo.h>
-
 #include <stdint.h>
 #include <SPI.h>
 #include <PubSubClient.h>
@@ -45,22 +43,21 @@ DHT dht(DHTPIN, DHTTYPE);
 //variveis
 volatile int soundReading,movement,gas_amount,t,h,luminosity;
 int aux;
-bool lamp;
 char str[20];  
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 10, 41, 0, 10 };
-byte ip[4]    = { 10, 41 , 0 , 97 };
+byte server[] = { 192, 168, 1, 14 };
+byte ip[4]    = { 192, 168 , 1 , 97 };
   
   bool get(uint32_t hash,void* response,uint8_t code){
     switch(hash){
         case H_move:
           //The I_V_sensor supports INFO and VALUE requests for any integer variable.
-          I_V_sensor(movement,response,code);
+          att_sensor(movement,response,code);
           movement = 0;
           break;
         case H_sound:
           //The I_V_analog_sensor supports INFO and VALUE requests for any integer variable.
-          I_V_analog_sensor(SOUND,soundReading,response,code);
+          sensor(SOUND,soundReading,response,code);
           break;
         case H_temp:
           //The dht_temperatures_sensor supports INFO and VALUE requests.
