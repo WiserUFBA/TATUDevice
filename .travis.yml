@@ -30,4 +30,4 @@ install:
     - platformio lib update 17 19 61 89
 
 script:
-    - platformio ci --lib="./TATUConfig" --lib="./TATUDevice" --lib="./TATUInterpreter" --lib="./sensors" --board=uno --board=miniatmega328 --board=pro16MHzatmega328 --board=megaatmega2560 --board=megaatmega1280
+    - platformio ci --lib="./TATUConfig" --lib="./TATUDevice" --lib="./TATUInterpreter" --lib="./sensors" --lib="./actuators" --board=uno --board=miniatmega328 --board=pro16MHzatmega328 --board=megaatmega2560 --board=megaatmega1280
