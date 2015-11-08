@@ -5,7 +5,7 @@
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <string.h>
-
+#include <sensors.h>
 //Digital pin for the pir sensor
 #define MOVE 3
 
@@ -33,7 +33,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
   switch(hash){
       case H_move:
         //The I_V_sensor supports INFO and VALUE requests for any integer variable.
-        I_V_sensor(movement,response,code);
+        att_sensor(movement,response,code);
         movement = 0;
         break;
       default:

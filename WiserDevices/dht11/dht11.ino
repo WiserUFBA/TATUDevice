@@ -6,6 +6,7 @@
 #include <TATUInterpreter.h>
 #include <string.h>
 #include <DHT.h>
+#include <sensors.h>
 
 //Digital pin for the dht sensor
 #define DHTPIN 8

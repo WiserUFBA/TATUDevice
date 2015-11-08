@@ -4,6 +4,7 @@
 #include <Ethernet.h>
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
+#include <sensors.h>
 #include <string.h>
 
 //Analogic pin for the gas sensor

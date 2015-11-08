@@ -5,6 +5,8 @@
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <string.h>
+#include <sensors.h>
+
 
 //Analogic pin for the photosensor
 #define LUMINOSITY 0
