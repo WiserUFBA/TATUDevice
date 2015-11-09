@@ -243,8 +243,8 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 
         case TATU_GET:
             #ifdef DEBUG
-            PRINT_DEBUG(CALLBACK_GET);
-            DEBUG_NL;
+            //PRINT_DEBUG(CALLBACK_GET);
+            //DEBUG_NL;
             #endif
 
             if(requisition->cmd.OBJ.CODE == TATU_CODE_DOD){
@@ -313,8 +313,8 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             break;
         case TATU_SET:
             #ifdef DEBUG
-            PRINT_DEBUG(CALLBACK_SET);
-            DEBUG_NL;
+            //PRINT_DEBUG(CALLBACK_SET);
+            //DEBUG_NL;
             #endif
             switch(requisition->cmd.OBJ.VAR){
                 case TATU_TYPE_ALIAS:

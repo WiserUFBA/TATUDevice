@@ -15,6 +15,8 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     200
 #endif
 
+//#define DEBUG
+
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
 #define putstring(x)        SerialPrint_PROGMEM(x)

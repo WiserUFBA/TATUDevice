@@ -20,7 +20,7 @@
 #define DEVICE_PAN_ID 88
 
 // Constants to connection with the broker
-#define DEVICE_NAME ""
+#define DEVICE_NAME "ufbaino"
 #define MQTT_USER  ""
 #define MQTT_PASS  ""
 #define MQTTPORT 1883
@@ -53,8 +53,8 @@ const char hello[] PROGMEM = DEVICE_NAME " has connected";
 
 // System properties
 byte ip[4]    = { 0 }; // Null array to avoid erros
-IPAddress server(192, 168, 0, 101); // If you aren't using the patched version of the CC3000 library, so put the IP in reverse order
-byte server_b[4]    = { 192, 168, 0, 101 };
+IPAddress server(192, 168, 0, 141); // If you aren't using the patched version of the CC3000 library, so put the IP in reverse order
+byte server_b[4]    = { 192, 168, 0, 141 };
 
 bool lamp;
 int luminosity;
