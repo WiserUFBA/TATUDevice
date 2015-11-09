@@ -70,13 +70,14 @@ bool get(uint32_t hash,void* response,uint8_t code){
         switch(code){
           //INFO means that the response must be a string 
           case TATU_CODE_INFO:
-            ITOS(luminosity,response);// This macro uses a integer to reply a request for a string  
-            //That is what this macro acttualy means: (itoa(luminosity,(char*)response,10))
+            //Once the pointer to response is a void, there must be a cast
+            ITOS(luminosity,response);// This macro uses a integer to reply a request for a string (ITOS = Integer to String)
+            //That is what this macro actualy means: (itoa(luminosity,(char*)response,10))
             break;
           //VALUE means that the response must be a integer
           case TATU_CODE_VALUE:
-            ITOI(luminosity,response);// This macro uses a integer to reply a request for a integer
-            //That is what this macro acttualy means: *(int*)INTEGER2 = INTEGER1
+            ITOI(luminosity,response);// This macro uses a integer to reply a request for a integer (ITOI = Integer to Integer)
+            //That is what this macro actualy means: *(int*)INTEGER2 = INTEGER
             break;
           //STATE means that the response must be a boolean
           case TATU_CODE_STATE:
@@ -90,7 +91,8 @@ bool get(uint32_t hash,void* response,uint8_t code){
       case H_lamp:
         switch(code){   
           case TATU_CODE_STATE:
-            BTOB(lamp,response);// This macro uses a boolean to reply a request for a boolean
+            BTOB(lamp,response);// This macro uses a boolean to reply a request for a boolean (BTOB = Boolean to Boolean)
+            //That is what this macro actualy means: *(bool*)response = lamp
             break;
           default:
             return false;
@@ -133,12 +135,12 @@ bool set(uint32_t hash, uint8_t code,void* request){
 // Essential objects and macros
 Adafruit_CC3000_Client wifiClient = Adafruit_CC3000_Client();
 TATUInterpreter interpreter;
-TATUDevice device("device", ip, 121, 88, 0, server_b, MQTTPORT, 1, &interpreter, get);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server_b, MQTTPORT, 1, &interpreter, get);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , wifiClient);
 MQTT_PUBLISH(bridge, client);
 
-CREATE_DOD("device_name",
+CREATE_DOD(DEVICE_NAME,
   ADD_LAST_SENSOR("sensor_name", "type", "pin"),
   ADD_NONE()
 );
