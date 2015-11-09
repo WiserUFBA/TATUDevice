@@ -50,12 +50,12 @@ bool get(uint32_t hash,void* response,uint8_t code){
           //INFO means that the response must be a string 
           case TATU_CODE_INFO:
             ITOS(luminosity,response);// This macro uses a integer to reply a request for a string  
-            //That is what this macro acttualy means: (itoa(luminosity,(char*)response,10))
+            //That is what this macro actually means: (itoa(luminosity,(char*)response,10))
             break;
           //VALUE means that the response must be a integer
           case TATU_CODE_VALUE:
             ITOI(luminosity,response);// This macro uses a integer to reply a request for a integer
-            //That is what this macro acttualy means: *(int*)response = luminosity
+            //That is what this macro actually means: *(int*)response = luminosity
             break;
           //STATE means that the response must be a boolean
           case TATU_CODE_STATE:
@@ -70,6 +70,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
         switch(code){   
           case TATU_CODE_STATE:
             BTOB(lamp,response);// This macro uses a boolean to reply a request for a boolean
+            //That is what this macro actually means: *(bool*)response = lamp
             break;
           default:
             return false;
