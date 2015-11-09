@@ -21,6 +21,7 @@ env:
     # Library Test
     - PLATFORMIO_CI_SRC=TATUDevice/examples/BasicTatuEthernet
     - PLATFORMIO_CI_SRC=TATUDevice/examples/BasicTatuWifi
+    - PLATFORMIO_CI_SRC=TATUDevice/examples/attachmentsLibs
 
 install:
     - pip install -U platformio
