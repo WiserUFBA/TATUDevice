@@ -13,7 +13,8 @@ env:
     # for x in $(echo $(find WiserDevices -type f) | cat); echo "  - PLATFORMIO_CI_SRC="$x
     # --- General devices ---
     - PLATFORMIO_CI_SRC=WiserDevices/device2/device2.ino
-    - PLATFORMIO_CI_SRC=WiserDevices/temp-lamp_2.0/temp-lamp_2.0.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/temp-lamp/temp-lamp.ino
+    - PLATFORMIO_CI_SRC=WiserDevices/rele-pres/rele-pres.ino
     - PLATFORMIO_CI_SRC=WiserDevices/luminosity/luminosity.ino
     - PLATFORMIO_CI_SRC=WiserDevices/gas/gas.ino
     - PLATFORMIO_CI_SRC=WiserDevices/dht11/dht11.ino
