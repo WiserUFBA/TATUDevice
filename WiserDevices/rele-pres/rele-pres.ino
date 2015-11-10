@@ -34,8 +34,8 @@ const char hello[] PROGMEM = DEVICE_NAME " has connected";
 //variveis
 bool lamp = 0,aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 1, 14 };
-byte ip[4]    = { 192, 168, 1, 27 };
+byte server[] = { 192, 168, 0, 101 };
+byte ip[4]    = { 192, 168, 0, 127 };
 
 //int t,h,count;
 volatile int soundReading,movement,gas_amount,t,h;
@@ -101,10 +101,10 @@ void setup() {
 
   Ethernet.begin(mac, ip);
   pinMode(LAMP,OUTPUT);
-  pinMode(MOVE, INPUT);
   
+  pinMode(MOVE, INPUT); 
   digitalWrite(MOVE, HIGH);
-  attachInterrupt(3, mexeu, FALLING);
+  attachInterrupt(1, mexeu, FALLING);
    
   //Trying connect to the broker
   //Serial.println("Trying connect to the broker");  

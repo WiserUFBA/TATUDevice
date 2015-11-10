@@ -10,7 +10,7 @@
 #include <DHT.h>
 
 // Pins used
-#define GAS 1
+#define GAS A1
 #define DOOR 6
 #define DHTPIN 8
 #define LAMP 9
@@ -30,7 +30,6 @@
 #define H_lamp 2090464143
 #define H_temp 2090755995
 #define H_humid 261814908
-#define H_ar 5863224
 #define H_move 2090515612
 #define H_door 2090191961
 
@@ -45,8 +44,8 @@ DHT dht(DHTPIN, DHTTYPE);
 //variveis
 bool lamp = 0,aux;
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 1, 14 };
-byte ip[4]    = { 192, 168, 1, 27 };
+byte server[] = { 192, 168, 0, 101 };
+byte ip[4]    = { 192, 168, 0, 68 };
 
 //int t,h,count;
 volatile int soundReading,movement,gas_amount,t,h;
@@ -101,12 +100,12 @@ MQTT_PUBLISH(bridge, client);
 
 // This is obrigatory, and defines this DEVICE
 CREATE_DOD(DEVICE_NAME,
-  ADD_SENSORS("luminosity", "ldr", "A3")
-  ADD_SENSORS("move", "pir", "3")
+  ADD_SENSORS("lamp", "relay", "9")
+  ADD_SENSORS("move", "pir", "20")
+  ADD_SENSORS("gas", "mq2", "A1")
+  ADD_SENSORS("door", "mq2", "6")
   ADD_SENSORS("temp", "dht11", "8")
-  ADD_SENSORS("gas", "mq2", "A0")
-  ADD_SENSORS("sound", "mic", "A1")
-  ADD_LAST_SENSOR("ar", "dht11", "8"),
+  ADD_LAST_SENSOR("humid", "dht11", "8"),
   ADD_NONE()
 );
 
