@@ -127,7 +127,7 @@ void setup() {
   Serial.println("Trying connect to the broker");  
   cli();//disable interruptions
 
-  device.publish_test = &bridge;
+  device.pub = &bridge;
 
   char aux[16];  
   Serial.begin(9600);

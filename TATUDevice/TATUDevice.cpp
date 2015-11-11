@@ -444,7 +444,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 }
 
 /* Function to abstract some low-level publishing action */
-void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, void (*publish)(char *, char *)){
+void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);
 
@@ -463,7 +463,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length, 
     strcpy_P(&aux_topic_name[len_name],res_str);
     
     //publish the message
-    publish(aux_topic_name, output_message);
+    pub(aux_topic_name, output_message);
 
     aux_topic_name[len_name] = 0;
 
@@ -487,7 +487,7 @@ void TATUDevice::interruption(const char *var_name, int var){
     BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
     CLOSE_MSG; 
     strcpy_P(&aux_topic_name[len_name],int_str);
-    publish_test(aux_topic_name, output_message); //publish the message 
+    pub(aux_topic_name, output_message); //publish the message 
     aux_topic_name[len_name] = 0;
     //RESPONSE_CONSTRUCT(var_name);
 }
@@ -502,7 +502,7 @@ void TATUDevice::interruption(const char *var_name, char *var){
     BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
     CLOSE_MSG; 
     strcpy_P(&aux_topic_name[len_name],int_str);
-    publish_test(aux_topic_name, output_message); //publish the message 
+    pub(aux_topic_name, output_message); //publish the message 
     aux_topic_name[len_name] = 0;
     //RESPONSE_CONSTRUCT(var_name);
 }
@@ -516,7 +516,7 @@ void TATUDevice::interruption(const char *var_name, bool var){
     BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
     CLOSE_MSG; 
     strcpy_P(&aux_topic_name[len_name],int_str);
-    publish_test(aux_topic_name, output_message); //publish the message 
+    pub(aux_topic_name, output_message); //publish the message 
     aux_topic_name[len_name] = 0;
    //RESPONSE_CONSTRUCT(var_name);
 }
@@ -532,7 +532,7 @@ void TATUDevice::interrupt(const char *var_name, char *var){
     BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
     CLOSE_MSG; 
     strcpy_P(&aux_topic_name[len_name],int_str);
-    publish_test(aux_topic_name, output_message); //publish the message 
+    pub(aux_topic_name, output_message); //publish the message 
     aux_topic_name[len_name] = 0;
 }
 

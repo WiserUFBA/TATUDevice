@@ -128,7 +128,8 @@ CREATE_DOD(DEVICE_NAME,
 /* Is just necessary to edit lines below if you modifies some variable*/
 void setup() { 
   
-  char aux[16];  
+  char aux[16];
+  device.pub= &bridge;
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  
 

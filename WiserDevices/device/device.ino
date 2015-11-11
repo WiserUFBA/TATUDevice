@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include <SPI.h>
 #include <PubSubClient.h>
-#include <Ethernet.h>
+#include <Adafruit_CC3000.h>
+#include <ccspi.h>
 #include <TATUDevice.h>
 #include <TATUInterpreter.h>
 #include <sensors.h>
@@ -35,6 +36,26 @@
 #define H_luminosity 1516126306
 #define H_humid 261814908
 
+// Network properties
+#define WLAN_SSID       "wiser"           // cannot be longer than 32 characters!
+#define WLAN_PASS       "wiser2014"
+// Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
+#define WLAN_SECURITY   WLAN_SEC_WPA2
+#define IDLE_TIMEOUT_MS  3000      // Amount of time to wait (in milliseconds) with no data 
+                                   // received before closing the connection.  If you know the server
+                                   // you're accessing is quick to respond, you can reduce this value.
+
+// These are the interrupt and control pins
+#define ADAFRUIT_CC3000_IRQ   2  // MUST be an interrupt pin!
+// These can be any two pins
+#define ADAFRUIT_CC3000_VBAT  7
+#define ADAFRUIT_CC3000_CS    10
+// Use hardware SPI for the remaining pins
+
+// On an UNO, SCK = 13, MISO = 12, and MOSI = 11
+Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
+                                         SPI_CLOCK_DIVIDER); // you can change this clock speed
+
 
 // Message for annoucement of connection
 const char hello[] PROGMEM = 
@@ -47,10 +68,10 @@ DHT dht(DHTPIN, DHTTYPE);
 volatile int soundReading,movement,gas_amount,t,h,luminosity;
 int aux;
 long long int time,nextTime;
-char str[20];  
-byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xAC, 0xDC };
-byte server[] = { 192, 168, 1, 14 };
-byte ip[4]    = { 192, 168 , 1 , 97 };
+char str[20]; 
+byte mac[]   = {  0xFA, 0xCA, 0xAA, 0x6A, 0x1F, 0xBA, 0x36, 0x16 };
+byte server[] = { 192, 168, 0, 101 };
+byte ip[4]    = { 192, 168 , 0 , 137 };
   
   bool get(uint32_t hash,void* response,uint8_t code){
     switch(hash){
@@ -86,11 +107,11 @@ byte ip[4]    = { 192, 168 , 1 , 97 };
   }
 
 // Objects to example that uses ethernet
-EthernetClient EthClient;
+Adafruit_CC3000_Client wifiClient = Adafruit_CC3000_Client();
 TATUInterpreter interpreter;
 TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
-PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
+PubSubClient client(server, MQTTPORT, mqtt_callback , wifiClient);
 MQTT_PUBLISH(bridge, client);
 
 // This is obrigatory, and defines this DEVICE
@@ -110,18 +131,41 @@ void setup() {
   //In order to avoid problems caused by external interruptions,
   //is recomended disable the interruption when using the attachInterrupt function;
   Serial.println("Trying connect to the broker");  
-  cli();//disable interruptions
+  //cli();//disable interruptions
 
-  device.publish_test = &bridge;
+  device.pub = &bridge;
 
   Serial.begin(9600);
-  Ethernet.begin(mac, ip);  
+
   dht.begin();
   pinMode(DHTPIN,INPUT);
   pinMode(MOVE, INPUT);
   
+  Serial.println("Inicializando!");
+  Serial.println(F("\nInitializing..."));
+  if (!cc3000.begin())
+  {
+    Serial.println(F("Couldn't begin()! Check your wiring?"));
+    while(1);
+  }
+  
+  Serial.print(F("\nAttempting to connect to ")); Serial.println(WLAN_SSID);
+  if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
+    Serial.println(F("Failed!"));
+    while(1);
+  }
+   
+  Serial.println(F("Connected!"));
+  
+  /* Wait for DHCP to complete */
+  Serial.println(F("Request DHCP"));
+  while (!cc3000.checkDHCP()) { delay(100); }  
+ 
+  Serial.println(F("Initialization complete"));
+  
+  
   digitalWrite(MOVE, HIGH);
-  attachInterrupt(1, mexeu, FALLING);
+//  attachInterrupt(1, mexeu, FALLING);
 
   //Trying connect to the broker
   //Serial.println("Trying connect to the broker");  
@@ -129,7 +173,7 @@ void setup() {
   client.publish("dev/CONNECTIONS",hello);
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
-  sei();//unable interruptions
+  //sei();//unable interruptions
   Serial.println("Conected!!");
 }
 

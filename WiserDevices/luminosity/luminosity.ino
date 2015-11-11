@@ -58,6 +58,7 @@ PubSubClient client(server, MQTTPORT, mqtt_callback , EthClient);
 MQTT_PUBLISH(bridge, client);
 
 void setup() {
+  device.pub= &bridge;
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  

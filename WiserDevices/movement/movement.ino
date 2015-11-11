@@ -64,7 +64,7 @@ void setup() {
   //is recomended disable the interruption when using the attachInterrupt function;
   cli();//disable interrupts
   
-  device.publish_test = &bridge;
+  device.pub = &bridge;
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);

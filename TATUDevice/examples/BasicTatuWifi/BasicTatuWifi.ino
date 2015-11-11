@@ -150,6 +150,7 @@ CREATE_DOD(DEVICE_NAME,
 void setup() {
     
   Serial.println("Inicializando!");
+  device.pub= &bridge;
   char aux[16];  
   Serial.begin(9600);  
   

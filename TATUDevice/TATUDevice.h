@@ -12,7 +12,7 @@ typedef uint8_t byte;
 #endif
 
 #ifndef MAX_SIZE_OUTPUT
-#define MAX_SIZE_OUTPUT     200
+#define MAX_SIZE_OUTPUT     256
 #endif
 
 //#define DEBUG
@@ -38,11 +38,10 @@ typedef uint8_t byte;
 
 // DOD - Device Object Description 
 #define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{\"name\":\"" NAME "\""\
-                                                ",\"mqtt_address\":\"dev/" NAME "\""\
                                                 ",\"sensors\":[" SENSORS "]," \
                                                 "\"actuators\":[" ACTUATORS "]}"
 
-#define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{\"name\":\"" NAME "\",\"type\":\"" TYPE "\",\"pin\":" PIN "}"
+#define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{\"N\":\"" NAME "\",\"T\":\"" TYPE "\",\"P\":" PIN "}"
 #define ADD_SINGLE_ACTUATOR(NAME, TYPE, PIN)    ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
 #define ADD_LAST_SENSOR(NAME, TYPE, PIN)        ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
 #define ADD_LAST_ACTUATOR(NAME, TYPE, PIN)      ADD_SINGLE_SENSOR(NAME,TYPE,PIN)
@@ -69,8 +68,8 @@ typedef uint8_t byte;
 
 // Cria wrapper para a função de callback da classe
 #define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\
-                                        void NAME(char *topic, byte *payload, unsigned int length) \
-                                        {OBJ.mqtt_callback(topic, payload, length, BRIDGE);}
+                                        void NAME(char *topic, byte *payload, unsigned int length)\
+                                        {OBJ.mqtt_callback(topic, payload, length);}
 #define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *topic, char *out)\
                                   { OBJ.publish(topic,out); }
 
@@ -223,19 +222,19 @@ void ipToString(byte *ip, char *str);
 // Extern Variables
 extern const char DOD[] PROGMEM;
 
-    typedef union {
-        struct {
-            uint8_t FLOW1 : 2;
-            uint8_t FLOW2 : 2;
-            uint8_t FLOW3 : 2;
-            uint8_t FLOW4 : 2;
-            uint8_t FLOW5 : 2;
-            uint8_t FLOW6 : 2;
-            uint8_t FLOW7 : 2;
-            uint8_t FLOW8 : 2;
-        } ATT;
-        uint16_t STRUCTURE;
-    } Bitflow;
+typedef union {
+    struct {
+        uint8_t FLOW1 : 2;
+        uint8_t FLOW2 : 2;
+        uint8_t FLOW3 : 2;
+        uint8_t FLOW4 : 2;
+        uint8_t FLOW5 : 2;
+        uint8_t FLOW6 : 2;
+        uint8_t FLOW7 : 2;
+        uint8_t FLOW8 : 2;
+    } ATT;
+    uint16_t STRUCTURE;
+} Bitflow;
 
 class TATUDevice{
 public:
@@ -257,7 +256,7 @@ public:
     bool        dod_used;
     bool (*get_function)(uint32_t hash, void* response, uint8_t code);
     bool (*set_function)(uint32_t hash, uint8_t type, void* request);
-    void (*publish_test)(char *, char *);
+    void (*pub)(char *, char *);
     // Atributos variaveis
     TATUInterpreter *requisition;
 
@@ -271,7 +270,7 @@ public:
 
     /* Callback's do Sistema */
     // Callback MQTT
-    void mqtt_callback(char *, byte *, unsigned int, void (*publish)(char *, char *));
+    void mqtt_callback(char *, byte *, unsigned int);
     
     // NOVA ARQUITETURA DE CALLBACK
     // ONLY GET AND SET ARE NEEDED

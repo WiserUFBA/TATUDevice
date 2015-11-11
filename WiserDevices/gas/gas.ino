@@ -64,6 +64,7 @@ MQTT_PUBLISH(bridge, client);
 
 /* Nao e necessario editar as linhas abaixo ao nao ser que tenha modificado alguma variavel */
 void setup() {
+  device.pub= &bridge;
   char aux[16];  
   Serial.begin(9600);
   Ethernet.begin(mac, ip);  
