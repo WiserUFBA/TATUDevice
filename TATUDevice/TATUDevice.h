@@ -15,7 +15,7 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     256
 #endif
 
-//#define DEBUG
+#define DEBUG
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
@@ -204,7 +204,7 @@ typedef uint8_t byte;
 #define STOS(STRING1,STRING2) strcpy((char*)STRING2,STRING1)
 #define ITOS(INTEGER,STRING) (itoa(INTEGER,(char*)STRING,10))
 #define ITOI(INTEGER1,INTEGER2) *(int*)INTEGER2 = INTEGER1
-#define BTOS(BOOL1,STRING) if (BOOL1) strcpy((char*)STRING,"T"); else strcpy((char*)STRING,"F");
+#define BTOS(BOOL1,STRING) if (BOOL1) strcpy((char*)STRING,"ON"); else strcpy((char*)STRING,"OFF");
 #define BTOB(BOOL1,BOOL2) *(bool*)BOOL2 = BOOL1
 
 //#define RESPONSE_CONSTRUCT(NAME_VAR)/* Coloca o BODY na resposta */ \
@@ -241,8 +241,6 @@ public:
     // Atributos públicos
     // Atributos do sistema
 
-
-    Bitflow bits;
     char        name[MAX_SIZE_NAME];
     int         len_name;
     char        aux_topic_name[MAX_SIZE_NAME + 15];

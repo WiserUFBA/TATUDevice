@@ -463,6 +463,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length){
     strcpy_P(&aux_topic_name[len_name],res_str);
     
     //publish the message
+    //pub(name, output_message); //publish the message 
     pub(aux_topic_name, output_message);
 
     aux_topic_name[len_name] = 0;
@@ -487,6 +488,7 @@ void TATUDevice::interruption(const char *var_name, int var){
     BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
     CLOSE_MSG; 
     strcpy_P(&aux_topic_name[len_name],int_str);
+    //pub(name, output_message); //publish the message 
     pub(aux_topic_name, output_message); //publish the message 
     aux_topic_name[len_name] = 0;
     //RESPONSE_CONSTRUCT(var_name);

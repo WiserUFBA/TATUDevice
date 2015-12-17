@@ -37,9 +37,9 @@ int aux;
 #define luminosity_sensor(PIN,VAR,RESPONSE,CODE)\
       do{\
         VAR = (analogRead(PIN) - 1023) * (-1);\
+        VAR = map (VAR,0,1023,0,100);\
         switch(CODE){\
           case TATU_CODE_INFO:\
-            VAR = map (VAR,0,1023,0,100);\
             ITOS(VAR,RESPONSE);\
             aux = strlen((char*)RESPONSE);\
             ((char*)RESPONSE)[aux++] = '%';\
@@ -121,6 +121,7 @@ int aux;
             return false;\
         }\
       }while(false)
+
 
 
 //bool luminosity_sensor(uint8_t PIN,int VAR,char *RESPONSE,uint8_t CODE);

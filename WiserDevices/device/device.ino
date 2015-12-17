@@ -170,7 +170,7 @@ void setup() {
   //Trying connect to the broker
   //Serial.println("Trying connect to the broker");  
   while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
-  client.publish("dev/CONNECTIONS",hello);
+  client.publish("dev/CONNECTIONS",DEVICE_NAME);
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
   //sei();//unable interruptions
@@ -207,18 +207,22 @@ void mexeu(){
   Serial.println("mexeu");
 }
 void reconnect() {
-  // Loop until we're reconnected
-  while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {
+  // Loop until we're reconnected  
+  while (true) {
     Serial.print("Attempting MQTT connection...");
+    client.connect(device.name, MQTT_USER, MQTT_PASS);
     // Attempt to connect
-    if (client.publish("dev/CONNECTIONS",hello)) {
-      Serial.println("connected");
+    if (client.publish("dev/CONNECTIONS",DEVICE_NAME)) {
+      Serial.println("publicou");
+      client.subscribe(device.aux_topic_name);
+      client.subscribe("dev");
+      return;
     } 
     else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
+      // Wait 5 seconds before retrying1
       delay(5000);
     }
   }
