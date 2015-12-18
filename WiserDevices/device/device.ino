@@ -165,7 +165,8 @@ void setup() {
   
   
   digitalWrite(MOVE, HIGH);
-//  attachInterrupt(1, mexeu, FALLING);
+  attachInterrupt(1, mexeu, FALLING);
+  //sei();//unable interruptions
 
   //Trying connect to the broker
   //Serial.println("Trying connect to the broker");  
@@ -173,7 +174,6 @@ void setup() {
   client.publish("dev/CONNECTIONS",DEVICE_NAME);
   client.subscribe(device.aux_topic_name);
   client.subscribe("dev");
-  //sei();//unable interruptions
   Serial.println("Conected!!");
 }
 

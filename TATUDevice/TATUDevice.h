@@ -15,7 +15,7 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     256
 #endif
 
-#define DEBUG
+//#define DEBUG
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
