@@ -209,11 +209,12 @@ void mexeu(){
 void reconnect() {
   // Loop until we're reconnected  
   while (true) {
+    restartWifi();
     Serial.print("Attempting MQTT connection...");
     client.connect(device.name, MQTT_USER, MQTT_PASS);
     // Attempt to connect
     if (client.publish("dev/CONNECTIONS",DEVICE_NAME)) {
-      Serial.println("publicou");
+      Serial.println("published");
       client.subscribe(device.aux_topic_name);
       client.subscribe("dev");
       return;
@@ -228,3 +229,17 @@ void reconnect() {
   }
 }
 
+void restartWifi(){
+  Serialprintln("restarting wifi");
+  while(!cc3000.getStatus()){
+    delay(1000);
+    cc3000.reboot();
+    if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {
+      while(1);
+    }
+    while (!cc3000.checkDHCP()){
+      delay(100);
+    }
+  
+  }
+}
