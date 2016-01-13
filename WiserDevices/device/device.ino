@@ -230,7 +230,7 @@ void reconnect() {
 }
 
 void restartWifi(){
-  Serialprintln("restarting wifi");
+  Serial.println("restarting wifi");
   while(!cc3000.getStatus()){
     delay(1000);
     cc3000.reboot();
