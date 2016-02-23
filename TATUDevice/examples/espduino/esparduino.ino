@@ -35,7 +35,7 @@
 #define off(PIN) digitalWrite(PIN,false)
 
 // Message for annoucement of connection
-const char hello[] PROGMEM = DEVICE_NAME " has connected";
+char hello[] = DEVICE_NAME " has connected";
 
 // System properties
 byte server[] = { 192, 168, 25, 20 }; // ip do servidor
@@ -126,7 +126,7 @@ boolean wifiConnected = false;
 
 // Essential objects and macros
 TATUInterpreter interpreter;
-TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get, set);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTT_PORT, 1, &interpreter, get, set);
 
 /* MODIFICAR ESP */
 void mqttSend(char *topic, char *out){
@@ -147,7 +147,12 @@ void mqttReceived(void* response)
   String data = res.popString();
   debugPort.println(data);
 
-  device.mqtt_callback(topic, data, strlen(data));
+  char topico[30];
+  strcpy(topico, topic.c_str());
+  char mensagem[100];
+  strcpy(mensagem, data.c_str());
+
+  device.mqtt_callback(topico, (byte *)mensagem, data.length());
 }
 
 void wifiCb(void* response)
