@@ -32,8 +32,8 @@ const char hello[] PROGMEM = DEVICE_NAME " has connected";
 
 // System properties
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 25, 20 };
-byte ip[]     = { 192, 168, 25, 40 };
+byte server[] = { 192, 168, 0, 130 };
+byte ip[]     = { 192, 168, 0, 148 };
 
 bool lamp;
 int luminosity;

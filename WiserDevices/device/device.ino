@@ -231,7 +231,7 @@ void reconnect() {
 
 void restartWifi(){
   Serial.println("restarting wifi");
-  while(!cc3000.getStatus()){
+  while(cc3000.getStatus()!=STATUS_CONNECTED){
     delay(1000);
     cc3000.reboot();
     if (!cc3000.connectToAP(WLAN_SSID, WLAN_PASS, WLAN_SECURITY)) {

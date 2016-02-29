@@ -12,6 +12,15 @@ volatile int luminosity;
 int aux;
 #endif
 
+
+//#define v_out(PIN)\ 
+//  analogRead(PIN)*5.0/1024.0
+
+/*#define lux(RESL,PIN)\
+    do{\
+      ((2500/analogRead(PIN)*5.0/1024.0) - 500)/RESL;\
+    }while(false)*/
+
 #define gas_sensor(PIN,VAR,RESPONSE,CODE)\
       do{\
 		    VAR = analogRead(PIN);\
@@ -33,11 +42,21 @@ int aux;
         }\
       }while(false)
 
+//VAR = (analogRead(PIN) - 1023) * (-1);\
+//VAR = map (VAR,0,1023,0,100);\
+//VAR = lux(RESL);\
 
-#define luminosity_sensor(PIN,VAR,RESPONSE,CODE)\
+#define luminosity_sensor(PIN,VAR,RESPONSE,CODE,RESL)\
       do{\
-        VAR = (analogRead(PIN) - 1023) * (-1);\
-        VAR = map (VAR,0,1023,0,100);\
+        v_out = ( (float)analogRead(PIN)*(5.0/1024.0)); \
+        luz = ( ( 2500 / v_out ) - 400)/RESL; \ 
+        Serial.print("v_out "); \
+        Serial.println(v_out); \
+        Serial.print("luz "); \
+        Serial.println(luz); \
+        VAR = luz; \
+        Serial.print("var "); \
+        Serial.println(VAR); \
         switch(CODE){\
           case TATU_CODE_INFO:\
             ITOS(VAR,RESPONSE);\

@@ -24,12 +24,12 @@
 	    else {OFF(PIN);Serial.println("OFF"); VAR = false;}\
 	    break;\
 	  case TATU_CODE_VALUE:\
-	    if (*(int*)RESPONSE){ON(PIN); Serial.println("ON"); VAR = true;}\
-	    else {OFF(PIN);Serial.println("OFF"); VAR = false;}\
+	    if (*(int*)RESPONSE == 1){ON(PIN); Serial.println("ON"); VAR = true;}\
+	    else if (*(int*)RESPONSE == 0){OFF(PIN);Serial.println("OFF"); VAR = false;}\
 	    break;\
 	  case TATU_CODE_INFO:\
-	    if (*(char*)RESPONSE == '1'){ON(PIN); Serial.println("ON"); VAR = true;}\
-	    else {OFF(PIN);Serial.println("OFF"); VAR = false;}\
+	    if (*(char*)RESPONSE == '1' || *(char*)RESPONSE == 'T'){ON(PIN); Serial.println("ON"); VAR = true;}\
+	    else if (*(char*)RESPONSE == '0' || *(char*)RESPONSE == 'F'){OFF(PIN);Serial.println("OFF"); VAR = false;}\
 	    break;\
 	  default:\
 	    return false;\
