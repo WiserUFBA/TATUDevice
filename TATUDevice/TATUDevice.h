@@ -15,7 +15,7 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     256
 #endif
 
-//#define DEBUG
+#define DEBUG
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
@@ -37,7 +37,7 @@ typedef uint8_t byte;
 #define CLOSE_MSG   output_message[aux]=0
 
 // DOD - Device Object Description 
-#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "POST " NAME ":{\"name\":\"" NAME "\""\
+#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "{\"CODE\":\"POST\",\"name\":\"" NAME "\""\ // Descrição da mensagem
                                                 ",\"sensors\":[" SENSORS "]," \
                                                 "\"actuators\":[" ACTUATORS "]}"
 
@@ -56,27 +56,29 @@ typedef uint8_t byte;
 //#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; i < LEN; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
 // Copiar uma string para a outra
 #define STRCPY(INPUT, OUTPUT) do{ for(i = 0;INPUT[i] != 0; ++i) OUTPUT[i] = INPUT[i]; OUTPUT[i] = 0; }while(0)
+// Copiar apartir de um index
 #define STRCPY_I(INPUT, OUTPUT, INDEX) do{ for(i = INDEX;INPUT[i - INDEX] != 0; ++i) OUTPUT[i] = INPUT[i - INDEX]; OUTPUT[i] = 0; }while(0)
 
 // Gera o body tendo o OBJETO dispositivo
 #define generatePost(DEVICE) do{ DEVICE.generateHeader(); DEVICE.generateBody(); }while(0)
 // Verifica se uma STRING está vazia
 #define ISEMPTY(VAR) (VAR[0] == 0)
+
+// Não entendi esse comentário("Ramon")
 // Switch topic to the following topic
 // REQ
 //#define SWITCH_REQ_TOPIC(TOPIC, )
 
 // Cria wrapper para a função de callback da classe
-#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\
-                                        void NAME(char *topic, byte *payload, unsigned int length)\
-                                        {OBJ.mqtt_callback(topic, payload, length);}
-#define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *topic, char *out)\
-                                  { OBJ.publish(topic,out); }
-
-#define MQTT_PUBLISH2(OBJ, BRIDGE) OBJ.publish_test = &BRIDGE;
+#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\ // Declaração da ponte
+                                        OBJ.pub = &BRIDGE
+                                        void NAME(char *topic, byte *payload, unsigned int length)\ // Função callback chamada pelo cliente mqtt
+                                        {OBJ.mqtt_callback(topic, payload, length);}// Essa é a função acionada dentro do objeto TATUDevice
+#define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *topic, char *out)\ // Atribuição da ponte
+                                  { OBJ.publish(topic,out); } // Essa é a função publish do cliente que será chama pelo objeto
 
 // Macro para interrupções
-#define INTERRUPTION_VALUE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){\
+#define INTERRUPTION_VALUE(DEVICE,VAR_NAME,VAR,OPR,TRIGGER)switch (OPR){\
         case '=':\
             if(VAR == TRIGGER)\
                 break;\
@@ -98,7 +100,7 @@ typedef uint8_t byte;
     }\
     DEVICE.interruption(VAR_NAME,VAR);
 
-#define INTERRUPTION_STATE(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){\
+#define INTERRUPTION_STATE(DEVICE,VAR_NAME,VAR,OPR,TRIGGER)switch (OPR){\
         case '=':\
             if(VAR == TRIGGER)\
                 break;\
@@ -112,7 +114,7 @@ typedef uint8_t byte;
     }\
     DEVICE.interruption(VAR_NAME,VAR);
 
-#define INTERRUPTION_INFO(DEVICE,VAR_NAME,VAR,OPER,TRIGGER)switch (OPER){\
+#define INTERRUPTION_INFO(DEVICE,VAR_NAME,VAR,OPR,TRIGGER)switch (OPR){\
         case '=':\
             if(!strcmp(VAR,TRIGGER))\
                 break;\
@@ -126,44 +128,7 @@ typedef uint8_t byte;
     }\
     DEVICE.interruption(VAR_NAME,VAR);
 
-// Constrói o dispositivo e o cliente 
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK, CLIENT)\
-            TATUInterpreter interpreter;\
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK);\
-            MQTT_CALLBACK( bridge, device, mqtt_callback);\
-            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT);\
-            MQTT_PUBLISH(bridge, client)
-
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, MQTTPORT, CALLBACK_GET, CALLBACK_SET, CLIENT)\
-            TATUInterpreter interpreter;\
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET);\
-            MQTT_CALLBACK( bridge, device, mqtt_callback);\
-            PubSubClient client(IP_SERVER, MQTTPORT, mqtt_callback, CLIENT);\
-            MQTT_PUBLISH(bridge, client)
-
-// -----------
-// Omite a porta padrão do MQTT
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK, CLIENT)\
-            TATUInterpreter interpreter;\
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK);\
-            MQTT_CALLBACK( bridge, device, mqtt_callback);\
-            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT);\
-            MQTT_PUBLISH(bridge, client)
-
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CALLBACK_GET, CALLBACK_SET, CLIENT)\
-            TATUInterpreter interpreter;\
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter, CALLBACK_GET, CALLBACK_SET);\
-            MQTT_CALLBACK( bridge, device, mqtt_callback);\
-            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT);\
-            MQTT_PUBLISH(bridge, client)
-
-#define SETUP(NAME, IP, ID, PAN, IP_SERVER, CLIENT)\
-            TATUInterpreter interpreter;\
-            TATUDevice device(NAME, IP, ID, PAN, SAMPLE, IP_SERVER, MQTTPORT_STANDARD, OS_VERSION, &interpreter);\
-            MQTT_CALLBACK( bridge, device, mqtt_callback);\
-            PubSubClient client(IP_SERVER, MQTTPORT_STANDARD, mqtt_callback, CLIENT);\
-            MQTT_PUBLISH(bridge, client)
-
+// Macro para a ativação de Fluxo
 #define FLUXO(DEVICE, HASH, ATT1, ATT2, ATT3, ACTIVE)\
         switch(HASH){\
             case ATT1:\
@@ -188,11 +153,11 @@ typedef uint8_t byte;
         return true
 
 // Conecta o cliente mqtt
-#define DEVICECONNECT() Serial.println("Trying to connect to the broker");\
-                        if(client.connect(device.name)){\
-                            Serial.println("The connection has suceeded");\
-                            client.subscribe(device.subscribe_topic);}\
-                        else Serial.println("The connection has failed")
+#define DEVICECONNECT(CLIENT) while(!CLIENT.connect(device.name,MQTT_USER,MQTT_PASS));\
+                        CLIENT.publish("dev/CONNECTIONS",DEVICE_NAME);\
+                        CLIENT.subscribe(device.aux_topic_name);\
+                        CLIENT.subscribe("dev");\
+                        Serial.println("Conected!!");
 
 // Conecta o cliente mqtt usando usuário e senha
 #define SECURE_DEVICECONNECT(USER,PASS) Serial.println("Trying to connect to the broker");\

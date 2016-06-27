@@ -94,7 +94,7 @@ byte ip[4]    = { 192, 168 , 0 , 137 };
           break;
         case H_luminosity:
           //The lumisity_sensor supports INFO and VALUE,requests. 
-          luminosity_sensor(LUMINOSITY,luminosity,response,code);
+          luminosity_sensor(LUMINOSITY,luminosity,response,code,20);
           break;
         case H_gas:
           //The gas_sensor supports INFO,VALUE and STATE requests.

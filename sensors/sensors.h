@@ -48,15 +48,15 @@ int aux;
 
 #define luminosity_sensor(PIN,VAR,RESPONSE,CODE,RESL)\
       do{\
-        v_out = ( (float)analogRead(PIN)*(5.0/1024.0)); \
-        luz = ( ( 2500 / v_out ) - 400)/RESL; \ 
-        Serial.print("v_out "); \
-        Serial.println(v_out); \
-        Serial.print("luz "); \
-        Serial.println(luz); \
-        VAR = luz; \
-        Serial.print("var "); \
-        Serial.println(VAR); \
+        v_out = ( (float)analogRead(PIN)*(5.0/1024.0));\
+        luz = ( ( 2500 / v_out ) - 400)/RESL;\ 
+        Serial.print("v_out ");\
+        Serial.println(v_out);\
+        Serial.print("luz ");\
+        Serial.println(luz);\
+        VAR = luz;\
+        Serial.print("var ");\
+        Serial.println(VAR);\
         switch(CODE){\
           case TATU_CODE_INFO:\
             ITOS(VAR,RESPONSE);\

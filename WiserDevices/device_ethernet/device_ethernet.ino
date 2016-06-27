@@ -49,8 +49,8 @@ int aux;
 long long int time,nextTime,count;
 char str[20]; 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte server[] = { 192, 168, 0, 130 };
-byte ip[4]    = { 192, 168 , 0 , 177 };
+byte server[] = { 192, 168, 0, 107 };
+byte ip[4]    = { 192, 168 , 0 , 141 };
   
 bool get(uint32_t hash,void* response,uint8_t code){
   switch(hash){

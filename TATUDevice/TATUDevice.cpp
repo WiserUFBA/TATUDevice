@@ -39,7 +39,7 @@ const char DOD_RETURN[]    PROGMEM = "[DEBUG] Returning the following DOD Object
 #endif
 
 // Constantes
-const char start_post[] PROGMEM = "POST ";
+const char start_post[] PROGMEM = "{\"CODE\":\"POST\"";
 const char null_body[]  PROGMEM = "\"BODY\":null}";
 const char true_body[]  PROGMEM = "\"BODY\":true}";
 const char false_body[] PROGMEM = "\"BODY\":false}";
@@ -157,7 +157,7 @@ void TATUDevice::generateHeader(){
     
     // Inicia o JSON
     aux = strlen(name) + 5;
-    COLON; BRACE_LEFT;
+    COMMA;
     
     // As próximas linhas produzem o HEADER
     strcpy_P(OUT_STR, header_str); /* Copia o HEADER */
