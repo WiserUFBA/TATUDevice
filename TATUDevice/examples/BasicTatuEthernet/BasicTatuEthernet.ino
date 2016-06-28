@@ -114,7 +114,7 @@ bool set(uint32_t hash, uint8_t code,void* request){
 // Essential objects and macros
 EthernetClient ethClient;
 TATUInterpreter interpreter;
-TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get, set);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get, set, bridge);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , ethClient);
 MQTT_PUBLISH(bridge, client);

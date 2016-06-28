@@ -135,7 +135,7 @@ bool set(uint32_t hash, uint8_t code,void* request){
 // Essential objects and macros
 Adafruit_CC3000_Client wifiClient = Adafruit_CC3000_Client();
 TATUInterpreter interpreter;
-TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server_b, MQTTPORT, 1, &interpreter, get);
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server_b, MQTTPORT, 1, &interpreter, get, bridge);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
 PubSubClient client(server, MQTTPORT, mqtt_callback , wifiClient);
 MQTT_PUBLISH(bridge, client);

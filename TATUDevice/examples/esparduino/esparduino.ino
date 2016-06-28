@@ -124,14 +124,14 @@ ESP esp(&Serial, &debugPort, 4);
 MQTT mqtt(&esp);
 boolean wifiConnected = false;
 
-// Essential objects and macros
-TATUInterpreter interpreter;
-TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTT_PORT, 1, &interpreter, get, set);
-
 /* MODIFICAR ESP */
 void mqttSend(char *topic, char *out){
   mqtt.publish(topic,out);
 }
+
+// Essential objects and macros
+TATUInterpreter interpreter;
+TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTT_PORT, 1, &interpreter, get, set, mqttSend);
 
 //////////////////////// ESP /////////////////////////
 
@@ -195,7 +195,6 @@ CREATE_DOD(DEVICE_NAME,
 
 /* Is just necessary to edit lines below if you modifies some variable */
 void setup() { 
-  device.pub = &mqttSend;
 
   Serial.begin(19200);
   debugPort.begin(19200);
