@@ -12,13 +12,8 @@ env:
     # Use this little line of shell script to generate list of files to compile
     # for x in $(echo $(find WiserDevices -type f) | cat); echo "  - PLATFORMIO_CI_SRC="$x
     # --- General devices ---
-    - PLATFORMIO_CI_SRC=WiserDevices/device2/device2.ino
-    - PLATFORMIO_CI_SRC=WiserDevices/temp-lamp/temp-lamp.ino
-    - PLATFORMIO_CI_SRC=WiserDevices/rele-pres/rele-pres.ino
-    - PLATFORMIO_CI_SRC=WiserDevices/luminosity/luminosity.ino
-    - PLATFORMIO_CI_SRC=WiserDevices/gas/gas.ino
-    - PLATFORMIO_CI_SRC=WiserDevices/dht11/dht11.ino
-    - PLATFORMIO_CI_SRC=WiserDevices/device/device.ino
+        # Have been moved
+
     # Library Test
     - PLATFORMIO_CI_SRC=TATUDevice/examples/BasicTatuEthernet
     - PLATFORMIO_CI_SRC=TATUDevice/examples/BasicTatuWifi
