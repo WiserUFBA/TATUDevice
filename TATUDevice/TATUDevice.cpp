@@ -76,19 +76,22 @@ void ipToString(byte *ip, char *str){
 /* Construct the TATUDevice Class with only the GET callback */
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code)){
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code),
+            void (*PUBLISH)(char *, char *)){
     get_function = GET_FUNCTION;
     set_function = NULL;
+    pub = PUBLISH;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 // > ONLY SET
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request)){
+            TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request),
+            void (*PUBLISH)(char *, char *)){
     set_function = SET_FUNCTION;
     get_function = NULL;
-
+    pub = PUBLISH;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
@@ -96,18 +99,22 @@ TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const 
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code), 
-            bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request)){
+            bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request),
+            void (*PUBLISH)(char *, char *)){
     get_function = GET_FUNCTION;
     set_function = SET_FUNCTION;
+    pub = PUBLISH;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
 // > NONE
 TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
-            TATUInterpreter *req){
+            TATUInterpreter *req,
+            void (*PUBLISH)(char *, char *)){
     get_function = NULL;
     set_function = NULL;
+    pub = PUBLISH;
     init(name_d,ip_d,id_d,pan_d,sample_d,ip_m,port_m,os_v,req);
 }
 
