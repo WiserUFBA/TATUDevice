@@ -159,11 +159,12 @@ void TATUDevice::generateHeader(){
     char aux_str[10];
 
     // Primeiro se coloca a seguinte string padrão no vetor
+    //strcpy(&output_message[strlen(start_post)], name);
     strcpy_P(output_message, start_post);
-    strcpy(&output_message[5], name);
     
     // Inicia o JSON
-    aux = strlen(name) + 5;
+    //aux = strlen(name) + strlen(start_post);
+    aux = strlen(start_post);
     COMMA;
     
     // As próximas linhas produzem o HEADER
