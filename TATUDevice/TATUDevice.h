@@ -15,7 +15,9 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     256
 #endif
 
-#define DEBUG
+// By default DEBUG on SERIAL is disabled
+//#define DEBUG
+//#define DEBUG_PORT Serial
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
