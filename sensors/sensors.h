@@ -53,9 +53,9 @@ int aux;
         /*Serial.print("v_out ");\
         Serial.println(v_out);\
         Serial.print("luz ");\
-        Serial.println(luz);\
+        Serial.println(luz);\*/
         VAR = luz;\
-        Serial.print("var ");\
+        /*Serial.print("var ");\
         Serial.println(VAR);\*/
         switch(CODE){\
           case TATU_CODE_INFO:\
