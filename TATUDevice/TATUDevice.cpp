@@ -471,6 +471,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length){
     #ifdef DEBUG
     PRINT_DEBUG_PROGMEM(PUBLISHING);
     PRINT_DEBUG(output_message);
+    DEBUG_NL();
     #endif
     
     strcpy_P(&aux_topic_name[len_name],res_str);
