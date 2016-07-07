@@ -5,7 +5,7 @@
 #include <avr/pgmspace.h>
 
 // Uncomment the follow line to show debug
-//#define DEBUG
+#define DEBUG
 // Change debug port to Software Serial Object if you want to
 //#define DEBUG_PORT                  Serial
 #define DEBUG_PORT                ATMSerial
