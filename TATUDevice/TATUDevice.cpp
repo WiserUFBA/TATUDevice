@@ -220,7 +220,7 @@ void TATUDevice::generateHeader(){
 void TATUDevice::generateBody(char *payload, uint8_t length){
     #ifdef DEBUG
     PRINT_DEBUG_PROGMEM(GENERATE_BODY);
-    DEBUG_NL;
+    DEBUG_NL();
     #endif
     
     if(dod_used){
@@ -242,7 +242,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     if (requisition->cmd.OBJ.VAR == TATU_TYPE_SYSTEM){
         #ifdef DEBUG
         PRINT_DEBUG_PROGMEM(SYSTEM);
-        DEBUG_NL;
+        DEBUG_NL();
         #endif
         /** MODIFICA PROPRIEDADE **/
         // ISTO AINDA NÃO FOI IMPLEMENTADO
@@ -257,7 +257,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         case TATU_GET:
             #ifdef DEBUG
             //PRINT_DEBUG_PROGMEM(CALLBACK_GET);
-            //DEBUG_NL;
+            //DEBUG_NL();
             #endif
 
             if(requisition->cmd.OBJ.CODE == TATU_CODE_DOD){
@@ -266,9 +266,9 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 
                 #ifdef DEBUG
                 PRINT_DEBUG_PROGMEM(DOD_RETURN);
-                DEBUG_NL;
+                DEBUG_NL();
                 PRINT_DEBUG_PROGMEM(DOD);
-                DEBUG_NL;
+                DEBUG_NL();
                 #endif
 
                 return;
@@ -327,7 +327,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         case TATU_SET:
             #ifdef DEBUG
             //PRINT_DEBUG_PROGMEM(CALLBACK_SET);
-            //DEBUG_NL;
+            //DEBUG_NL();
             #endif
             switch(requisition->cmd.OBJ.VAR){
                 case TATU_TYPE_ALIAS:
@@ -353,7 +353,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     requisition->cmd.OBJ.ERROR = false;
                     #ifdef DEBUG
                     PRINT_DEBUG_PROGMEM(SET_PIN);
-                    DEBUG_NL;
+                    DEBUG_NL();
                     #endif
                     break; 
                 break;
@@ -363,7 +363,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     requisition->cmd.OBJ.ERROR = false;
                     #ifdef DEBUG
                     PRINT_DEBUG_PROGMEM(SET_PIN);
-                    DEBUG_NL;
+                    DEBUG_NL();
                     #endif
                     break;
                     
@@ -375,9 +375,9 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         default:
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(EXEC_ERROR);
-            DEBUG_NL;
+            DEBUG_NL();
             PRINT_DEBUG_PROGMEM(EXEC_ERROR_TYPE_VAR);
-            DEBUG_NL;
+            DEBUG_NL();
             #endif
             strcpy_P(OUT_STR, null_body);
             return;
@@ -388,7 +388,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     if(requisition->cmd.OBJ.ERROR){ 
         #ifdef DEBUG
         PRINT_DEBUG_PROGMEM(PARAM_ERROR);
-        DEBUG_NL;
+        DEBUG_NL();
         #endif
         strcpy_P(OUT_STR, false_body);
         return;
@@ -398,7 +398,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     if(requisition->cmd.OBJ.TYPE != TATU_GET){
         #ifdef DEBUG
         PRINT_DEBUG_PROGMEM(NOT_A_GET);
-        DEBUG_NL;
+        DEBUG_NL();
         #endif
         strcpy_P(OUT_STR, true_body);
         return;
@@ -418,7 +418,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             QUOTE; strcpy(OUT_STR, str_buffer); aux+=strlen(str_buffer); QUOTE;
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(RESPONSE_TYPE_INFO);
-            DEBUG_NL;
+            DEBUG_NL();
             PRINT_DEBUG_PROGMEM(THE_RESPONSE);
             PRINT_DEBUG_NL(str_buffer);
             #endif
@@ -429,7 +429,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             aux+=strlen(str_buffer);
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(RESPONSE_TYPE_VALUE);
-            DEBUG_NL;
+            DEBUG_NL();
             PRINT_DEBUG_PROGMEM(THE_RESPONSE);
             PRINT_DEBUG_NL(str_buffer);
             #endif
@@ -441,7 +441,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             aux+=strlen(str_buffer);
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(RESPONSE_TYPE_STATE);
-            DEBUG_NL;
+            DEBUG_NL();
             PRINT_DEBUG_PROGMEM(THE_RESPONSE);
             PRINT_DEBUG_NL(str_buffer);
             #endif
@@ -452,7 +452,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     CLOSE_MSG;
     #ifdef DEBUG
     PRINT_DEBUG_PROGMEM(BODY_GENERATED);
-    DEBUG_NL;
+    DEBUG_NL();
     #endif
 }
 
@@ -464,7 +464,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length){
     if(requisition->cmd.OBJ.TYPE == TATU_POST){
         #ifdef DEBUG
         PRINT_DEBUG_PROGMEM(IS_A_POST);
-        DEBUG_NL;
+        DEBUG_NL();
         #endif
         return;
     }
@@ -483,7 +483,7 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length){
 
     #ifdef DEBUG
     PRINT_DEBUG_PROGMEM(PUBLISHED);
-    DEBUG_NL;
+    DEBUG_NL();
     #endif
 
 }
