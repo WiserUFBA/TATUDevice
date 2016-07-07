@@ -25,6 +25,7 @@ SoftwareSerial static DEBUG_PORT(7,6);
 #define PRINT_DEBUG(MSG)            DEBUG_PORT.print(MSG)
 #define PRINT_DEBUG_NL(MSG)         DEBUG_PORT.println(MSG)
 #define DEBUG_NL()                  DEBUG_PORT.println()
+#define DEBUG_PORT_SPEED            115200
 
 // System definitions
 #define PROGMEM                     __ATTR_PROGMEM__
