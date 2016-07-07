@@ -46,6 +46,10 @@ uint8_t atoi_T(char *p){
 
 /* Little utilitie to print progmem char */
 void SerialPrint_PROGMEM(const char str[] PROGMEM){
+    #ifdef ENABLE_SOFTWARE_SERIAL
+    DEBUG_PORT.begin(DEBUG_PORT_SPEED);
+    #endif
+
     char c;
     if(!str) return;
     while((c = pgm_read_byte(str++)))
