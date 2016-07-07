@@ -15,15 +15,12 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     256
 #endif
 
-// By default DEBUG on SERIAL is disabled
+// By default DEBUG on SERIAL or SoftwareSerial is disabled
+// Change debug definitions on TATUInterpreter.h
 //#define DEBUG
-//#define DEBUG_PORT Serial
 
 // System definitions
 #define PROGMEM             __ATTR_PROGMEM__
-#define putstring(x)        SerialPrint_PROGMEM(x)
-#define PRINT_DEBUG(MSG)    SerialPrint_PROGMEM(MSG)
-#define DEBUG_NL            Serial.write('\n')
 #define OUT_STR             &output_message[aux]
 #define MAX_SIZE_IP         16
 #define MAX_SIZE_NAME       20

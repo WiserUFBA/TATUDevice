@@ -5,13 +5,29 @@
 #include <avr/pgmspace.h>
 
 // Uncomment the follow line to show debug
-//#define DEBUG 1
+//#define DEBUG
+// Change debug port to Software Serial Object if you want to
+//#define DEBUG_PORT                  Serial
+#define DEBUG_PORT                ATMSerial
+// Allow Software Serial 
+#define ENABLE_SOFTWARE_SERIAL
+
+// If enabled Software Serial
+#ifdef ENABLE_SOFTWARE_SERIAL
+#include <SoftwareSerial.h>
+// Software Serial should be static since this file can be called multiple times
+SoftwareSerial static DEBUG_PORT(7,6);
+#endif
+
+// Debug Definitions
+#define putstring(MSG)              SerialPrint_PROGMEM(MSG)
+#define PRINT_DEBUG_PROGMEM(MSG)    SerialPrint_PROGMEM(MSG)
+#define PRINT_DEBUG(MSG)            DEBUG_PORT.print(MSG)
+#define PRINT_DEBUG_NL(MSG)         DEBUG_PORT.println(MSG)
+#define DEBUG_NL()                  DEBUG_PORT.println()
 
 // System definitions
-#define PROGMEM             __ATTR_PROGMEM__
-#define putstring(x)        SerialPrint_PROGMEM(x)
-#define PRINT_DEBUG(MSG)    SerialPrint_PROGMEM(MSG)
-#define DEBUG_NL            Serial.write('\n')
+#define PROGMEM                     __ATTR_PROGMEM__
 
 // TATU Protocol available commands
 #define TATU_POST   0
@@ -76,7 +92,14 @@ private:
 public:
     Command cmd;
     uint32_t str_hash;
-    TATUInterpreter(){ cmd.OBJ.ERROR = true; }
+    TATUInterpreter(){
+        cmd.OBJ.ERROR = true;
+
+        // Enable Software Serial Debug port if it's not already started 
+        #ifdef ENABLE_SOFTWARE_SERIAL
+        DEBUG_PORT.begin(DEBUG_PORT_SPEED);
+        #endif
+    }
     bool parse(char *, unsigned int);
 };
 
