@@ -36,9 +36,10 @@ typedef uint8_t byte;
 #define CLOSE_MSG   output_message[aux]=0
 
 // DOD - Device Object Description             // Descrição da mensagem
-#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM = "{\"CODE\":\"POST\",\"name\":\"" NAME "\"" \ 
-                                                ",\"sensors\":[" SENSORS "]," \
-                                                "\"actuators\":[" ACTUATORS "]}"
+#define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM =   "{\"CODE\":\"POST\",\"METHOD\":\"DOD\",\"HEADER\":{},\"BODY\":{\"DOD\":"\
+                                                                            "{\"name\":\"" NAME "\"" \ 
+                                                                            ",\"sensors\":[" SENSORS "]," \
+                                                                            "\"actuators\":[" ACTUATORS "]}"
 
 #define ADD_SINGLE_SENSOR(NAME, TYPE, PIN)      "{\"N\":\"" NAME "\",\"T\":\"" TYPE "\",\"P\":" PIN "}"
 #define ADD_SINGLE_ACTUATOR(NAME, TYPE, PIN)    ADD_SINGLE_SENSOR(NAME,TYPE,PIN)

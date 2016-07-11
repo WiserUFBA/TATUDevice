@@ -49,12 +49,14 @@ const char id_str[]     PROGMEM = "\"ID\":";
 const char pan_str[]    PROGMEM = "\"PAN\":";
 const char ip_str[]     PROGMEM = "\"IP\":\"";
 const char body_str[]   PROGMEM = "\"BODY\":{";
+const char method_str[] PROGMEM = "\"METHOD\":"
+const char method_get[] PROGMEM = "GET";
+const char method_set[] PROGMEM = "SET";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
 const char null_str[]   PROGMEM = "null";
 const char pin_str[]    PROGMEM = "PIN";
 const char dev_str[]    PROGMEM = "dev/";
-
 const char int_str[]    PROGMEM = "/INT";
 const char res_str[]    PROGMEM = "/RES";
 const char flow_str[]   PROGMEM = "/FLOW";
@@ -380,6 +382,24 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             return;
     }
 
+    /* Coloca METHOD na resposta */
+    strcpy_P(OUT_STR, method_str);
+    aux += 9;
+
+    // Como são apenas suportados GET e SET ...
+    QUOTE;
+    switch(requisition->cmd.OBJ.TYPE){
+        case TATU_GET:
+            strcpy_P(OUT_STR, method_get);
+            aux += 3;
+            break;
+        case TATU_SET:
+            strcpy_P(OUT_STR, method_set);
+            aux += 3;
+            break;
+    }
+    QUOTE; COMMA,
+
     /* Coloca o BODY na resposta */
     strcpy_P(OUT_STR, body_str);
     aux += 8;
@@ -394,7 +414,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         PRINT_DEBUG_PROGMEM(PARAM_ERROR);
         DEBUG_NL();
         #endif
+        
         strcpy_P(OUT_STR, null_str);
+        aux += 4;
+        
         BRACE_RIGHT; BRACE_RIGHT;
         return;
     }
@@ -405,7 +428,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         PRINT_DEBUG_PROGMEM(NOT_A_GET);
         DEBUG_NL();
         #endif
+        
         strcpy_P(OUT_STR, true_str);
+        aux += 4;
+
         BRACE_RIGHT; BRACE_RIGHT;
         return;
     }
