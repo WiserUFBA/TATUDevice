@@ -51,6 +51,7 @@ const char ip_str[]     PROGMEM = "\"IP\":\"";
 const char body_str[]   PROGMEM = "\"BODY\":{";
 const char true_str[]   PROGMEM = "true";
 const char false_str[]  PROGMEM = "false";
+const char null_str[]   PROGMEM = "null";
 const char pin_str[]    PROGMEM = "PIN";
 const char dev_str[]    PROGMEM = "dev/";
 
@@ -237,6 +238,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
+    
     // DEPRECATED //
     if(requisition->cmd.OBJ.TYPE == TATU_POST){ strcpy_P(OUT_STR, false_body); return; }
     if (requisition->cmd.OBJ.VAR == TATU_TYPE_SYSTEM){
@@ -318,10 +320,8 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                         case TATU_CODE_STATE:
                             bool_buffer = analogRead(requisition->cmd.OBJ.PIN);
                             break;
-                    
-                    break;
                     }
-                break;
+                    break;
             }
             break;
         case TATU_SET:
@@ -356,7 +356,6 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     DEBUG_NL();
                     #endif
                     break; 
-                break;
                 /* ADC Modifier */
                 case TATU_TYPE_ANALOG:
                     analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
@@ -366,8 +365,6 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     DEBUG_NL();
                     #endif
                     break;
-                    
-                break;
             }
             break;
         
@@ -381,16 +378,24 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             #endif
             strcpy_P(OUT_STR, null_body);
             return;
-
     }
 
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+
+    // !IMPORTANT! Suporte para apenas uma variavel ''
+    /* Copia a variavel vinda do payload */
+    QUOTE; strcpy(OUT_STR, payload); aux += strlen(payload); QUOTE; COLON;
+    
     // Se encontrado qualquer tipo de erro
     if(requisition->cmd.OBJ.ERROR){ 
         #ifdef DEBUG
         PRINT_DEBUG_PROGMEM(PARAM_ERROR);
         DEBUG_NL();
         #endif
-        strcpy_P(OUT_STR, false_body);
+        strcpy_P(OUT_STR, null_str);
+        BRACE_RIGHT; BRACE_RIGHT;
         return;
     }
    
@@ -400,17 +405,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         PRINT_DEBUG_PROGMEM(NOT_A_GET);
         DEBUG_NL();
         #endif
-        strcpy_P(OUT_STR, true_body);
+        strcpy_P(OUT_STR, true_str);
+        BRACE_RIGHT; BRACE_RIGHT;
         return;
     }
-    
-    /* Coloca o BODY na resposta */
-    strcpy_P(OUT_STR, body_str);
-    aux += 8;
-
-    // !IMPORTANT! Suporte para apenas uma variavel ''
-    /* Copia a variavel vinda do payload */
-    QUOTE; strcpy(OUT_STR, payload); aux += strlen(payload); QUOTE; COLON;
 
     /* Verifica o tipo de resposta esperada, e responde adequadamente*/
     switch(requisition->cmd.OBJ.CODE) {
