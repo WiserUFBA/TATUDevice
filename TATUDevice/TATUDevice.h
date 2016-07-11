@@ -69,13 +69,14 @@ typedef uint8_t byte;
 //#define SWITCH_REQ_TOPIC(TOPIC, )
 
 // Cria wrapper para a função de callback da classe
+                                        // Cria a declaração da função ponte
+#define MQTT_BRIDGE(BRIDGE)             void BRIDGE(char *, char *)
                                         // Declaração da ponte// Função callback chamada pelo cliente mqtt  
-#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void BRIDGE(char *, char *);\ 
-                                        void NAME(char *topic, byte *payload, unsigned int length)\ 
+#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void NAME(char *topic, byte *payload, unsigned int length)\ 
                                         {OBJ.mqtt_callback(topic, payload, length);}// Essa é a atribuição da função acionada dentro do objeto TATUDevice
                                         // Atribuição da ponte
-#define MQTT_PUBLISH(BRIDGE, OBJ) void BRIDGE(char *topic, char *out)\ 
-                                  { OBJ.publish(topic,out); } // Essa é a função publish do cliente que será chama pelo objeto
+#define MQTT_PUBLISH(BRIDGE, OBJ)       void BRIDGE(char *topic, char *out)\ 
+                                        { OBJ.publish(topic,out); } // Essa é a função publish do cliente que será chama pelo objeto
 
 // Macro para interrupções
 #define INTERRUPTION_VALUE(DEVICE,VAR_NAME,VAR,OPR,TRIGGER)switch (OPR){\
@@ -154,9 +155,9 @@ typedef uint8_t byte;
 
 // Conecta o cliente mqtt
 #define DEVICECONNECT(CLIENT) while(!CLIENT.connect(device.name,MQTT_USER,MQTT_PASS));\
-                        CLIENT.publish("dev/CONNECTIONS",DEVICE_NAME);\
-                        CLIENT.subscribe(device.aux_topic_name);\
-                        CLIENT.subscribe("dev");
+                                    CLIENT.publish("dev/CONNECTIONS",DEVICE_NAME);\
+                                    CLIENT.subscribe(device.aux_topic_name);\
+                                    CLIENT.subscribe("dev");
                         
 
 // Conecta o cliente mqtt usando usuário e senha
@@ -167,19 +168,19 @@ typedef uint8_t byte;
                                         else Serial.println("The connection has failed")
 
 // Macros para conversão de tipos
-#define STOS(STRING1,STRING2) strcpy((char*)STRING2,STRING1)
-#define ITOS(INTEGER,STRING) (itoa(INTEGER,(char*)STRING,10))
+#define STOS(STRING1,STRING2)   strcpy((char*)STRING2,STRING1)
+#define ITOS(INTEGER,STRING)    (itoa(INTEGER,(char*)STRING,10))
 #define ITOI(INTEGER1,INTEGER2) *(int*)INTEGER2 = INTEGER1
-#define BTOS(BOOL1,STRING) if (BOOL1) strcpy((char*)STRING,"ON"); else strcpy((char*)STRING,"OFF");
-#define BTOB(BOOL1,BOOL2) *(bool*)BOOL2 = BOOL1
+#define BTOS(BOOL1,STRING)      if (BOOL1) strcpy((char*)STRING,"ON"); else strcpy((char*)STRING,"OFF");
+#define BTOB(BOOL1,BOOL2)       *(bool*)BOOL2 = BOOL1
 
 //#define RESPONSE_CONSTRUCT(NAME_VAR)/* Coloca o BODY na resposta */ \
-                                    //strcpy_P(OUT_STR, body_str); \
-                                    //aux += 8; \
-                                    //QUOTE; strcpy(OUT_STR, NAME_VAR); aux += strlen(NAME_VAR); QUOTE; COLON;  /* Copia a variavel vinda do payload */ \
-                                    //BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ \
-                                    //CLOSE_MSG; \
-                                    //publish(name, output_message) //publish the message 
+//strcpy_P(OUT_STR, body_str); \
+//aux += 8; \
+//QUOTE; strcpy(OUT_STR, NAME_VAR); aux += strlen(NAME_VAR); QUOTE; COLON;  /* Copia a variavel vinda do payload */ \
+//BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ \
+//CLOSE_MSG; \
+//publish(name, output_message) //publish the message 
 
 /* Utilidades */
 int freeRAM();

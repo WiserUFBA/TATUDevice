@@ -17,45 +17,45 @@
 
 /* Configuration Constants */
 /* Network */
-#define NETWORK_IP 222
-#define NETWORK_MAC 166
-#define NETWORK_ESSID 255
-#define NETWORK_TYPE 53
-#define NETWORK_PASS 64
-#define NETWORK_ENCRYPTION 108
+#define NETWORK_IP 			222
+#define NETWORK_MAC 		166
+#define NETWORK_ESSID 		255
+#define NETWORK_TYPE 		53
+#define NETWORK_PASS 		64
+#define NETWORK_ENCRYPTION 	108
 /* MQTT Broker */
-#define MQTT_IP 194
-#define MQTT_PORT 22
-#define MQTT_USER 28
-#define MQTT_PASS 36
+#define MQTT_IP 			194
+#define MQTT_PORT 			22
+#define MQTT_USER 			28
+#define MQTT_PASS 			36
 /* System Access */
-#define ADMIN_USER 249
-#define ADMIN_PASSWORD 197
-#define ADMIN_SALT 4
+#define ADMIN_USER 			249
+#define ADMIN_PASSWORD 		197
+#define ADMIN_SALT 			4
 /* Device */
-#define DEVICE_ID 100
-#define DEVICE_PAN 18
-#define DEVICE_NAME 208
+#define DEVICE_ID 			100
+#define DEVICE_PAN 			18
+#define DEVICE_NAME 		208
 /* System Configuration */
-#define BOARD_PIN 82
-#define BOARD_PULLUP 87
-#define BOARD_SERIAL 121
-#define BOARD_SAMPLE 119
-#define BOARD_SLEEP 192
-#define BOARD_AREF 27
+#define BOARD_PIN 			82
+#define BOARD_PULLUP 		87
+#define BOARD_SERIAL 		121
+#define BOARD_SAMPLE 		119
+#define BOARD_SLEEP 		192
+#define BOARD_AREF 			27
 /* System Details */
-#define SYSTEM_VERSION 150
-#define SYSTEM_DATE 158
+#define SYSTEM_VERSION 		150
+#define SYSTEM_DATE 		158
 
 /* Sizes */
-#define IP_SIZE 3
-#define MAC_SIZE 6
-#define ESSID_SIZE 32
-#define NAMES_SIZE 20
-#define NUMBER_1BYTE 1
-#define NUMBER_2BYTE 2
-#define NUMBER_4BYTE 4
-#define NUMBER_8BYTE 8
+#define IP_SIZE 			3
+#define MAC_SIZE 			6
+#define ESSID_SIZE 			32
+#define NAMES_SIZE 			20
+#define NUMBER_1BYTE 		1
+#define NUMBER_2BYTE 		2
+#define NUMBER_4BYTE 		4
+#define NUMBER_8BYTE 		8
 
 enum Configs{
 	Network_Ip = 1,

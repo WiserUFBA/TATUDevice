@@ -6,23 +6,23 @@
 #include <TATUInterpreter.h>
 
 // Hash that represents a atributte
-#define H_lamp 2090464143
-#define H_luminosity 1516126306
+#define H_lamp        2090464143
+#define H_luminosity  1516126306
 
 // Device constants
 #define DEVICE_SAMPLE 0
-#define DEVICE_ID 121
+#define DEVICE_ID     121
 #define DEVICE_PAN_ID 88
 
 // Device pins
-#define LAMP 8
-#define LUMINOSITY A0
+#define LAMP          8
+#define LUMINOSITY    A0
 
 // Information for connection with broker
-#define DEVICE_NAME ""
-#define MQTT_USER  ""
-#define MQTT_PASS  ""
-#define MQTTPORT 1883
+#define DEVICE_NAME   ""
+#define MQTT_USER     ""
+#define MQTT_PASS     ""
+#define MQTTPORT      1883
 
 #define on(PIN) digitalWrite(PIN,true)
 #define off(PIN) digitalWrite(PIN,false)
@@ -82,6 +82,7 @@ bool get(uint32_t hash,void* response,uint8_t code){
   }
   return true; 
 }
+
 // The set function is called when a modification is required
 // Notice that the order of the parameters is diferent from the get function
 bool set(uint32_t hash, uint8_t code,void* request){
@@ -114,9 +115,10 @@ bool set(uint32_t hash, uint8_t code,void* request){
 // Essential objects and macros
 EthernetClient ethClient;
 TATUInterpreter interpreter;
+MQTT_BRIDGE(bridge);
 TATUDevice device(DEVICE_NAME, ip, 121, 88, 0, server, MQTTPORT, 1, &interpreter, get, set, bridge);
 MQTT_CALLBACK(bridge, device, mqtt_callback);
-PubSubClient client(server, MQTTPORT, mqtt_callback , ethClient);
+PubSubClient client(server, MQTTPORT, mqtt_callback, ethClient);
 MQTT_PUBLISH(bridge, client);
 
 // Constructs the JSON that describes the device
@@ -157,6 +159,8 @@ void reconnect() {
     // Attempt to connect
     if (client.publish("dev/CONNECTIONS",hello)) {
       Serial.println("connected");
+      client.subscribe(device.aux_topic_name);
+      client.subscribe("dev");
     } 
     else {
       Serial.print("failed, rc=");
