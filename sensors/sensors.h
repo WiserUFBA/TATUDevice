@@ -39,14 +39,13 @@ int aux;
         ((char*)RESPONSE)[aux] = 0;\*/
  #define current_sensor(PIN,VAR,RESPONSE,CODE)\
           do{\
-    		    Irms = emon1.calcIrms(1480);\
+    		    irms = VAR.calcIrms(1480);\
             switch(CODE){\
               case TATU_CODE_INFO:\
-                /*aparentemente só precisa disso*/\
-                dtostrf(Irms,2,2,(char *)RESPONSE);\
+                dtostrf(irms,2,2,(char *)RESPONSE);\
                 break;\
               case TATU_CODE_VALUE:\
-                ITOI(VAR,RESPONSE);\
+                ITOI(irms,RESPONSE);\
                 break;\
               default:\
                   return false;\
