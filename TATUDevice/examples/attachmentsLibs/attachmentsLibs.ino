@@ -25,8 +25,8 @@ In those libraries you can found simple codes for use with DHT11 sensor, lamp(re
 
 // Pins used
 #define GAS     1
-#define DOOR    6
-#define DHTPIN  8
+#define DOOR    8
+#define DHTPIN  6
 #define LAMP    9
 #define MOVE    20
 
@@ -45,6 +45,7 @@ In those libraries you can found simple codes for use with DHT11 sensor, lamp(re
 #define H_temp      2090755995
 #define H_humid     261814908
 #define H_move      2090515612
+#define H_luminosity 1516126306
 
 // Message for annoucement of connection
 const char hello[] PROGMEM = DEVICE_NAME " has connected";
@@ -54,8 +55,8 @@ DHT dht(DHTPIN, DHTTYPE);
 //variveis
 bool lamp = 0,aux;
 byte mac[]    = { 0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 192, 168, 1, 14 };
-byte ip[4]    = { 192, 168, 1, 27 };
+byte server[] = { 192, 168, 0, 112 };
+byte ip[4]    = { 192, 168, 0, 155 };
 
 //int t,h,count;
 volatile int soundReading,movement,gas_amount,t,h;
@@ -83,6 +84,10 @@ bool get(uint32_t hash,void* response,uint8_t code){
             //The bool_sensor supports INFO and STATE requests.
             bool_sensor(lamp,response,code);
             break;
+        case H_luminosity:
+            //The lumisity_sensor supports INFO and VALUE,requests. 
+            luminosity_sensor(LUMINOSITY,luminosity,response,code);
+            break;    
         default:
             return false;
     }
@@ -128,13 +133,12 @@ CREATE_DOD(DEVICE_NAME,
 void setup() {
     //In order to avoid problems caused by external interruptions,
     //is recomended disable the interruption when using the attachInterrupt function;
+    Serial.begin(9600);
     Serial.println("Trying connect to the broker");  
-    cli();//disable interruptions
 
     device.pub = &bridge;
 
     char aux[16];  
-    Serial.begin(9600);
     dht.begin();
     Ethernet.begin(mac, ip);
     pinMode(DHTPIN,INPUT);
@@ -148,10 +152,10 @@ void setup() {
     //Trying connect to the broker
     //Serial.println("Trying connect to the broker");  
     while(!client.connect(device.name,MQTT_USER,MQTT_PASS));
-    client.publish("dev/CONNECTIONS",hello);
+    client.publish("dev/CONNECTIONS",DEVICE_NAME);
     client.subscribe(device.aux_topic_name);
     client.subscribe("dev");
-    sei();//unable interruptions
+
     Serial.println("Conected!!");
 }
 
@@ -177,7 +181,7 @@ void reconnect() {
     while (!client.connect(device.name, MQTT_USER, MQTT_PASS)) {
         Serial.print("Attempting MQTT connection...");
         // Attempt to connect
-        if (client.publish("dev/CONNECTIONS",hello)) {
+        if (client.publish("dev/CONNECTIONS",DEVICE_NAME)) {
             Serial.println("connected");
         } 
         else {
