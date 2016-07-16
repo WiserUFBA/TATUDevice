@@ -12,6 +12,9 @@ volatile int luminosity;
 int aux;
 #endif
 
+/*int aux1;
+char aux20[3],aux10[3];*/
+
 
 //#define v_out(PIN)\
 //  analogRead(PIN)*5.0/1024.0
@@ -37,11 +40,27 @@ int aux;
         aux = strlen((char*)RESPONSE);\
         ((char*)RESPONSE)[aux++] = 'A';\
         ((char*)RESPONSE)[aux] = 0;\*/
- #define current_sensor(PIN,VAR,RESPONSE,CODE)\
-          do{\
-    		    irms = VAR.calcIrms(1480);\
+            /*aux1 = irms*100;\ 
+            aux = (int)irms;\
+            aux = aux*100;\
+            aux1 = aux1 - 100;\
+            aux = aux/100;\
+            ITOS(aux,aux20);\
+            ITOS(aux1,aux10);\
             switch(CODE){\
               case TATU_CODE_INFO:\
+                strcpy((char *)RESPONSE,aux20);\
+                RESPONSE[strlen(aux20)] = '.';\
+                RESPONSE[strlen(aux20)+1] = '\0';\
+                strcpy(RESPONSE[strlen(RESPONSE)],aux10);\
+                aux = strlen((char*)RESPONSE);\
+                ((char*)RESPONSE)[aux++] = 'A';\
+                ((char*)RESPONSE)[aux] = 0;\*/
+ #define current_sensor(PIN,VAR,RESPONSE,CODE)\
+          do{\
+            switch(CODE){\
+              case TATU_CODE_INFO:\
+                /*strcpy((char *)RESPONSE,"[\"10.3\",\"9.4\"]");*/\
                 dtostrf(irms,2,2,(char *)RESPONSE);\
                 break;\
               case TATU_CODE_VALUE:\
@@ -50,6 +69,7 @@ int aux;
               default:\
                   return false;\
             }\
+            irms = 0;\
           }while(false)
 
 #define gas_sensor(PIN,VAR,RESPONSE,CODE)\
@@ -91,9 +111,6 @@ int aux;
         switch(CODE){\
           case TATU_CODE_INFO:\
             ITOS(VAR,RESPONSE);\
-            aux = strlen((char*)RESPONSE);\
-            ((char*)RESPONSE)[aux++] = '%';\
-            ((char*)RESPONSE)[aux] = 0;\
             break;\
           case TATU_CODE_VALUE:\
             ITOI(VAR,RESPONSE);\
@@ -123,6 +140,22 @@ int aux;
         switch(CODE){\
           case TATU_CODE_INFO:\
             ITOS(VAR,RESPONSE);\
+            break;\
+          case TATU_CODE_VALUE:\
+            ITOI(VAR,RESPONSE);\
+            break;\
+          default:\
+            return false;\
+        }\
+      }while(false)
+#define sound_sensor(PIN,VAR,RESPONSE,CODE)\
+      do{\
+        /*VAR = analogRead(PIN);*/\
+        VAR = (20. * log10(analogRead(PIN) / 1.));\
+        switch(CODE){\
+          case TATU_CODE_INFO:\
+            /*ITOS(VAR,RESPONSE);*/\
+            dtostrf(VAR,4,3,(char *)RESPONSE);\
             break;\
           case TATU_CODE_VALUE:\
             ITOI(VAR,RESPONSE);\

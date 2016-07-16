@@ -439,7 +439,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     /* Verifica o tipo de resposta esperada, e responde adequadamente*/
     switch(requisition->cmd.OBJ.CODE) {
         case TATU_CODE_INFO:
-            QUOTE; strcpy(OUT_STR, str_buffer); aux+=strlen(str_buffer); QUOTE;
+            if (str_buffer[0] == '[' ){
+                strcpy(OUT_STR, str_buffer);
+                aux+=strlen(str_buffer);
+            }
+            else {QUOTE; strcpy(OUT_STR, str_buffer); aux+=strlen(str_buffer); QUOTE;}
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(RESPONSE_TYPE_INFO);
             DEBUG_NL();
