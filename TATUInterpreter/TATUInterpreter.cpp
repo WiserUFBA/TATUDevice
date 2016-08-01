@@ -1,14 +1,18 @@
-#include "TATUInterpreter.h"
+#include "NewInterpreter.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <avr/pgmspace.h>
 #include "Arduino.h"
+
+#ifdef AVR_GCC
+#include <avr/pgmspace.h>
+#endif
 
 #ifdef DEBUG
 const char START_PARSE[]        PROGMEM = "[DEBUG] Starting Parse";
 const char FOUND_GET[]          PROGMEM = "[DEBUG] Found GET";
 const char FOUND_SET[]          PROGMEM = "[DEBUG] Found SET";
+const char FOUND_FLOW[]         PROGMEM = "[DEBUG] Found FLOW";
 const char FOUND_NUM[]          PROGMEM = "[DEBUG] Is Pin";
 const char FOUND_DOD[]          PROGMEM = "[DEBUG] Found DOD";
 const char FOUND_EDIT[]         PROGMEM = "[DEBUG] Found EDIT";
@@ -45,6 +49,7 @@ uint8_t atoi_T(char *p){
 }
 
 /* Little utilitie to print progmem char */
+#ifdef AVR_GCC
 void SerialPrint_PROGMEM(const char str[] PROGMEM){
     #ifdef ENABLE_SOFTWARE_SERIAL
     DEBUG_PORT.begin(DEBUG_PORT_SPEED);
@@ -55,9 +60,10 @@ void SerialPrint_PROGMEM(const char str[] PROGMEM){
     while((c = pgm_read_byte(str++)))
         DEBUG_PORT.write(c);
 }
+#endif
 
 /* Parse TATU and return if this fail or not */
-bool TATUInterpreter::parse(char *string, unsigned int length){
+bool NewInterpreter::parse(char *string, unsigned int length){
     #ifdef DEBUG
     PRINT_DEBUG_PROGMEM(START_PARSE);
     DEBUG_NL();
@@ -83,134 +89,27 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             PRINT_DEBUG_PROGMEM(FOUND_GET);
             DEBUG_NL();
             #endif
-            
             cmd.OBJ.TYPE = TATU_GET;
             j = 9;
-            
-            switch(string[4]){
-                case CODE_DOD:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_DOD);
-                    DEBUG_NL();
-                    //PRINT_DEBUG_PROGMEM(ALL_ERROR);
-                    //DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_DOD;
-                    break;
-                case CODE_INFO:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_INFO);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_INFO;
-                    break; 
-                case CODE_STATE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_STATE);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_STATE;
-                    j++;
-                    break; 
-                case CODE_VALUE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_VALUE);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_VALUE;
-                    j++;
-                   break;
-                default:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(CODE_ERROR);
-                    DEBUG_NL();
-                    #endif
-                    /* If the desired command is not found return error */
-                    return false;
-            }
+            code_evaluation(string[4]);
             break;
         case COMMAND_SET: 
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(FOUND_SET);
             DEBUG_NL();
             #endif
-            
             cmd.OBJ.TYPE = TATU_SET;
             j = 9; // Default String position
-            switch(string[4]){
-                case CODE_INFO:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_INFO);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_INFO;
-                    break;
-                case CODE_STATE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_STATE);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_STATE;
-                    j++;
-                    break;
-                case CODE_VALUE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_VALUE);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_VALUE;
-                    j++;
-                    break;
-                default:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(CODE_ERROR);
-                    DEBUG_NL();
-                    #endif
-                    /* If the desired command is not found return error */
-                    return false;
-            }
+            code_evaluation(string[4]);
             break;
-        case COMMAND_EDIT:
-            #ifdef DEBUG
-            PRINT_DEBUG_PROGMEM(FOUND_EDIT);
+        case COMMAND_FLOW:
+            #ifdef
+            PRINT_DEBUG_PROGMEM(FOUND_FLOW);
             DEBUG_NL();
             #endif
-            
-            cmd.OBJ.TYPE = TATU_EDIT;
-            j = 10;
-            switch(string[5]){
-                case CODE_INFO:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_INFO);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_INFO;
-                    break;
-                case CODE_STATE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_STATE);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_STATE;
-                    j++; 
-                    break;
-                case CODE_VALUE:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(FOUND_VALUE);
-                    DEBUG_NL();
-                    #endif
-                    cmd.OBJ.CODE = TATU_CODE_VALUE;
-                    j++; 
-                    break;
-                default:
-                    #ifdef DEBUG
-                    PRINT_DEBUG_PROGMEM(CODE_ERROR);
-                    DEBUG_NL();
-                    #endif
-                    /* If the desired command is not found return error */
-                    return false;
-            }
-            break;
+            cmd.OBJ.TYPE = TATU_FLOW;
+            j = 9; // Default String position
+            code_evaluation(string[4]);
         case COMMAND_POST:
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(FOUND_POST);
@@ -223,6 +122,16 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             // Copy the entire JSON to the String variable
             strcpy(string, &string[++j]);
             return true;
+        //Not in use for now
+        /*case COMMAND_EDIT:
+            #ifdef DEBUG
+            PRINT_DEBUG_PROGMEM(FOUND_EDIT);
+            DEBUG_NL();
+            #endif    
+            cmd.OBJ.TYPE = TATU_EDIT;
+            j = 10;
+            code_evaluation(string[5]);
+            break;*/
         default:
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(REQUISITION_ERROR);
@@ -282,6 +191,50 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
     PRINT_DEBUG_PROGMEM(HASH_GENERATED);
     PRINT_DEBUG_NL(str_hash);
     #endif
-    
     return true;
+}
+
+void NewInterpreter::code_evaluation(){
+    switch(string[4]){
+        case CODE_DOD:
+            #ifdef DEBUG
+            PRINT_DEBUG_PROGMEM(FOUND_DOD);
+            DEBUG_NL();
+            //PRINT_DEBUG_PROGMEM(ALL_ERROR);
+            //DEBUG_NL();
+            #endif
+            cmd.OBJ.CODE = TATU_CODE_DOD;
+            break;
+        case CODE_INFO:
+            #ifdef DEBUG
+            PRINT_DEBUG_PROGMEM(FOUND_INFO);
+            DEBUG_NL();
+            #endif
+            cmd.OBJ.CODE = TATU_CODE_INFO;
+            break; 
+        case CODE_STATE:
+            #ifdef DEBUG
+            PRINT_DEBUG_PROGMEM(FOUND_STATE);
+            DEBUG_NL();
+            #endif
+            cmd.OBJ.CODE = TATU_CODE_STATE;
+            j++;
+            break; 
+        case CODE_VALUE:
+            #ifdef DEBUG
+            PRINT_DEBUG_PROGMEM(FOUND_VALUE);
+            DEBUG_NL();
+            #endif
+            cmd.OBJ.CODE = TATU_CODE_VALUE;
+            j++;
+           break;
+        default:
+            #ifdef DEBUG
+            PRINT_DEBUG_PROGMEM(CODE_ERROR);
+            DEBUG_NL();
+            #endif
+            /* If the desired command is not found return error */
+            return false;
+    }
+    break;
 }

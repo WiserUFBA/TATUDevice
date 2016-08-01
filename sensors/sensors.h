@@ -13,7 +13,7 @@ int aux;
 #endif
 
 /*int aux1;
-char aux20[3],aux10[3];*/
+char aux20[3],aux101[3];*/
 
 
 //#define v_out(PIN)\

@@ -1,26 +1,33 @@
 #ifndef TATUDevice_h
 #define TATUDevice_h
 
-#include <avr/wdt.h>
 #include <stdint.h>
 #include <TATUInterpreter.h>
+
+#ifdef AVR_GCC
+#include <avr/wdt.h>
+#endif
 
 typedef uint8_t byte;
 
 #ifndef MAX_SIZE_RESPONSE
-#define MAX_SIZE_RESPONSE   40
+#define MAX_SIZE_RESPONSE   60
 #endif
 
 #ifndef MAX_SIZE_OUTPUT
 #define MAX_SIZE_OUTPUT     256
 #endif
 
+
+
 // By default DEBUG on SERIAL or SoftwareSerial is disabled
 // Change debug definitions on TATUInterpreter.h
-#define DEBUG 1
+//#define DEBUG 1
 
 // System definitions
-#define PROGMEM             __ATTR_PROGMEM__
+#ifdef AVR_GCC
+#define PROGMEM                     __ATTR_PROGMEM__
+#endif
 #define OUT_STR             &output_message[aux]
 #define MAX_SIZE_IP         16
 #define MAX_SIZE_NAME       20
@@ -169,7 +176,7 @@ typedef uint8_t byte;
                                         else Serial.println("The connection has failed")
 
 // Macros para conversão de tipos
-#define STOS(STRING1,STRING2)   strcpy((char*)STRING2,STRING1)
+#define STOS(STRING1,STRING2)   strcpy((char*)STRING1,STRING2)
 #define ITOS(INTEGER,STRING)    (itoa(INTEGER,(char*)STRING,10))
 #define ITOI(INTEGER1,INTEGER2) *(int*)INTEGER2 = INTEGER1
 #define BTOS(BOOL1,STRING)      if (BOOL1) strcpy((char*)STRING,"ON"); else strcpy((char*)STRING,"OFF");
@@ -277,6 +284,7 @@ public:
     void loop();
 };
 
+#ifdef AVR_GCC
 class TATUWatchDog{
 public:
     long int time;
@@ -288,5 +296,6 @@ public:
     void watchdogSetup();
     void loop(); 
 };
+#endif
 
 #endif

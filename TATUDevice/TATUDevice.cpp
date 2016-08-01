@@ -2,8 +2,11 @@
 #include <TATUInterpreter.h>
 #include <stdint.h>
 #include <string.h>
-#include <avr/pgmspace.h>
 #include "Arduino.h"
+
+#ifdef AVR_GCC
+#include <avr/pgmspace.h>
+#endif
 
 /* DEBUG! */
 #ifdef DEBUG
@@ -35,7 +38,7 @@ const char PARAM_ERROR[]            PROGMEM = "[DEBUG] Param Error!";
 const char RESPONSE_TYPE_INFO[]     PROGMEM = "[DEBUG] The response type is INFO";
 const char RESPONSE_TYPE_VALUE[]    PROGMEM = "[DEBUG] The response type is VALUE";
 const char RESPONSE_TYPE_STATE[]    PROGMEM = "[DEBUG] The response type is STATE";
-const char DOD_RETURN[]    PROGMEM = "[DEBUG] Returning the following DOD Object";
+const char DOD_RETURN[]             PROGMEM = "[DEBUG] Returning the following DOD Object";
 #endif
 
 // Constantes
@@ -253,11 +256,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         strcpy_P(OUT_STR, false_body);
         return;
     }
-
     /* Check the variable type */
     switch(requisition->cmd.OBJ.TYPE){
         /* If the desired variable is of type ALIAS, call the user's function */
-
+        
         case TATU_GET:
             #ifdef DEBUG
             //PRINT_DEBUG_PROGMEM(CALLBACK_GET);
@@ -331,8 +333,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             //PRINT_DEBUG_PROGMEM(CALLBACK_SET);
             //DEBUG_NL();
             #endif
+            
             switch(requisition->cmd.OBJ.VAR){
+
                 case TATU_TYPE_ALIAS:
+                    
                     //Baseado no código da resposta, decide qual função do usuário deve ser usada
                     switch(requisition->cmd.OBJ.CODE) {
                         case TATU_CODE_INFO:
@@ -369,8 +374,22 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     break;
             }
             break;
-        
-        /* System functions */
+        /*case TATU_FLOW:
+                case TATU_TYPE_ALIAS:
+                    //Baseado no código da resposta, decide qual função do usuário deve ser usada
+                    switch(requisition->cmd.OBJ.CODE) {
+                        case TATU_CODE_INFO:
+                            response = &str_buffer;
+                            break;
+                        case TATU_CODE_VALUE:
+                            response = &int_buffer;
+                            break;
+                        case TATU_CODE_STATE:
+                            response = &bool_buffer;
+                            break;
+                    }
+                    requisition->cmd.OBJ.ERROR = !flow_function(requisition->str_hash,colect_freq,publish_freq,requisition->cmd.OBJ.CODE);
+                    break;        /* System functions */
         default:
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(EXEC_ERROR);
@@ -583,6 +602,7 @@ void TATUDevice::loop(){
     //mqtt_client.loop();
 }
 
+#ifdef AVR_GCC
 void TATUWatchDog::watchdogSetup(){
     cli();
     // disable all interrupts
@@ -618,4 +638,4 @@ void TATUWatchDog::loop(){
     if (time - lastConnect > reset_time) 
         wdt_reset();*/
 }
-    
+#endif    

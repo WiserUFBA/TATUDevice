@@ -1,14 +1,24 @@
-#ifndef TATUInterpreter_h
-#define TATUInterpreter_h
+#ifndef NewInterpreter_h
+#define NewInterpreter_h
+
+#define AVR_GCC
 
 #include <stdint.h>
-#include <avr/pgmspace.h>
 
+#ifndef AVR_GCC
+#include <pgmspace.h>
+#endif
+
+#ifdef AVR_GCC
+#include <avr/pgmspace.h>
+#endif
 // Uncomment the follow line to show debug
 #define DEBUG
 // Change debug port to Software Serial Object if you want to
 //#define DEBUG_PORT                  Serial
+#ifdef AVR_GCC
 #define DEBUG_PORT                ATMSerial
+#endif
 // Allow Software Serial 
 #define ENABLE_SOFTWARE_SERIAL
 
@@ -28,13 +38,16 @@ SoftwareSerial static DEBUG_PORT(7,6);
 #define DEBUG_PORT_SPEED            115200
 
 // System definitions
+#ifdef AVR_GCC
 #define PROGMEM                     __ATTR_PROGMEM__
+#endif
 
 // TATU Protocol available commands
 #define TATU_POST   0
 #define TATU_SET    1
 #define TATU_GET    2
-#define TATU_EDIT   3
+#define TATU_FLOW   3
+#define TATU_EDIT   4
 
 // TATU Protocol available properties
 #define TATU_CODE_DOD   0
@@ -52,6 +65,7 @@ SoftwareSerial static DEBUG_PORT(7,6);
 // Char that represents the TATU Protocol commands
 #define CODE_DOD   'D'
 #define CODE_INFO  'I'
+#define CODE_FLOW  'F'
 #define CODE_VALUE 'V'
 #define CODE_STATE 'S'
 
@@ -75,6 +89,7 @@ SoftwareSerial static DEBUG_PORT(7,6);
 /* Utilities */
 uint32_t hash_djb(char *string);
 uint8_t atoi_T(char *p);
+
 void SerialPrint_PROGMEM(PGM_P str);
 
 class TATUInterpreter{
