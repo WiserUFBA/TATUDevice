@@ -374,22 +374,16 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     break;
             }
             break;
-        /*case TATU_FLOW:
+
+
+        case TATU_FLOW:
+            switch(requisition->cmd.OBJ.VAR){
                 case TATU_TYPE_ALIAS:
-                    //Baseado no código da resposta, decide qual função do usuário deve ser usada
-                    switch(requisition->cmd.OBJ.CODE) {
-                        case TATU_CODE_INFO:
-                            response = &str_buffer;
-                            break;
-                        case TATU_CODE_VALUE:
-                            response = &int_buffer;
-                            break;
-                        case TATU_CODE_STATE:
-                            response = &bool_buffer;
-                            break;
-                    }
-                    requisition->cmd.OBJ.ERROR = !flow_function(requisition->str_hash,colect_freq,publish_freq,requisition->cmd.OBJ.CODE);
-                    break;        /* System functions */
+                    //request is the json
+                    request = &str_buffer;
+                    requisition->cmd.OBJ.ERROR = !set_function(requisition->str_hash,requisition->cmd.OBJ.CODE,request);
+                    break;
+            }
         default:
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(EXEC_ERROR);

@@ -1,5 +1,5 @@
-#ifndef NewInterpreter_h
-#define NewInterpreter_h
+#ifndef TATUInterpreter_h
+#define TATUInterpreter_h
 
 #define AVR_GCC
 
@@ -65,7 +65,6 @@ SoftwareSerial static DEBUG_PORT(7,6);
 // Char that represents the TATU Protocol commands
 #define CODE_DOD   'D'
 #define CODE_INFO  'I'
-#define CODE_FLOW  'F'
 #define CODE_VALUE 'V'
 #define CODE_STATE 'S'
 
@@ -74,6 +73,7 @@ SoftwareSerial static DEBUG_PORT(7,6);
 #define COMMAND_SET  'S'
 #define COMMAND_GET  'G'
 #define COMMAND_EDIT 'E'
+#define COMMAND_FLOW 'F'
 
 // DJB Hash macro(deprecated)
 //#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(i = START; INPUT[i] != ' '; i++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[i]; }
@@ -117,6 +117,7 @@ public:
         #endif
     }
     bool parse(char *, unsigned int);
+    bool code_evaluation(char,unsigned int*);
 };
 
 #endif
