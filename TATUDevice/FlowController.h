@@ -2,9 +2,14 @@
 #define FlowController_h
 
 #include <stdint.h>
-
+#include <stdint.h>
+#include "Arduino.h"
+#include <TATUDevice.h>
+#include <ArduinoJson.h>
 //#define flowList *FlowUnit
 
+#define H_flow              0x7C96D85D
+const char get_flow[]     PROGMEM = "GET INFO flow";
 
 class FlowUnit {
   public:
@@ -20,15 +25,23 @@ class FlowUnit {
 };
 typedef FlowUnit* FlowList;
 
+typedef struct flowBuffer {
+  byte vector[100];
+  void* end;
+} flowBuffer;
+
 class FlowController{
 public:
-    FlowUnit activity;
+    FlowList activity;
+    TATUDevice* device;
+    char* vector_response;
+    flowBuffer flow_buffer;
 
-    FlowController();
+    FlowController(TATUDevice* aux_device);
     void buffer_alloc(uint8_t size, FlowList unit);
     void flowbuilder(char* json, uint32_t hash, uint8_t code);
     void* vector_iterator(FlowList unit);
-    void flow_loop(FlowList unit);
+    void loop();
     void requisition(void* response, uint32_t hash);
     void* vector_acess(FlowList unit, int i);
     void push_value(char* response, FlowList unit, int i);

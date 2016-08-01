@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <TATUInterpreter.h>
-#include "FlowController.h"
 
 #ifdef AVR_GCC
 #include <avr/wdt.h>
@@ -19,17 +18,6 @@ typedef uint8_t byte;
 #define MAX_SIZE_OUTPUT     256
 #endif
 
-typedef struct flowUnit {
-  unsigned long int collect_freq, publish_freq;
-  void* vector; uint8_t iterator, size;
-  void* publish_method;
-  void* message;
-  uint32_t att, flow;
-  flowUnit* next;
-  int lastTimeCollect, lastTimePub;
-  uint8_t type;
-  bool used;
-} flowUnit, *flowList;
 
 // By default DEBUG on SERIAL or SoftwareSerial is disabled
 // Change debug definitions on TATUInterpreter.h
@@ -295,6 +283,7 @@ public:
     void loop();
 };
 
+#include "FlowController.h"
 
 #ifdef AVR_GCC
 class TATUWatchDog{
