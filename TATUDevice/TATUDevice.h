@@ -228,6 +228,7 @@ public:
     bool        dod_used;
     bool (*get_function)(uint32_t hash, void* response, uint8_t code);
     bool (*set_function)(uint32_t hash, uint8_t type, void* request);
+    bool (*flow_function)(uint32_t hash, uint8_t code, void* response);
     void (*pub)(char *, char *);
     // Atributos variaveis
     TATUInterpreter *requisition;
@@ -271,7 +272,7 @@ public:
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
             const int sample_d, byte *ip_m, const int port_m, const int os_v,
             TATUInterpreter *req); 
-    
+
     void interruption(const char *name, int var);
     void interruption(const char *name, char *var);
     void interruption(const char *name, bool var);

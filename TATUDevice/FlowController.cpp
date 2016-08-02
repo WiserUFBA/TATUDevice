@@ -1,11 +1,20 @@
 #include "FlowController.h"
+#define DOD_T 	TATU_CODE_DOD   
+#define STR_T 	TATU_CODE_INFO  
+#define INT_T	TATU_CODE_VALUE 
+#define BOOL_T	TATU_CODE_STATE 
 
 FlowController::FlowController(TATUDevice* aux_device){
 	device = aux_device;
 }
 
 void* FlowController::vector_iterator(FlowList unit) {
-	return ((unit->vector) + (unit->type * unit->iterator++));
+	if (unit->type == STR_T){
+
+	}
+	(unit->vector) + (unit->type * unit->iterator++);
+	return unit->iterator;
+	
 }
 
 void FlowController::loop() {
@@ -14,8 +23,6 @@ void FlowController::loop() {
 	if (!unit->used) break;
 	if ((millis() / unit->collect_freq) >= unit->lastTimeCollect) {
 	  unit->lastTimeCollect++;
-	  //requisition_int(&temp_vector[temp_size++],unit->att);
-	  //requisition_int(&((int*)fluxo->vector)[temp_size++],unit->att);
 	  requisition(vector_iterator(unit), unit->att);
 	}
 	if ((millis() / unit->publish_freq) >= unit->lastTimePub) {
@@ -33,40 +40,46 @@ void FlowController::requisition(void* response, uint32_t hash) {
 	code = TATU_GET;
 	device->get_function(hash, response, code);
 }
+#define nextStr(STR,COUNT) while(STR[COUNT]++)
 void* FlowController::vector_acess(FlowList unit, int i) {
+
+	if (unit->type == sizeof(char*)){
+		int j,k;
+		char* str = (char*)unit->vector;
+		for (j = 0; j < i; ++j){
+			nextStr(str,k);
+		}
+	}
+
 	return ((unit->vector) + (unit->type * i));
+	
 }
 
 //Push the value to the response buffer
 void FlowController::push_value(char* response, FlowList unit, int i) {
 	switch (unit->type) {
-		case sizeof(int):
-		  itoa((*(int*)vector_acess(unit, i)), response, 10);
-
-		  // do something
+		case STR_T:
+			strcpy((*(int*)vector_acess(unit, i)));
+		  	itoa((*(int*)vector_acess(unit, i)), response, 10);
+		  	// do something
 		  break;
-		/*case sizeof(char*):
-		  // do something
-		  break;*/
-		case sizeof(uint8_t):
-		  itoa((*(int*)vector_acess(unit, i)), response, 10);
-		  // do something
-		  break;
+		case INT_T:
+		  	itoa((*(int*)vector_acess(unit, i)), response, 10);
+		  	// do something
+		  	break;
+		case BOOL_T:
+		  	// do something
+		  	break;
 		default:
 		  return;
 		  // do something
 	}
-
 }
 
 //Who sends
 void FlowController::flow_publish(FlowList unit) {
 	uint8_t i, aux;
 	char* response = vector_response;
-
-	/*if (unit->flow == H_flow)
-	response = vector_response;
-	else response = vector_response2;*/
 
 	response[0] = '\0';
 
@@ -131,13 +144,13 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	ATMSerial.println(json);
 	ATMSerial.print("collect :"); ATMSerial.println((int)root["collect"]);
 	ATMSerial.print("publish :"); ATMSerial.println((int)root["publish"]);
-	ATMSerial.print("type :"); ATMSerial.println((int)root["type"]);
+	ATMSerial.print("turn :"); ATMSerial.println((int)root["turn"]);
 
 	void* vector;
 	FlowList unit = activity;
 
-	//if type is '0' stop the attribute flow
-	if (root["type"] == 1) {
+	//if turn is '0' stop the attribute flow
+	if (root["turn"] == 1) {
 		while (unit->att != hash) {
 		  	unit = unit->next;
 		  	// statement
@@ -153,22 +166,7 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	}
 
 	//set the type
-	uint8_t type;
-	switch (code) {
-		case TATU_CODE_INFO:
-			type = sizeof(char*);
-			// do something
-			break;
-		case TATU_CODE_VALUE:
-		  	type = sizeof(int);
-		  	// do something
-		  	break;
-		case TATU_CODE_STATE:
-		  	type = sizeof(bool);
-		  	break;
-		default:
-		  	break;
-	}
+	uint8_t type = code;
 
 	//construct the flow unit
 

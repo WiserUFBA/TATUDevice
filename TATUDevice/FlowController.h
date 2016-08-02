@@ -14,7 +14,9 @@ const char get_flow[]     PROGMEM = "GET INFO flow";
 class FlowUnit {
   public:
     unsigned long int collect_freq, publish_freq;
-    void* vector; uint8_t iterator, size;
+    void* vector; 
+    uint8_t iterator;
+    uint8_t size;
     void* publish_method;
     void* message;
     uint32_t att, flow;
@@ -26,7 +28,7 @@ class FlowUnit {
 typedef FlowUnit* FlowList;
 
 typedef struct flowBuffer {
-  byte vector[100];
+  uint8_t vector[100];
   void* end;
 } flowBuffer;
 
