@@ -380,10 +380,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             switch(requisition->cmd.OBJ.VAR){
                 case TATU_TYPE_ALIAS:
                     //request is the json
-                    request = &str_buffer;
-                    requisition->cmd.OBJ.ERROR = !set_function(requisition->str_hash,requisition->cmd.OBJ.CODE,request);
+                    request = &payload[strlen(payload)+1];
+                    requisition->cmd.OBJ.ERROR = !flow_function(requisition->str_hash,requisition->cmd.OBJ.CODE,request);
                     break;
             }
+            break;
         default:
             #ifdef DEBUG
             PRINT_DEBUG_PROGMEM(EXEC_ERROR);

@@ -110,7 +110,7 @@ bool TATUInterpreter::parse(char *string, unsigned int length){
             DEBUG_NL();
             #endif
             cmd.OBJ.TYPE = TATU_FLOW;
-            j = 9; // Default String position
+            j = 10; // Default String position
             if(!code_evaluation(string[5],&j)) return false;
 
             break;

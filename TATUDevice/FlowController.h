@@ -39,8 +39,8 @@ public:
     char* vector_response;
     flowBuffer flow_buffer;
 
-    FlowController(TATUDevice* aux_device);
-    void buffer_alloc(uint8_t size, FlowList unit);
+    FlowController(TATUDevice* , char* );
+    void buffer_alloc(FlowList unit);
     void flowbuilder(char* json, uint32_t hash, uint8_t code);
     void* vector_iterator(FlowList unit);
     void loop();
