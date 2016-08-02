@@ -22,15 +22,15 @@ void* FlowController::vector_iterator(FlowList unit) {
 void FlowController::loop() {
 	FlowList unit = activity;
 	while (unit) {
-	if (!unit->used) break;
-	if ((millis() / unit->collect_freq) >= unit->lastTimeCollect) {
-	  unit->lastTimeCollect++;
-	  requisition(vector_iterator(unit), unit->att);
-	}
-	if ((millis() / unit->publish_freq) >= unit->lastTimePub) {
-	  unit->lastTimePub++;
-	  flow_publish(unit);
-	  unit->iterator = 0;
+		if (!unit->used) break;
+		if ((millis() / unit->collect_freq) >= unit->lastTimeCollect) {
+		  unit->lastTimeCollect++;
+		  requisition(vector_iterator(unit), unit->att);
+		}
+		if ((millis() / unit->publish_freq) >= unit->lastTimePub) {
+		  unit->lastTimePub++;
+		  flow_publish(unit);
+		  unit->iterator = 0;
 	}
 	unit = unit->next;
 	}
@@ -38,9 +38,11 @@ void FlowController::loop() {
 }
 //Who collects the samples(void*)
 void FlowController::requisition(void* response, uint32_t hash) {
+	ATMSerial.begin(115200);
 	uint8_t code;
 	code = TATU_GET;
 	device->get_function(hash, response, code);
+	ATMSerial.println(*(int*)response);
 }
 #define nextStr(STR,COUNT) while(STR[COUNT]++)
 void* FlowController::vector_acess(FlowList unit, int i) {
@@ -73,6 +75,7 @@ void FlowController::push_value(char* response, FlowList unit, int i) {
 		  	// do something
 		  	break;
 		default:
+			itoa((*(int*)vector_acess(unit, i)), response, 10);
 		  return;
 		  // do something
 	}
@@ -139,7 +142,7 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, void* messa
 void FlowController::buffer_alloc(FlowList unit) {
 	//Allocate space on buffer according to the number of samples
 	unit->vector = flow_buffer.end;
-	flow_buffer.end = ((unit->vector) + (unit->type * unit->size));
+	flow_buffer.end = ((unit->vector) + (unit->type * unit->size - 1));
 	ATMSerial.println("Alocou!");
 
 }
@@ -179,7 +182,7 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	}
 
 	//set the type
-	uint8_t type = code;
+	uint8_t type = sizeof(int);
 
 	//construct the flow unit
 	ATMSerial.println("Construindo!");

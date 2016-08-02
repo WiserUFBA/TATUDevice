@@ -221,7 +221,7 @@ bool TATUInterpreter::code_evaluation(char code,unsigned int *j){
             DEBUG_NL();
             #endif
             cmd.OBJ.CODE = TATU_CODE_STATE;
-            *j++;
+            *j += 1;
             break; 
         case CODE_VALUE:
             #ifdef DEBUG
@@ -229,7 +229,7 @@ bool TATUInterpreter::code_evaluation(char code,unsigned int *j){
             DEBUG_NL();
             #endif
             cmd.OBJ.CODE = TATU_CODE_VALUE;
-            *j++;
+            *j += 1;
            break;
         default:
             #ifdef DEBUG
