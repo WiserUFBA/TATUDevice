@@ -189,7 +189,6 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	vector = flow_buffer.end;
 	flow_construct(hash, root["collect"], (void*)get_flow,
 	             root["publish"], TATU_GET, type, vector, H_flow, unit);
-	return;
 	//Allocate space on buffer according to the number of samples
 	buffer_alloc(unit);
 }
