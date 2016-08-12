@@ -10,13 +10,20 @@ FlowController::FlowController(TATUDevice* aux_device, char* aux_response){
 	flow_buffer.end = flow_buffer.vector;
 }
 
-void* FlowController::vector_iterator(FlowList unit) {
-	/*if (unit->type == STR_T){
+int FlowController::nextStr(char* str){
+	int i = 0;
+	while(str[i++])
+	return i;
+}
 
+void* FlowController::vector_iterator(FlowList unit) {
+	if (unit->type == STR_T){
+		//Jumps to the next iterator according to the size of the next string
+		unit->iterator += sizeof(char)*nextStr((char*)unit->iterator);
 	}
-	else ;
-	return unit->iterator;*/
-	return (unit->vector) + (unit->type * unit->iterator++);
+	//Jumps the iterator accordin to the type size
+	else unit->iterator += unit->t_size;
+	return unit->iterator;
 }
 
 void FlowController::loop() {
@@ -47,7 +54,7 @@ void FlowController::requisition(void* response, uint32_t hash) {
 #define nextStr(STR,COUNT) while(STR[COUNT]++)
 void* FlowController::vector_acess(FlowList unit, int i) {
 
-	if (unit->type == sizeof(char*)){
+	if (unit->type == STR_T){
 		int j,k;
 		char* str = (char*)unit->vector;
 		for (j = 0; j < i; ++j){
@@ -55,7 +62,7 @@ void* FlowController::vector_acess(FlowList unit, int i) {
 		}
 	}
 
-	return ((unit->vector) + (unit->type * i));
+	return ((unit->vector) + (unit->t_size * i));
 	
 }
 
@@ -129,10 +136,11 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, void* messa
 	unit->lastTimePub = millis() / publish_freq;
 	unit->att = hash;
 	unit->vector = vector;
-	unit->type = type;
+	unit->t_size = type;
 	unit->flow = flow;
 	unit->message = message;
 	unit->used = true;
+	unit->t_size = sizeof(int);
 
 	uint8_t size = unit->publish_freq / unit->collect_freq;
 	unit->size = size;
@@ -142,7 +150,7 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, void* messa
 void FlowController::buffer_alloc(FlowList unit) {
 	//Allocate space on buffer according to the number of samples
 	unit->vector = flow_buffer.end;
-	flow_buffer.end = ((unit->vector) + (unit->type * unit->size - 1));
+	flow_buffer.end = ((unit->vector) + (unit->t_size * unit->size - 1));
 	ATMSerial.println("Alocou!");
 
 }
@@ -151,7 +159,7 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 
 	ATMSerial.begin(115200);
 
-	ATMSerial.println("Birll");
+	ATMSerial.println("Builder");
 	const int BUFFER_SIZE = JSON_OBJECT_SIZE(3);//needed to determine jsonbuffer size(abstarct it)
 	StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
 	JsonObject& root = jsonBuffer.parseObject(json);
@@ -182,13 +190,17 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	}
 
 	//set the type
-	uint8_t type = sizeof(int);
+	uint8_t type = code;
 
 	//construct the flow unit
 	ATMSerial.println("Construindo!");
 	vector = flow_buffer.end;
 	flow_construct(hash, root["collect"], (void*)get_flow,
 	             root["publish"], TATU_GET, type, vector, H_flow, unit);
+
+
 	//Allocate space on buffer according to the number of samples
+	//int *p = new (buffer_alloc) int[unit->size];
+	//unit->vector = p;
 	buffer_alloc(unit);
 }

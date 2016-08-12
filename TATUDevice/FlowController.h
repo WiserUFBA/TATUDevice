@@ -15,8 +15,9 @@ class FlowUnit {
   public:
     unsigned long int collect_freq, publish_freq;
     void* vector; 
-    uint8_t iterator;
+    void* iterator;
     uint8_t size;
+    uint8_t t_size;
     void* publish_method;
     void* message;
     uint32_t att, flow;
@@ -38,6 +39,7 @@ public:
     TATUDevice* device;
     char* vector_response;
     flowBuffer flow_buffer;
+    //uint8_t flow_buffer[100];
 
     FlowController(TATUDevice* , char* );
     void buffer_alloc(FlowList unit);
@@ -49,6 +51,7 @@ public:
     void push_value(char* response, FlowList unit, int i);
     void flow_publish(FlowList unit);
     void flow_construct(uint32_t hash, int collect_freq, void* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit);
+    int nextStr(char* str);
 
 private:
     //FlowList unit;
