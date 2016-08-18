@@ -8,6 +8,21 @@
 #include <ArduinoJson.h>
 //#define flowList *FlowUnit
 
+#define DOD_T   0   
+#define STR_T   1  
+#define INT_T   2 
+#define BOOL_T  3 
+
+#ifdef AVR_GCC
+#define DOD_T   TATU_CODE_DOD   
+#define STR_T   TATU_CODE_INFO  
+#define INT_T   TATU_CODE_VALUE 
+#define BOOL_T  TATU_CODE_STATE 
+
+#define PRINTLN(str) ATMSerial.println(STR)
+#define PRINT(str) ATMSerial.print(STR)
+#endif
+
 #define H_flow              0x7C96D85D
 const char get_flow[]     PROGMEM = "GET INFO flow";
 
