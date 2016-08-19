@@ -26,6 +26,8 @@ void* FlowController::iterator_reset(FlowList unit){
 	unit->iterator = unit->vector;
 }
 
+std::vector<char> v;
+
 void FlowController::loop() {
 	FlowList unit = activity;
 	while (unit) {
@@ -52,7 +54,7 @@ void FlowController::requisition(void* response, uint32_t hash) {
 	device->get_function(hash, response, code);
 	PRINTLN(*(int*)response);
 }
-#define nextStr(STR,COUNT) while(STR[COUNT]++)
+//#define nextStr(STR,COUNT) while(STR[COUNT]++)
 void* FlowController::vector_acess(FlowList unit, int i) {
 
 	if (unit->type == STR_T){
@@ -67,52 +69,87 @@ void* FlowController::vector_acess(FlowList unit, int i) {
 	
 }
 
+void FlowController::push_method_char(char* vector,char* x){
+	char pos;
+	pos = vector[0];
+	strcpy(&vector[pos],x);
+	vector[0] += strlen(x)+1;
+}
+char* FlowController::acess_method_char(char* vector,int length){
+	int i = 0;
+	while(vector[i++])
+	return &vector[i];
+}
 //Push the value to the response buffer
-
-// Position acces
-/*void FlowController::push_value(char* response, FlowList unit, int i) {
+void FlowController::push_value(char* response, FlowList unit, int iterator) {
 	switch (unit->type) {
 		case STR_T:
-			//strcpy((*(int*)vector_acess(unit, i)));
-		  	itoa((*(int*)vector_acess(unit, i)), response, 10);
-		  	// do something
-		  break;
+			strcpy( response);
+		  	break;
 		case INT_T:
-		  	itoa((*(int*)vector_acess(unit, i)), response, 10);
+		  	itoa((*(int*)vector_acess(unit, iterator)), response, 10);
 		  	// do something
 		  	break;
 		case BOOL_T:
 		  	// do something
 		  	break;
 		default:
-			itoa((*(int*)vector_acess(unit, i)), response, 10);
+			itoa((*(int*)vector_acess(unit, iterator)), response, 10);
 		  return;
 		  // do something
 	}
-}*/
+}
+// Position acces
+void FlowController::push_value(char* response, uint8_t type, void* iterator) {
+	switch (unit->type) {
+		case STR_T:
+			//strcpy((*(int*)vector_acess(unit, i)));
+		  	strcpy(iterator,response);
+		  	// do something
+		  break;
+		case INT_T:
+		  	itoa(*(int*)(iterator), response, 10);
+		  	// do something
+		  	break;
+		case BOOL_T:
+		  	// do something
+		  	break;
+		default:
+		  	itoa(*(int*)(iterator), response, 10);
+		  return;
+		  // do something
+	}
+}
+
+//May be build in future
+//void FlowController::push_response(char* response,){}
 
 //Who sends
 void FlowController::flow_publish(FlowList unit) {
 	uint8_t i, aux;
 	char* response = vector_response;
+	void* iterator;
 
 	response[0] = '\0';
 
+	//Describes the flow unit
 	PRINT("Unit: ");
 	PRINT("collect :"); PRINTLN(unit->collect_freq);
 	PRINT("publish :"); PRINTLN(unit->publish_freq);
-
 	PRINT("Size : ");
 	PRINTLN(unit->size);
-	for (i = 0; i < unit->size; i++) {
+
+
+	for (unit->iterator = unit->vector; unit->iterator != unit->vector_end; vector_iterator(unit)) {
+		//adiciona uma virgula a response
 		aux = strlen(response);
 		response[aux] = ',';
 		response[++aux] = '\0';
+		//PRINT("Pushing : ");
+		//PRINTLN((*(int*)vector_acess(unit, unit->iterator)));
 
-		PRINT("Pushing : ");
-		PRINTLN((*(int*)vector_acess(unit, i)));
 		//Dinamic array builder!
-		push_value(&response[aux], unit, i);
+		push_value(&response[aux], unit->type, unit->iterator);
 	}
 
 	//encapsula nos colchetes

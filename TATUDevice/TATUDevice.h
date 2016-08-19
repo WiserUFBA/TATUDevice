@@ -196,19 +196,6 @@ void ipToString(byte *ip, char *str);
 // Extern Variables
 extern const char DOD[] PROGMEM;
 
-typedef union {
-    struct {
-        uint8_t FLOW1 : 2;
-        uint8_t FLOW2 : 2;
-        uint8_t FLOW3 : 2;
-        uint8_t FLOW4 : 2;
-        uint8_t FLOW5 : 2;
-        uint8_t FLOW6 : 2;
-        uint8_t FLOW7 : 2;
-        uint8_t FLOW8 : 2;
-    } ATT;
-    uint16_t STRUCTURE;
-} Bitflow;
 
 class TATUDevice{
 public:

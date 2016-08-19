@@ -13,14 +13,19 @@
 #define INT_T   2 
 #define BOOL_T  3 
 
+#ifdef STANDARD
+#define PRINTLN(STR) cout << STR << endl
+#define PRINT(STR) cout << STR
+#endif
+
 #ifdef AVR_GCC
 #define DOD_T   TATU_CODE_DOD   
 #define STR_T   TATU_CODE_INFO  
 #define INT_T   TATU_CODE_VALUE 
 #define BOOL_T  TATU_CODE_STATE 
 
-#define PRINTLN(str) ATMSerial.println(STR)
-#define PRINT(str) ATMSerial.print(STR)
+#define PRINTLN(STR) ATMSerial.println(STR)
+#define PRINT(STR) ATMSerial.print(STR)
 #endif
 
 #define H_flow              0x7C96D85D
