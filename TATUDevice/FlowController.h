@@ -24,6 +24,8 @@
 #define INT_T   TATU_CODE_VALUE 
 #define BOOL_T  TATU_CODE_STATE 
 
+#define FLOW_DEBUG 1
+
 #define PRINTLN(STR) ATMSerial.println(STR)
 #define PRINT(STR) ATMSerial.print(STR)
 #endif
@@ -35,6 +37,7 @@ class FlowUnit {
   public:
     unsigned long int collect_freq, publish_freq;
     void* vector; 
+    void* vector_end; 
     void* iterator;
     uint8_t size;
     uint8_t t_size;
@@ -68,9 +71,12 @@ public:
     void loop();
     void requisition(void* response, uint32_t hash);
     void* vector_acess(FlowList unit, int i);
-    void push_value(char* response, FlowList unit, int i);
+    void push_value(char* response, uint8_t type, void* iterator);
     void flow_publish(FlowList unit);
     void flow_construct(uint32_t hash, int collect_freq, void* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit);
+    void* iterator_reset(FlowList unit);
+    void push_method_char(char* vector,char* x);
+    char* acess_method_char(char* vector,int length);
     int nextStr(char* str);
 
 private:

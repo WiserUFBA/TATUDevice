@@ -26,8 +26,6 @@ void* FlowController::iterator_reset(FlowList unit){
 	unit->iterator = unit->vector;
 }
 
-std::vector<char> v;
-
 void FlowController::loop() {
 	FlowList unit = activity;
 	while (unit) {
@@ -61,7 +59,7 @@ void* FlowController::vector_acess(FlowList unit, int i) {
 		int j,k;
 		char* str = (char*)unit->vector;
 		for (j = 0; j < i; ++j){
-			nextStr(str,k);
+			//nextStr(str,k);
 		}
 	}
 
@@ -81,7 +79,8 @@ char* FlowController::acess_method_char(char* vector,int length){
 	return &vector[i];
 }
 //Push the value to the response buffer
-void FlowController::push_value(char* response, FlowList unit, int iterator) {
+// Position acces
+/*void FlowController::push_value(char* response, FlowList unit, int iterator) {
 	switch (unit->type) {
 		case STR_T:
 			strcpy( response);
@@ -98,13 +97,12 @@ void FlowController::push_value(char* response, FlowList unit, int iterator) {
 		  return;
 		  // do something
 	}
-}
-// Position acces
+}*/
 void FlowController::push_value(char* response, uint8_t type, void* iterator) {
-	switch (unit->type) {
+	switch (type) {
 		case STR_T:
 			//strcpy((*(int*)vector_acess(unit, i)));
-		  	strcpy(iterator,response);
+		  	strcpy((char*)iterator,response);
 		  	// do something
 		  break;
 		case INT_T:
@@ -133,12 +131,13 @@ void FlowController::flow_publish(FlowList unit) {
 	response[0] = '\0';
 
 	//Describes the flow unit
-	PRINT("Unit: ");
-	PRINT("collect :"); PRINTLN(unit->collect_freq);
-	PRINT("publish :"); PRINTLN(unit->publish_freq);
-	PRINT("Size : ");
-	PRINTLN(unit->size);
-
+	#ifdef FLOW_DEBUG
+		PRINT("Unit: ");
+		PRINT("collect :"); PRINTLN(unit->collect_freq);
+		PRINT("publish :"); PRINTLN(unit->publish_freq);
+		PRINT("Size : ");
+		PRINTLN(unit->size);
+	#endif
 
 	for (unit->iterator = unit->vector; unit->iterator != unit->vector_end; vector_iterator(unit)) {
 		//adiciona uma virgula a response
@@ -169,7 +168,9 @@ void FlowController::flow_publish(FlowList unit) {
 void FlowController::flow_construct(uint32_t hash, int collect_freq, void* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit) {
 	//This function constructs the flow unit
 	ATMSerial.begin(115200);
-	PRINTLN("Entrou!");
+	#ifdef FLOW_DEBUG
+		PRINTLN("Entrou!");
+	#endif
 	unit->iterator = 0;
 	unit->collect_freq = collect_freq;
 	unit->publish_freq = publish_freq;
@@ -186,13 +187,18 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, void* messa
 	uint8_t size = unit->publish_freq / unit->collect_freq;
 	unit->size = size;
 	//unit->used = true;
-	PRINTLN("Construiu!");
+	#ifdef FLOW_DEBUG
+		PRINTLN("Construiu!");
+	#endif
 }
 void FlowController::buffer_alloc(FlowList unit) {
 	//Allocate space on buffer according to the number of samples
 	unit->vector = flow_buffer.end;
 	flow_buffer.end = ((unit->vector) + (unit->t_size * unit->size - 1));
-	PRINTLN("Alocou!");
+
+	#ifdef FLOW_DEBUG
+		PRINTLN("Alocou!");
+	#endif
 
 }
 
@@ -200,17 +206,17 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 
 	ATMSerial.begin(115200);
 
-	PRINTLN("Builder");
 	const int BUFFER_SIZE = JSON_OBJECT_SIZE(3);//needed to determine jsonbuffer size(abstarct it)
 	StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
 	JsonObject& root = jsonBuffer.parseObject(json);
 
-	PRINT("JSON: ");
-	PRINTLN(json);
-	PRINT("collect :"); PRINTLN((int)root["collect"]);
-	PRINT("publish :"); PRINTLN((int)root["publish"]);
-	PRINT("turn :"); PRINTLN((int)root["turn"]);
-
+	#ifdef FLOW_DEBUG
+		PRINT("JSON: ");
+		PRINTLN(json);
+		PRINT("collect :"); PRINTLN((int)root["collect"]);
+		PRINT("publish :"); PRINTLN((int)root["publish"]);
+		PRINT("turn :"); PRINTLN((int)root["turn"]);
+	#endif
 	void* vector;
 	FlowList unit = activity;
 
