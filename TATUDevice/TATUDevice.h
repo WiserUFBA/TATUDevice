@@ -230,7 +230,7 @@ public:
 
     /* Callback's do Sistema */
     // Callback MQTT
-    void mqtt_callback(char *, byte *, unsigned int);
+    void callback(char *, byte *, unsigned int);
     
     // NOVA ARQUITETURA DE CALLBACK
     // ONLY GET AND SET ARE NEEDED

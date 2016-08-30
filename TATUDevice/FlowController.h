@@ -24,7 +24,7 @@
 #define INT_T   TATU_CODE_VALUE 
 #define BOOL_T  TATU_CODE_STATE 
 
-#define FLOW_DEBUG 1
+//#define FLOW_DEBUG 1
 
 #define PRINTLN(STR) ATMSerial.println(STR)
 #define PRINT(STR) ATMSerial.print(STR)
@@ -56,15 +56,15 @@ typedef struct flowBuffer {
   void* end;
 } flowBuffer;
 
-class FlowController{
+template <class Device>class FlowController{
 public:
     FlowList activity;
-    TATUDevice* device;
+    Device* device;
     char* vector_response;
     flowBuffer flow_buffer;
     //uint8_t flow_buffer[100];
 
-    FlowController(TATUDevice* , char* );
+    FlowController(Device* , char* );
     void buffer_alloc(FlowList unit);
     void flowbuilder(char* json, uint32_t hash, uint8_t code);
     void* vector_iterator(FlowList unit);

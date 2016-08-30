@@ -499,7 +499,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 }
 
 /* Function to abstract some low-level publishing action */
-void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length){
+void TATUDevice::callback(char *topic, byte *payload, unsigned int length){
     /* Gera o body e publica o mesmo */
     generateBody((char *) payload, (uint8_t) length);
 

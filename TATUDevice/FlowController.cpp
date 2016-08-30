@@ -1,6 +1,6 @@
 #include "FlowController.h"
 
-FlowController::FlowController(TATUDevice* aux_device, char* aux_response){
+FlowController::FlowController(Device* aux_device, char* aux_response){
 	device = aux_device;
 	vector_response = aux_response;
 	flow_buffer.end = flow_buffer.vector;
@@ -151,7 +151,7 @@ void FlowController::flow_publish(FlowList unit) {
 		push_value(&response[aux], unit->type, unit->iterator);
 	}
 
-	//encapsula nos colchetes
+	//encapsula a resposta nos colchetes
 	response[0] = '[';
 	aux = strlen(response);
 	response[aux] = ']';
@@ -161,7 +161,7 @@ void FlowController::flow_publish(FlowList unit) {
 
 	strcpy_P((char*)req, (const char*)unit->message);
 
-	device->mqtt_callback("", req, strlen((char*)req) );
+	device->callback("", req, strlen((char*)req) );
 	PRINTLN(response);
 }
 
