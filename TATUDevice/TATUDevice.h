@@ -194,7 +194,7 @@ int freeRAM();
 void ipToString(byte *ip, char *str);
 
 // Extern Variables
-extern const char DOD[] PROGMEM;
+//extern const char DOD[] PROGMEM;
 
 
 class TATUDevice{
@@ -230,34 +230,34 @@ public:
 
     /* Callback's do Sistema */
     // Callback MQTT
-    void callback(char *, byte *, unsigned int);
+    void mqtt_callback(char *, byte *, unsigned int);
     
     // NOVA ARQUITETURA DE CALLBACK
     // ONLY GET AND SET ARE NEEDED
     // > ONLY GET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                const int sample_d, const int port_m, const int os_v,
                 TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type),
                 void (*PUBLISH)(char *, char *));
     // > ONLY SET
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                const int sample_d, const int port_m, const int os_v,
                 TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, uint8_t type, void* request),
                 void (*PUBLISH)(char *, char *));
     // > BOTH
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                const int sample_d, const int port_m, const int os_v,
                 TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type), 
                 bool (*SET_FUNCTION)(uint32_t hash, uint8_t type, void* request),
                 void (*PUBLISH)(char *, char *));
     // > NONE
     TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, byte *ip_m, const int port_m, const int os_v,
+                const int sample_d, const int port_m, const int os_v,
                 TATUInterpreter *req,
                 void (*PUBLISH)(char *, char *));
     
     void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-            const int sample_d, byte *ip_m, const int port_m, const int os_v,
+            const int sample_d, const int port_m, const int os_v,
             TATUInterpreter *req); 
 
     void interruption(const char *name, int var);
@@ -271,7 +271,7 @@ public:
     void loop();
 };
 
-#include "FlowController.h"
+//#include "FlowController.h"
 
 #ifdef AVR_GCC
 class TATUWatchDog{

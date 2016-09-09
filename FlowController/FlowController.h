@@ -13,18 +13,6 @@
 #define INT_T   2 
 #define BOOL_T  3 
 
-#define DEBUG
-#define FLOW_DEBUG
-
-//espITEAD
-#define ESP_F
-#ifdef ESP_F
-    #include <SoftwareSerial.h>
-    #define DEBUG_PORT ESPSerial
-    // Debug Software Serial
-    SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
-#endif
-
 #define PRINTLN(STR) DEBUG_PORT.println(STR)
 #define PRINT(STR) DEBUG_PORT.print(STR)
 
@@ -48,13 +36,12 @@
 #define H_flow              0x7C96D85D
 const char get_flow[]     PROGMEM = "GET INFO flow";
 
-
 class FlowUnit {
   public:
     unsigned long int collect_freq, publish_freq;
     void* vector; 
     void* vector_end; 
-    int iterator;
+    void* iterator;
     uint8_t size;
     uint8_t t_size;
     void* publish_method;

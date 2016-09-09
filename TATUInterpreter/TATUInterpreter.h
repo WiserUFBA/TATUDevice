@@ -1,7 +1,7 @@
 #ifndef TATUInterpreter_h
 #define TATUInterpreter_h
 
-#define AVR_GCC
+//#define AVR_GCC
 
 #include <stdint.h>
 
@@ -13,20 +13,20 @@
 #include <avr/pgmspace.h>
 #endif
 // Uncomment the follow line to show debug
-#define DEBUG
+//#define DEBUG
 // Change debug port to Software Serial Object if you want to
 //#define DEBUG_PORT                  Serial
 #ifdef AVR_GCC
 #define DEBUG_PORT                ATMSerial
 #endif
 // Allow Software Serial 
-#define ENABLE_SOFTWARE_SERIAL
+//#define ENABLE_SOFTWARE_SERIAL
 
 // If enabled Software Serial
 #ifdef ENABLE_SOFTWARE_SERIAL
 #include <SoftwareSerial.h>
 // Software Serial should be static since this file can be called multiple times
-SoftwareSerial static DEBUG_PORT(7,6);
+//SoftwareSerial static DEBUG_PORT(7,6);
 #endif
 
 // Debug Definitions
@@ -117,7 +117,7 @@ public:
         #endif
     }
     bool parse(char *, unsigned int);
-    bool code_evaluation(char,unsigned int*);
+    bool code_evaluation(char, unsigned int*);
 };
 
 #endif
