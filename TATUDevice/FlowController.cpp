@@ -55,7 +55,7 @@ void* FlowController::vector_iterator(FlowList unit) {
 	//Jumps the iterator according to the type size
 	//else unit->iterator += unit->t_size;
 	//return unit->iterator - unit->t_size;
-	return ((unit->vector) + (unit->type * unit->iterator++));
+	return ((unit->vector) + (unit->t_size * unit->iterator++));
 }
 
 // Reset a iterator
@@ -68,10 +68,11 @@ void* FlowController::iterator_reset(FlowList unit){
 void print_array(int* arr, int length){
 	int i;
 	PRINT("Array: [");
-	for (i = 0; i < length; ++i){
+	for (i = 0; i < length - 1; ++i){
 		PRINT(arr[i]);
 		PRINT(",");
 	}
+	PRINT(arr[i]);
 	PRINTLN("]");
 
 }
@@ -87,7 +88,10 @@ void FlowController::flow_pub(FlowList unit){
 		{
 		}*/
 	#endif
+	// Polymorphism to handle types
+	//if(unit->type)
 	buildResponse((int*)unit->vector,unit->size);
+
 	pubResponse(unit);
 }
 
@@ -189,13 +193,13 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	}
 
 	//set the type
-	uint8_t type = sizeof(int);
+	//uint8_t type = sizeof(int);
 
 	//construct the flow unit
 	//PRINTLN("Construindo!");
 	//vector = flow_buffer.end;
 	flow_construct(hash, root["collect"], (void*)get_flow,
-	             root["publish"], TATU_GET, type, vector, H_flow, unit);
+	             root["publish"], TATU_GET, code, vector, H_flow, unit);
 
 
 	//Allocate space on buffer according to the number of samples
@@ -217,12 +221,18 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, void* messa
 	unit->att = hash;
 	//dynamic array still not implemented
 	//unit->vector = vector;
-	unit->t_size = type;
 	unit->type = type;
+	
+	if (type == TATU_CODE_VALUE){
+		unit->t_size = sizeof(int);
+	}
+	if (type == TATU_CODE_INFO){
+		unit->t_size = sizeof(char*);
+	}
+	
 	unit->flow = flow;
 	unit->message = message;
 	unit->used = true;
-	unit->t_size = sizeof(int);
 
 	uint8_t size = unit->publish_freq / unit->collect_freq;
 	unit->size = size;

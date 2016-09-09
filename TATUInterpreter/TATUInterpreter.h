@@ -22,6 +22,15 @@
 // Allow Software Serial 
 //#define ENABLE_SOFTWARE_SERIAL
 
+//espITEAD
+//#define ESP_F
+#ifdef ESP_F
+    #include <SoftwareSerial.h>
+    #define DEBUG_PORT ESPSerial
+    // Debug Software Serial
+    SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
+#endif
+
 // If enabled Software Serial
 #ifdef ENABLE_SOFTWARE_SERIAL
 #include <SoftwareSerial.h>
