@@ -28,7 +28,7 @@ void FlowController::loop() {
 				//PRINTLN(counting);
 			#endif
 		  	unit->lastTimeCollect++;
-		  	requisition(vector_iterator(unit), unit->att);
+		  	requisition(vector_iterator(unit), unit->att,unit->type);
 		  	#ifdef FLOW_DEBUG
 				PRINTLN("Requisition done!");
 				//PRINTLN(counting);
@@ -76,12 +76,24 @@ void print_array(int* arr, int length){
 	PRINTLN("]");
 
 }
+void print_array(char arr[][10], int length){
+	int i;
+	PRINT("Array: [");
+	for (i = 0; i < length - 1; ++i){
+		PRINT(arr[i]);
+		PRINT(",");
+	}
+	PRINT(arr[i]);
+	PRINTLN("]");
+
+}
 #endif
 
 void FlowController::flow_pub(FlowList unit){
 	#ifdef FLOW_DEBUG
 		PRINTLN("Publishing...");
-		print_array((int*)unit->vector,unit->size);
+		//print_array((int*)unit->vector,unit->size);
+
 		/*int* arr; 
 		(int*)unit->vector;
 		for (int i = 0; i < count; ++i)
@@ -89,27 +101,31 @@ void FlowController::flow_pub(FlowList unit){
 		}*/
 	#endif
 	// Polymorphism to handle types
-	//if(unit->type)
-	buildResponse((int*)unit->vector,unit->size);
+	if(unit->type == INT_T)
+		buildResponse((int*)unit->vector,unit->size);
+	if(unit->type  == STR_T)
+		buildResponse((char(*)[10])unit->vector,unit->size);
 
 	pubResponse(unit);
 }
 
 //Who collects the samples(void*)
-void FlowController::requisition(void* response, uint32_t hash) {
-	uint8_t code;
-	code = INT_T;
+void FlowController::requisition(void* response, uint32_t hash,uint8_t code) {
 	device->get_function(hash, response, code);
 	#ifdef FLOW_DEBUG
 		//DEBUG_PORT.begin(115200);
-		PRINTLN(*(int*)response);
+		//PRINTLN(*(int*)response);
 	#endif
 }
 
 
-//responseBuilder
+//responseBuilder INTEGER
 void FlowController::buildResponse(int* arr,int length) {
 	
+	#ifdef FLOW_DEBUG
+		print_array(arr,length);
+		PRINTLN("INTEGER!!");
+	#endif
 	uint8_t aux;//char response Iterator
 	uint8_t i;//int* arr Iterator
 
@@ -128,6 +144,58 @@ void FlowController::buildResponse(int* arr,int length) {
 
 		// Insert integer value
 		itoa(arr[i], &response[aux], 10);
+	}
+
+	//<closeData> Encapsula a resposta nos colchetes
+	response[0] = '[';
+	aux = strlen(response);
+	response[aux] = ']';
+	response[++aux] = '\0';
+	#ifdef FLOW_DEBUG
+		PRINTLN("RESPONSE:");
+		PRINTLN(response);
+	#endif
+	//</closeData>
+	//</dataManipulation>
+}
+//responseBuilder String
+void FlowController::buildResponse(char arr[][10],int length) {
+	
+	uint8_t aux;//char response Iterator
+	uint8_t i;//int* arr Iterator
+
+	#ifdef FLOW_DEBUG
+		PRINTLN("STRING!!");
+		print_array(arr,length);
+	#endif
+
+	// Writes the response on the flowController buffer 
+	char* response = vector_response;
+	response[0] = '\0';
+
+	//<dataManipulation>
+	// Array values construction
+	for (i = 0; i < length; i++){
+		//<block> insert comma
+		aux = strlen(response);
+		response[aux] = ',';
+		//OPEN QUOTES
+		response[++aux] = '\"';
+		response[++aux] = '\0';
+		//</block>
+		#ifdef FLOW_DEBUG
+			//print_array(arr,length);
+			PRINT("Copiando: ");
+			PRINTLN(arr[i]);
+		#endif
+		// Insert String value
+		strcpy(&response[aux],arr[i]);
+
+		//CLOSE QUOTES
+		aux = strlen(response);
+		response[aux] = '\"';
+		response[++aux] = '\0';
+
 	}
 
 	//<closeData> Encapsula a resposta nos colchetes
@@ -227,7 +295,7 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, void* messa
 		unit->t_size = sizeof(int);
 	}
 	if (type == TATU_CODE_INFO){
-		unit->t_size = sizeof(char*);
+		unit->t_size = 10;//sizeof(char(*)[10]);
 	}
 	
 	unit->flow = flow;

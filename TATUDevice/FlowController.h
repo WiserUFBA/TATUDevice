@@ -6,6 +6,7 @@
 #include "Arduino.h"
 #include <TATUDevice.h>
 #include <ArduinoJson.h>
+//#include <Str.h>
 //#define flowList *FlowUnit
 
 #define DOD_T   0   
@@ -85,7 +86,7 @@ public:
     void flowbuilder(char* json, uint32_t hash, uint8_t code);
     void* vector_iterator(FlowList unit);
     void loop();
-    void requisition(void* response, uint32_t hash);
+    void requisition(void* response, uint32_t hash,uint8_t code);
     void* vector_acess(FlowList unit, int i);
     void push_value(char* response, uint8_t type, void* iterator);
     void flow_publish(FlowList unit);
@@ -94,6 +95,7 @@ public:
 
     void flow_construct(uint32_t hash, int collect_freq, void* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit);
     void buildResponse(int* arr,int length);
+    void buildResponse(char arr[][10],int length);//char matrix
 
     void* iterator_reset(FlowList unit);
     void push_method_char(char* vector,char* x);
