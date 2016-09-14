@@ -18,12 +18,12 @@
 #define FLOW_DEBUG
 
 //espITEAD
-#define ESP_F
+//#define ESP_F
 #ifdef ESP_F
     #include <SoftwareSerial.h>
     #define DEBUG_PORT ESPSerial
     // Debug Software Serial
-    SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
+    //SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
 #endif
 
 #define PRINTLN(STR) DEBUG_PORT.println(STR)

@@ -5,8 +5,8 @@
 
 #include <stdint.h>
 
-#ifndef AVR_GCC
-#include <pgmspace.h>
+#ifdef AVR_GCC
+//#include <pgmspace.h>
 #endif
 
 #ifdef AVR_GCC
@@ -15,20 +15,36 @@
 // Uncomment the follow line to show debug
 //#define DEBUG
 // Change debug port to Software Serial Object if you want to
-//#define DEBUG_PORT                  Serial
+#define DEBUG_PORT                  ESPSerial
+
+
 #ifdef AVR_GCC
-#define DEBUG_PORT                ATMSerial
+    void SerialPrint_PROGMEM(PGM_P str);
+    //#define DEBUG_PORT                ATMSerial
+    #define PRINT(MSG)          ATMSerial.print(MSG)
+    #define PRINTLN(MSG)        ATMSerial.println(MSG)
+    #define PRINT_DEBUG(MSG)    SerialPrint_PROGMEM(MSG)
 #endif
 // Allow Software Serial 
 //#define ENABLE_SOFTWARE_SERIAL
 
 //espITEAD
-//#define ESP_F
+#define ESP_F
 #ifdef ESP_F
     #include <SoftwareSerial.h>
-    #define DEBUG_PORT ESPSerial
+    #define PRINT(MSG)          ESPSerial.print(MSG)
+    #define PRINTLN(MSG)        ESPSerial.println(MSG)
+    #define PRINT_DEBUG(MSG)    ESPSerial.print(MSG)
+    //#define DEBUG_PORT ESPSerial
     // Debug Software Serial
     SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
+#endif
+
+//#define SIMUL
+#ifdef SIMUL
+    #define PRINT(MSG)          cout << MSG
+    #define PRINTLN(MSG)        cout << MSG << endl
+    #define PRINT_DEBUG(MSG)    cout << MSG
 #endif
 
 // If enabled Software Serial
@@ -39,13 +55,15 @@
 #endif
 
 // Debug Definitions
-#define putstring(MSG)              SerialPrint_PROGMEM(MSG)
-#define PRINT_DEBUG_PROGMEM(MSG)    SerialPrint_PROGMEM(MSG)
-#define PRINT_DEBUG(MSG)            DEBUG_PORT.print(MSG)
+//#define putstring(MSG)              SerialPrint_PROGMEM(MSG)
+//#define PRINT_DEBUG_PROGMEM(MSG)    SerialPrint_PROGMEM(MSG)
+//#define PRINT_DEBUG(MSG)            DEBUG_PORT.print(MSG)
 #define PRINT_DEBUG_NL(MSG)         DEBUG_PORT.println(MSG)
-#define DEBUG_NL()                  DEBUG_PORT.println()
+//#define DEBUG_NL()                  DEBUG_PORT.println()
+#define DEBUG_NL()          PRINTLN()
 #define DEBUG_PORT_SPEED            115200
 
+#define PROGMEM
 // System definitions
 #ifdef AVR_GCC
 #define PROGMEM                     __ATTR_PROGMEM__
@@ -98,8 +116,6 @@
 /* Utilities */
 uint32_t hash_djb(char *string);
 uint8_t atoi_T(char *p);
-
-void SerialPrint_PROGMEM(PGM_P str);
 
 class TATUInterpreter{
 private:

@@ -11,17 +11,17 @@
 typedef uint8_t byte;
 
 #ifndef MAX_SIZE_RESPONSE
-#define MAX_SIZE_RESPONSE   60
+#define MAX_SIZE_RESPONSE   400
 #endif
 
 #ifndef MAX_SIZE_OUTPUT
-#define MAX_SIZE_OUTPUT     256
+#define MAX_SIZE_OUTPUT     1024
 #endif
 
 
 // By default DEBUG on SERIAL or SoftwareSerial is disabled
 // Change debug definitions on TATUInterpreter.h
-//#define DEBUG 1
+#define DEBUG 1
 
 // System definitions
 #ifdef AVR_GCC

@@ -35,7 +35,7 @@ void FlowController::loop() {
 			#endif
 		}
 		//"Shipping" timeout
-		if ((millis() / unit->publish_freq) >= unit->lastTimePub) {
+		if ((millis() / unit->publish_freq) > unit->lastTimePub) {
 		  unit->lastTimePub++;
 		  //flow_publish(unit);
 		  flow_pub(unit);
@@ -161,8 +161,8 @@ void FlowController::buildResponse(int* arr,int length) {
 //responseBuilder String
 void FlowController::buildResponse(char arr[][10],int length) {
 	
-	uint8_t aux;//char response Iterator
-	uint8_t i;//int* arr Iterator
+	int aux;//char response Iterator
+	int i;//int* arr Iterator
 
 	#ifdef FLOW_DEBUG
 		PRINTLN("STRING!!");
