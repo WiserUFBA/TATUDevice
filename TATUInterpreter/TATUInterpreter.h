@@ -13,10 +13,8 @@
 #include <avr/pgmspace.h>
 #endif
 // Uncomment the follow line to show debug
-//#define DEBUG
+#define DEBUG
 // Change debug port to Software Serial Object if you want to
-#define DEBUG_PORT                  ESPSerial
-
 
 #ifdef AVR_GCC
     void SerialPrint_PROGMEM(PGM_P str);
@@ -32,9 +30,11 @@
 #define ESP_F
 #ifdef ESP_F
     #include <SoftwareSerial.h>
+    #define DEBUG_PORT                  ESPSerial
     #define PRINT(MSG)          ESPSerial.print(MSG)
     #define PRINTLN(MSG)        ESPSerial.println(MSG)
     #define PRINT_DEBUG(MSG)    ESPSerial.print(MSG)
+
     //#define DEBUG_PORT ESPSerial
     // Debug Software Serial
     SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
@@ -48,6 +48,7 @@
 #endif
 
 // If enabled Software Serial
+#define ENABLE_SOFTWARE_SERIAL
 #ifdef ENABLE_SOFTWARE_SERIAL
 #include <SoftwareSerial.h>
 // Software Serial should be static since this file can be called multiple times
@@ -78,6 +79,7 @@
 
 // TATU Protocol available properties
 #define TATU_CODE_DOD   0
+#define TATU_CODE_FLOW  0
 #define TATU_CODE_INFO  1
 #define TATU_CODE_VALUE 2
 #define TATU_CODE_STATE 3
@@ -94,6 +96,7 @@
 #define CODE_INFO  'I'
 #define CODE_VALUE 'V'
 #define CODE_STATE 'S'
+#define CODE_FLOW  'F'
 
 // Char that represents the TATU Protocol properties
 #define COMMAND_POST 'P'

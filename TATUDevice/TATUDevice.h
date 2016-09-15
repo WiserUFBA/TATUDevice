@@ -11,7 +11,7 @@
 typedef uint8_t byte;
 
 #ifndef MAX_SIZE_RESPONSE
-#define MAX_SIZE_RESPONSE   400
+#define MAX_SIZE_RESPONSE   768
 #endif
 
 #ifndef MAX_SIZE_OUTPUT

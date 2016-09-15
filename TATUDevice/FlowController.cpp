@@ -216,7 +216,11 @@ void FlowController::pubResponse(FlowList unit){
 		req = "SET INFO flow"
 		the objective is to call the device->callback function internally
 	*/
-	byte req[20];
+	byte req[30];
+	#ifdef DEBUG_PORT
+		DEBUG_PORT.print("Publish requisition: ");
+		DEBUG_PORT.println((const char*)unit->message);
+	#endif
 	strcpy_P((char*)req, (const char*)unit->message);
 	device->mqtt_callback("", req, strlen((char*)req) );	
 
@@ -226,6 +230,17 @@ void FlowController::pubResponse(FlowList unit){
 //May be build in future
 //void FlowController::push_response(char* response,){}
 
+// verify if there is a instantiated flow of this sensor
+bool FlowController::isInstantiated(FlowList unit,uint32_t hash){
+	while (unit->att != hash && unit->next) {
+		unit = unit->next;
+	}
+	if (unit->att == hash)
+		return true;
+	return false;
+}
+
+//
 void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 
 
@@ -243,6 +258,7 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	#endif
 	void* vector;
 	FlowList unit = activity;
+	//
 
 	//if turn is '1' stop the attribute flow
 	if (root["turn"] == 1) {
@@ -259,6 +275,10 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	while (unit->used) {
 		unit = unit->next;
 	}
+	/*if(!isInstantiated(unit,hash)){
+		flow_construct(hash, root["collect"], (void*)get_flow,
+	             root["publish"], TATU_GET, code, vector, H_flow, unit);
+	}*/
 
 	//set the type
 	//uint8_t type = sizeof(int);
@@ -266,7 +286,7 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	//construct the flow unit
 	//PRINTLN("Construindo!");
 	//vector = flow_buffer.end;
-	flow_construct(hash, root["collect"], (void*)get_flow,
+	flow_construct(hash, root["collect"], get_flow,
 	             root["publish"], TATU_GET, code, vector, H_flow, unit);
 
 
@@ -275,7 +295,7 @@ void FlowController::flowbuilder(char* json, uint32_t hash, uint8_t code) {
 	//unit->vector = p;
 	//buffer_alloc(unit);
 }
-void FlowController::flow_construct(uint32_t hash, int collect_freq, void* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit) {
+void FlowController::flow_construct(uint32_t hash, int collect_freq, const char* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit) {
 	//This function constructs the flow unit
 	#ifdef FLOW_DEBUG
 	DEBUG_PORT.begin(115200);
@@ -299,7 +319,24 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, void* messa
 	}
 	
 	unit->flow = flow;
-	unit->message = message;
+
+	//unit->message = message;
+	//<workAround>
+	int i;
+	for (i = 0; i < 2 && (sensors[i].hash != hash); i++);
+	//unit->message = message + sensors[i].sensorName;
+	/*
+		the message
+		GET FLOW + temperatureSensor
+	*/
+	#ifdef DEBUG
+		PRINT("Nome do sensor: ");
+		PRINTLN(sensors[i].sensorName);
+	#endif	
+	strcpy(unit->message,message);
+	strcpy(&(unit->message)[strlen(unit->message)],sensors[i].sensorName);
+	//</workAround>
+
 	unit->used = true;
 
 	uint8_t size = unit->publish_freq / unit->collect_freq;

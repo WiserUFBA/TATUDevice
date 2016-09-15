@@ -228,7 +228,10 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
         PRINT_DEBUG(GENERATE_BODY);
         DEBUG_NL();
     #endif
-    
+    #ifdef ENABLE_SOFTWARE_SERIAL
+        DEBUG_PORT.begin(DEBUG_PORT_SPEED);
+    #endif
+
     if(dod_used){
         dod_used = false;
         generateHeader();
@@ -285,6 +288,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                 case TATU_TYPE_ALIAS:
                     //Baseado no código da resposta, decide qual função do usuário deve ser usada
                     switch(requisition->cmd.OBJ.CODE) {
+                        case TATU_CODE_FLOW:
                         case TATU_CODE_INFO:
                             response = &str_buffer;
                             break;
@@ -453,6 +457,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
 
     /* Verifica o tipo de resposta esperada, e responde adequadamente*/
     switch(requisition->cmd.OBJ.CODE) {
+        case TATU_CODE_FLOW:
         case TATU_CODE_INFO:
             if (str_buffer[0] == '[' ){
                 strcpy(OUT_STR, str_buffer);
