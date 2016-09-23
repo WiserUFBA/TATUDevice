@@ -20,6 +20,47 @@ interface para gereneciamento das configurações do dispositivo , como atributo
 
 Através de um [Driver](https://github.com/WiserUFBA/DriverMQTT/blob/master/README.md) desenvolvido pelo projeto, que trata as mensagens enviadas pelos dispositivos e intermedia a comunicação destes com possíveis serviços que se utilizem de suas funcionalidades.
 
+## The protocol
+
+### The requisitions
+	<type> 	: The type of the expected response(ex: int,str,bool...)
+	<var> 	: The name of the sensor/actuactor/etc that is requested(ex: temperature, lamp, AirConditioner)
+	<value>	: The value of the request(ex: on, off, 26, {"collect":800,"publish":"4000"}-read flow section-)
+#### FLOW
+FLOW <type> <var> <value>
+	<example>
+	FLOW INT temperatureSensor {"collect":500,"publish":2500}(-read flow section for more details-)
+	</example>
+#### GET
+GET <type> <var>
+	<example>
+	GET INFO lamp
+	</example>
+#### SET
+SET <type> <var> <value>
+	<example>
+	SET BOOL lamp true
+	</example>
+###	The responses
+	The response are always jsons with the above format:
+	{"code":"post","HEADER":{"requisition":"<requisition>","name":"<deviceName>"},"BODY":{"<var>":<value>,"<aditionional>":"<aditionional>"...}}
+#### Flow response
+	<example>
+	{"code":"post","HEADER":{"requisition":"FLOW","name":"device01"},"BODY":{"temperatureSensor":true}
+	</example>
+#### Get response
+	<example>
+	{"code":"post","HEADER":{"requisition":"GET","name":"device01"},"BODY":{"lamp":"off"}
+	</example>	
+#### Set response
+	<example>
+	{"code":"post","HEADER":{"requisition":"SET","name":"device01"},"BODY":{"lamp":true}
+	</example>
+
+{"code":"post","HEADER":{"requisition":"FLOW","name":"device01"},"BODY":{"temperatureSensor":[27,28,27,27,27],{"collect":500,"publish":2500}}
+
+
+
 ##TATUDevice
 
 O instanciamento `device(...params...)` significa a criação de um dispositivo capaz de ler mensagens TPI e dar uma resposta adequada providenciada pelo desenvolvedor.
