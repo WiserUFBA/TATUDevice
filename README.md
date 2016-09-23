@@ -37,7 +37,7 @@ GET <type> <var>
 	GET INFO lamp
 	</example>
 #### SET
-SET <type> <var> <value>
+SET \<type\> \<var\> \<value\>
 	<example>
 	SET BOOL lamp true
 	</example>
