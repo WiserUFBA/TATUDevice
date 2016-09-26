@@ -10,13 +10,13 @@ A biblioteca TATUDevice usa o TPI sobre o protocolo [MQTT](http://mqtt.org/faq),
 
 Os tópicos são as vias de comunicação do protocolo e funcionam como um terminal de replicação, tudo que chega num determinado tópico é replicado para todos os clientes inscritos neste determinado tópico. O responsável por replicar estas mensagens é o “broker”.
 
-###Quais as funcionalidades desse Sistema Operacional?
+### Quais as funcionalidades desse Sistema Operacional?
 
 O TATUDevice permite uma ágil implementação de um dispositvo que use o protocolo TPI, além de providenciar uma 
 
 interface para gereneciamento das configurações do dispositivo , como atributos que o caracterizem(e.g nome,id e ip do dispositivo) e para gerenciamento da comunicação do controlador com seus elementos(e.g sensores e atuadores).
 
-###Como o TATU integra os elementos de um sistema IoT?
+### Como o TATU integra os elementos de um sistema IoT?
 
 Através de um [Driver](https://github.com/WiserUFBA/DriverMQTT/blob/master/README.md) desenvolvido pelo projeto, que trata as mensagens enviadas pelos dispositivos e intermedia a comunicação destes com possíveis serviços que se utilizem de suas funcionalidades.
 
@@ -27,17 +27,23 @@ Através de um [Driver](https://github.com/WiserUFBA/DriverMQTT/blob/master/READ
 	<var> 	: The name of the sensor/actuactor/etc that is requested(ex: temperature, lamp, AirConditioner)
 	<value>	: The value of the request(ex: on, off, 26, {"collect":800,"publish":"4000"}-read flow section-)
 #### FLOW
-FLOW <type> <var> <value>
+FLOW \<type\> \<var\> \<value\>
+
+
 	<example>
 	FLOW INT temperatureSensor {"collect":500,"publish":2500}(-read flow section for more details-)
 	</example>
 #### GET
-GET <type> <var>
+GET \<type\> \<var\> \<value\>
+
+
 	<example>
 	GET INFO lamp
 	</example>
 #### SET
 SET \<type\> \<var\> \<value\>
+
+
 	<example>
 	SET BOOL lamp true
 	</example>
