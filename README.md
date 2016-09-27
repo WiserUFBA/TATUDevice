@@ -63,11 +63,22 @@ SET \<type\> \<var\> \<value\>
 	{"code":"post","HEADER":{"requisition":"SET","name":"device01"},"BODY":{"lamp":true}
 	</example>
 
-{"code":"post","HEADER":{"requisition":"FLOW","name":"device01"},"BODY":{"temperatureSensor":[27,28,27,27,27],{"collect":500,"publish":2500}}
+## The FLOW feature
+When a device receive a flow request it means that some client expects that the device delivers, with the requested frequence, the value of the last "n" values of a sensor, where "n" is the delivery time divided by the collect time.
+
+### Example
+Let's say that a client make that request for temperatureSensor's values:
+FLOW INT temperatureSensor {"collect":500,"publish":2500}
+
+It means that the device must collect data from it's temperatureSensor every 500ms(milliseconds) and deliver all that collected data(in form of a integer array) every 2500ms.
+
+**That's how the delivered message is going look like:**
+
+{"code":"post","HEADER":{"requisition":"FLOW","name":"device01"},"BODY":{"temperatureSensor":[27,28,27,27,27],flow:{"collect":500,"publish":2500}}
 
 
 
-##TATUDevice
+## TATUDevice
 
 O instanciamento `device(...params...)` significa a criação de um dispositivo capaz de ler mensagens TPI e dar uma resposta adequada providenciada pelo desenvolvedor.
 
