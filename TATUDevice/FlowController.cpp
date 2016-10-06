@@ -8,43 +8,48 @@ FlowController::FlowController(TATUDevice* aux_device, char* aux_response){
 	vector_response = aux_response;
 	flow_buffer.end = flow_buffer.vector;
 }
+
 void FlowController::loop() {
 	FlowList unit = activity;
 	#ifdef FLOW_DEBUG
 		int counting = 0;
 	#endif
 	while (unit) {
-		if (!unit->used) break;
 		#ifdef COUNTING
 			//counts the units being used
 			PRINT("counting: ");
 			PRINTLN(counting);
 		#endif
-		
-		//"Collect" timeout
-		if ((millis() / unit->collect_freq) >= unit->lastTimeCollect) {
-			#ifdef FLOW_DEBUG
-				PRINTLN("Trying to request...");
-				//PRINTLN(counting);
-			#endif
-		  	unit->lastTimeCollect++;
-		  	requisition(vector_iterator(unit), unit->att,unit->type);
-		  	#ifdef FLOW_DEBUG
-				PRINTLN("Requisition done!");
-				//PRINTLN(counting);
-			#endif
-		}
-		//"Shipping" timeout
-		if ((millis() / unit->publish_freq) > unit->lastTimePub) {
-		  unit->lastTimePub++;
-		  //flow_publish(unit);
-		  flow_pub(unit);
-		  unit->iterator = 0;
-		}
+		flowIteration(unit);
 		unit = unit->next;
 	}
 }
+void FlowController::flowIteration(FlowList unit){
+	
+	// If is not used it's not executed
+	if (!unit->used) return;
 
+	//"Collect" timeout
+	if ((millis() / unit->collect_freq) >= unit->lastTimeCollect) {
+		#ifdef FLOW_DEBUG
+			PRINTLN("Trying to request...");
+			//PRINTLN(counting);
+		#endif
+	  	unit->lastTimeCollect++;
+	  	requisition(vector_iterator(unit), unit->att,unit->type);
+	  	#ifdef FLOW_DEBUG
+			PRINTLN("Requisition done!");
+			//PRINTLN(counting);
+		#endif
+	}
+	//"Shipping" timeout
+	if ((millis() / unit->publish_freq) > unit->lastTimePub) {
+	  unit->lastTimePub++;
+	  //flow_publish(unit);
+	  flow_pub(unit);
+	  unit->iterator = 0;
+	}
+}
 //increment a iterator and return the previous
 void* FlowController::vector_iterator(FlowList unit) {	
 	/*	DEPRECATED!

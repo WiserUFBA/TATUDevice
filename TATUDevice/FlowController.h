@@ -102,6 +102,7 @@ public:
     void flow_pub(FlowList unit);
     void pubResponse(FlowList unit);
 
+    void flowIteration(FlowList unit);
     void flow_construct(uint32_t hash, int collect_freq,const char* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit);
     void buildResponse(int* arr,int length);
     void buildResponse(char arr[][10],int length);//char matrix
