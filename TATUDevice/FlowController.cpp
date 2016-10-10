@@ -110,8 +110,49 @@ void FlowController::flow_pub(FlowList unit){
 		buildResponse((int*)unit->vector,unit->size);
 	if(unit->type  == STR_T)
 		buildResponse((char(*)[10])unit->vector,unit->size);
-
+	//<workaround>
+	add_info(unit);
+	//</workaround>
 	pubResponse(unit);
+}
+
+void  FlowController::add_info(FlowList unit){
+	/* 
+		Work arround to insert the flow collect/publish informations
+		
+		<example>
+			,"collect":500,"publish":2500 
+		</example>
+	*/
+	char num_aux[10];
+	char* response = vector_response;
+
+	int i;
+
+	//open flow object
+	i = strlen(response);
+	strcpy(&response[i],",\"FLOW\":{");
+
+	//inserts collect frequence
+	itoa(unit->collect_freq,num_aux,10);
+	
+	i = strlen(response);
+	strcpy(&response[i],",\"collect\":");
+	i = strlen(response);
+	strcpy(&response[i],num_aux);
+
+	//inserts publish frequence
+	itoa(unit->publish_freq,num_aux,10);
+
+	i = strlen(response);
+	strcpy(&response[i],",\"publish\":");
+	i = strlen(response);
+	strcpy(&response[i],num_aux);
+
+	//close object flow
+	i = strlen(response);
+	strcpy(&response[i],"}");
+
 }
 
 //Who collects the samples(void*)
@@ -156,6 +197,8 @@ void FlowController::buildResponse(int* arr,int length) {
 	aux = strlen(response);
 	response[aux] = ']';
 	response[++aux] = '\0';
+
+	//
 	#ifdef FLOW_DEBUG
 		PRINTLN("RESPONSE:");
 		PRINTLN(response);

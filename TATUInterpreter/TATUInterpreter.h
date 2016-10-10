@@ -4,6 +4,7 @@
 //#define AVR_GCC
 
 #include <stdint.h>
+#include "Arduino.h"
 
 #ifdef AVR_GCC
 //#include <pgmspace.h>
@@ -29,15 +30,15 @@
 //espITEAD
 #define ESP_F
 #ifdef ESP_F
-    #include <SoftwareSerial.h>
+//    #include <SoftwareSerial.h>
     #define DEBUG_PORT                  ESPSerial
-    #define PRINT(MSG)          ESPSerial.print(MSG)
-    #define PRINTLN(MSG)        ESPSerial.println(MSG)
-    #define PRINT_DEBUG(MSG)    ESPSerial.print(MSG)
+    #define PRINT(MSG)          DEBUG_PORT.print(MSG)
+    #define PRINTLN(MSG)        DEBUG_PORT.println(MSG)
+    #define PRINT_DEBUG(MSG)    DEBUG_PORT.print(MSG)
 
     //#define DEBUG_PORT ESPSerial
     // Debug Software Serial
-    SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
+//    SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
 #endif
 
 //#define SIMUL
@@ -53,6 +54,7 @@
 #include <SoftwareSerial.h>
 // Software Serial should be static since this file can be called multiple times
 //SoftwareSerial static DEBUG_PORT(7,6);
+SoftwareSerial static ESPSerial(12, 13);
 #endif
 
 // Debug Definitions
@@ -140,9 +142,9 @@ public:
         cmd.OBJ.ERROR = true;
 
         // Enable Software Serial Debug port if it's not already started 
-        #ifdef ENABLE_SOFTWARE_SERIAL
+        //#ifdef ENABLE_SOFTWARE_SERIAL
         DEBUG_PORT.begin(DEBUG_PORT_SPEED);
-        #endif
+        //#endif
     }
     bool parse(char *, unsigned int);
     bool code_evaluation(char, unsigned int*);

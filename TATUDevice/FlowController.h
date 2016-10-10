@@ -21,7 +21,7 @@
 //#define ESP_F
 #ifdef ESP_F
     #include <SoftwareSerial.h>
-    #define DEBUG_PORT ESPSerial
+    #define DEBUG_PORT Serial
     // Debug Software Serial
     //SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
 #endif
@@ -101,6 +101,8 @@ public:
     void flow_publish(FlowList unit);
     void flow_pub(FlowList unit);
     void pubResponse(FlowList unit);
+
+    void add_info(FlowList unit);
 
     void flowIteration(FlowList unit);
     void flow_construct(uint32_t hash, int collect_freq,const char* message, int publish_freq, uint8_t code, uint8_t type, void* vector, uint32_t flow, FlowList unit);
