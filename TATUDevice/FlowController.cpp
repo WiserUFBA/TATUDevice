@@ -137,7 +137,7 @@ void  FlowController::add_info(FlowList unit){
 	itoa(unit->collect_freq,num_aux,10);
 	
 	i = strlen(response);
-	strcpy(&response[i],",\"collect\":");
+	strcpy(&response[i],"\"collect\":");
 	i = strlen(response);
 	strcpy(&response[i],num_aux);
 
