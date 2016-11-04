@@ -21,7 +21,7 @@ typedef uint8_t byte;
 
 // By default DEBUG on SERIAL or SoftwareSerial is disabled
 // Change debug definitions on TATUInterpreter.h
-#define DEBUG 1
+//#define DEBUG 1
 
 // System definitions
 #ifdef AVR_GCC

@@ -265,7 +265,7 @@ void FlowController::pubResponse(FlowList unit){
 		the objective is to call the device->callback function internally
 	*/
 	byte req[30];
-	#ifdef DEBUG_PORT
+	#ifdef FLOW_DEBUG
 		DEBUG_PORT.print("Publish requisition: ");
 		DEBUG_PORT.println((const char*)unit->message);
 	#endif

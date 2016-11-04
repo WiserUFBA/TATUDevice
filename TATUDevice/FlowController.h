@@ -14,8 +14,8 @@
 #define INT_T   2 
 #define BOOL_T  3 
 
-#define DEBUG
-#define FLOW_DEBUG
+//#define DEBUG
+//#define FLOW_DEBUG
 
 //espITEAD
 //#define ESP_F

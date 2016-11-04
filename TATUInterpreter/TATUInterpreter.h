@@ -54,7 +54,7 @@
 #include <SoftwareSerial.h>
 // Software Serial should be static since this file can be called multiple times
 //SoftwareSerial static DEBUG_PORT(7,6);
-SoftwareSerial static ESPSerial(12, 13);
+SoftwareSerial static DEBUG_PORT(12, 13);
 #endif
 
 // Debug Definitions
