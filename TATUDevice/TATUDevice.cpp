@@ -80,53 +80,48 @@ void ipToString(byte *ip, char *str){
 }
 
 /* Construct the TATUDevice Class with only the GET callback */
-TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-            const int sample_d, const int port_m, const int os_v,
+TATUDevice::TATUDevice( const char *name_d, const int os_v,
             TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code),
             void (*PUBLISH)(char *, char *)){
     get_function = GET_FUNCTION;
     set_function = NULL;
     pub = PUBLISH;
-    init(name_d,ip_d,id_d,pan_d,sample_d,port_m,os_v,req);
+    init(name_d,os_v,req);
 }
 
 // > ONLY SET
-TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-            const int sample_d, const int port_m, const int os_v,
+TATUDevice::TATUDevice( const char *name_d, const int os_v,
             TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request),
             void (*PUBLISH)(char *, char *)){
     set_function = SET_FUNCTION;
     get_function = NULL;
     pub = PUBLISH;
-    init(name_d,ip_d,id_d,pan_d,sample_d,port_m,os_v,req);
+    init(name_d,os_v,req);
 }
 
 // > BOTH
-TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-            const int sample_d, const int port_m, const int os_v,
-            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code), 
+TATUDevice::TATUDevice( const char *name_d, const int os_v,
+            TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t code),
             bool (*SET_FUNCTION)(uint32_t hash, uint8_t code, void* request),
             void (*PUBLISH)(char *, char *)){
     get_function = GET_FUNCTION;
     set_function = SET_FUNCTION;
     pub = PUBLISH;
-    init(name_d,ip_d,id_d,pan_d,sample_d,port_m,os_v,req);
+    init(name_d,os_v,req);
 }
 
 // > NONE
-TATUDevice::TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-            const int sample_d, const int port_m, const int os_v,
+TATUDevice::TATUDevice( const char *name_d, const int os_v,
             TATUInterpreter *req,
             void (*PUBLISH)(char *, char *)){
     get_function = NULL;
     set_function = NULL;
     pub = PUBLISH;
-    init(name_d,ip_d,id_d,pan_d,sample_d,port_m,os_v,req);
+    init(name_d,os_v,req);
 }
 
 /* Initialize the class */
-void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                        const int sample_d, const int port_m, const int os_v,
+void TATUDevice::init(  const char *name_d, const int os_v,
                         TATUInterpreter *req){
     cli();
     int i;
@@ -139,15 +134,7 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
 
     strcpy_P(aux_topic_name,dev_str);
     strcpy(&aux_topic_name[strlen(aux_topic_name)],name_d);
-    
-    ipToString(ip_d, aux);
-    STRCPY(aux, ip);
-    id = (uint8_t)  id_d;
-    pan = (uint8_t) pan_d;
-    samples = (uint8_t) sample_d;
-    //ipToString(ip_m, aux);
-    //STRCPY(aux, mqtt_ip);
-    mqtt_port = (uint16_t) port_m;
+
     os_version = (uint8_t) os_v;
     requisition = req;
 
@@ -157,7 +144,7 @@ void TATUDevice::init(  const char *name_d, byte *ip_d, const int id_d,   const 
 
     dod_used = false;
 
-    // Enable Software Serial Debug port if it's not already started 
+    // Enable Software Serial Debug port if it's not already started
     #ifdef ENABLE_SOFTWARE_SERIAL
     DEBUG_PORT.begin(DEBUG_PORT_SPEED);
     #endif
@@ -172,16 +159,16 @@ void TATUDevice::generateHeader(){
     // Primeiro se coloca a seguinte string padrão no vetor
     //strcpy(&output_message[strlen(start_post)], name);
     strcpy_P(output_message, start_post);
-    
+
     // Inicia o JSON
     //aux = strlen(name) + strlen(start_post);
     aux = strlen(start_post);
     COMMA;
-    
+
     // As próximas linhas produzem o HEADER
     strcpy_P(OUT_STR, header_str); /* Copia o HEADER */
     aux += 10;
-    
+
     /* Coloca o NAME */
     strcpy_P(OUT_STR, name_str);
     aux += 8;
@@ -196,7 +183,7 @@ void TATUDevice::generateHeader(){
     strcpy(OUT_STR, aux_str);
     aux += strlen(aux_str);
     COMMA;
-    
+
     /* Coloca o PAN */
     strcpy_P(OUT_STR, pan_str);
     aux += 6;
@@ -204,7 +191,7 @@ void TATUDevice::generateHeader(){
     strcpy(OUT_STR, aux_str);
     aux += strlen(aux_str);
     // COMMA;
-    
+
     /* Coloca o IP */
     // Comment this out to PUT IP on header
     /*
@@ -242,11 +229,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     bool isString,
          bool_buffer = false;
     char str_buffer[MAX_SIZE_RESPONSE] = {0};
-    uint16_t int_buffer = 0;         
+    uint16_t int_buffer = 0;
 
     // Se encontrados erros no PARSE retorne "BODY":null
     if(!requisition->parse(payload, length)){ strcpy_P(OUT_STR, null_body); return; }
-    
+
     // DEPRECATED //
     if(requisition->cmd.OBJ.TYPE == TATU_POST){ strcpy_P(OUT_STR, false_body); return; }
     if (requisition->cmd.OBJ.VAR == TATU_TYPE_SYSTEM){
@@ -262,7 +249,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     /* Check the variable type */
     switch(requisition->cmd.OBJ.TYPE){
         /* If the desired variable is of type ALIAS, call the user's function */
-        
+
         case TATU_GET:
             #ifdef DEBUG
             //PRINT_DEBUG(CALLBACK_GET);
@@ -338,11 +325,11 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
             //PRINT_DEBUG(CALLBACK_SET);
             //DEBUG_NL();
             #endif
-            
+
             switch(requisition->cmd.OBJ.VAR){
 
                 case TATU_TYPE_ALIAS:
-                    
+
                     //Baseado no código da resposta, decide qual função do usuário deve ser usada
                     switch(requisition->cmd.OBJ.CODE) {
                         case TATU_CODE_INFO:
@@ -367,7 +354,7 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
                     PRINT_DEBUG(SET_PIN);
                     DEBUG_NL();
                     #endif
-                    break; 
+                    break;
                 /* ADC Modifier */
                 case TATU_TYPE_ANALOG:
                     analogWrite(requisition->cmd.OBJ.PIN, atoi(&payload[strlen(payload) + 1]));
@@ -426,28 +413,28 @@ void TATUDevice::generateBody(char *payload, uint8_t length){
     // !IMPORTANT! Suporte para apenas uma variavel ''
     /* Copia a variavel vinda do payload */
     QUOTE; strcpy(OUT_STR, payload); aux += strlen(payload); QUOTE; COLON;
-    
+
     // Se encontrado qualquer tipo de erro
-    if(requisition->cmd.OBJ.ERROR){ 
+    if(requisition->cmd.OBJ.ERROR){
         #ifdef DEBUG
         PRINT_DEBUG(PARAM_ERROR);
         DEBUG_NL();
         #endif
-        
+
         strcpy_P(OUT_STR, null_str);
         aux += 4;
-        
+
         BRACE_RIGHT; BRACE_RIGHT;
         return;
     }
-   
+
     // Se não temos um GET verificamos se o SET ou EDIT não apresentaram erro
     if(requisition->cmd.OBJ.TYPE != TATU_GET){
         #ifdef DEBUG
         PRINT_DEBUG(NOT_A_GET);
         DEBUG_NL();
         #endif
-        
+
         strcpy_P(OUT_STR, true_str);
         aux += 4;
 
@@ -520,11 +507,11 @@ void TATUDevice::mqtt_callback(char *topic, byte *payload, unsigned int length){
     PRINT_DEBUG(PUBLISHING);
     PRINT_DEBUG_NL(output_message);
     #endif
-    
+
     strcpy_P(&aux_topic_name[len_name],res_str);
-    
+
     //publish the message
-    //pub(name, output_message); //publish the message 
+    //pub(name, output_message); //publish the message
     pub(aux_topic_name, output_message);
 
     aux_topic_name[len_name] = 0;
@@ -539,47 +526,47 @@ void TATUDevice::interruption(const char *var_name, int var){
     int aux = last_char;
     char str_buffer[MAX_SIZE_RESPONSE];
 
-    /* Coloca o BODY na resposta */ 
-    strcpy_P(OUT_STR, body_str); 
-    aux += 8; 
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
     QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */
     itoa(var,str_buffer,10);
     strcpy(OUT_STR, str_buffer);
     aux+=strlen(str_buffer);
-    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
-    CLOSE_MSG; 
+    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */
+    CLOSE_MSG;
     strcpy_P(&aux_topic_name[len_name],int_str);
-    //pub(name, output_message); //publish the message 
-    pub(aux_topic_name, output_message); //publish the message 
+    //pub(name, output_message); //publish the message
+    pub(aux_topic_name, output_message); //publish the message
     aux_topic_name[len_name] = 0;
     //RESPONSE_CONSTRUCT(var_name);
 }
 void TATUDevice::interruption(const char *var_name, char *var){
     int aux = last_char;
 
-    /* Coloca o BODY na resposta */ 
-    strcpy_P(OUT_STR, body_str); 
-    aux += 8; 
-    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */ 
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */
     QUOTE; strcpy(OUT_STR, var); aux+=strlen(var); QUOTE;
-    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
-    CLOSE_MSG; 
+    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */
+    CLOSE_MSG;
     strcpy_P(&aux_topic_name[len_name],int_str);
-    pub(aux_topic_name, output_message); //publish the message 
+    pub(aux_topic_name, output_message); //publish the message
     aux_topic_name[len_name] = 0;
     //RESPONSE_CONSTRUCT(var_name);
 }
 void TATUDevice::interruption(const char *var_name, bool var){
     int aux = last_char;
 
-    /* Coloca o BODY na resposta */ 
-    strcpy_P(OUT_STR, body_str); 
-    aux += 8; 
-    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */ 
-    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
-    CLOSE_MSG; 
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */
+    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */
+    CLOSE_MSG;
     strcpy_P(&aux_topic_name[len_name],int_str);
-    pub(aux_topic_name, output_message); //publish the message 
+    pub(aux_topic_name, output_message); //publish the message
     aux_topic_name[len_name] = 0;
    //RESPONSE_CONSTRUCT(var_name);
 }
@@ -587,15 +574,15 @@ void TATUDevice::interruption(const char *var_name, bool var){
 void TATUDevice::interrupt(const char *var_name, char *var){
     int aux = last_char;
 
-    /* Coloca o BODY na resposta */ 
-    strcpy_P(OUT_STR, body_str); 
-    aux += 8; 
-    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */ 
+    /* Coloca o BODY na resposta */
+    strcpy_P(OUT_STR, body_str);
+    aux += 8;
+    QUOTE; strcpy(OUT_STR, var_name); aux += strlen(var_name); QUOTE; COLON;  /* Copia a variavel vinda do payload */
     QUOTE; strcpy(OUT_STR, var); aux+=strlen(var); QUOTE;
-    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ 
-    CLOSE_MSG; 
+    BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */
+    CLOSE_MSG;
     strcpy_P(&aux_topic_name[len_name],int_str);
-    pub(aux_topic_name, output_message); //publish the message 
+    pub(aux_topic_name, output_message); //publish the message
     aux_topic_name[len_name] = 0;
 }
 
@@ -621,11 +608,11 @@ void TATUWatchDog::watchdogSetup(){
     // Enter Watchdog Configuration mode:
     WDTCSR |= (1<<WDCE) | (1<<WDE);
     // Set Watchdog settings:
-    WDTCSR =      (1<<WDIE) 
-                | (1<<WDE) 
-                | (0<<WDP3) 
-                | (1<<WDP2) 
-                | (1<<WDP1) 
+    WDTCSR =      (1<<WDIE)
+                | (1<<WDE)
+                | (0<<WDP3)
+                | (1<<WDP2)
+                | (1<<WDP1)
                 | (1<<WDP0);
     sei();
 }
@@ -635,8 +622,8 @@ void TATUWatchDog::loop(){
     if (!client.connected()){
         client.connect(name);
     }
-        
-    if (time - lastConnect > reset_time) 
+
+    if (time - lastConnect > reset_time)
         wdt_reset();*/
 }
-#endif    
+#endif

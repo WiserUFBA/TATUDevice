@@ -43,7 +43,7 @@ typedef uint8_t byte;
 
 // DOD - Device Object Description             // Descrição da mensagem
 #define CREATE_DOD(NAME, SENSORS, ACTUATORS)   const char DOD[] PROGMEM =   "{\"CODE\":\"POST\",\"METHOD\":\"DOD\",\"HEADER\":{},\"BODY\":{\"DOD\":"\
-                                                                            "{\"name\":\"" NAME "\"" \ 
+                                                                            "{\"name\":\"" NAME "\"" \
                                                                             ",\"sensors\":[" SENSORS "]," \
                                                                             "\"actuators\":[" ACTUATORS "]}"
 
@@ -78,11 +78,11 @@ typedef uint8_t byte;
 // Cria wrapper para a função de callback da classe
                                         // Cria a declaração da função ponte
 #define MQTT_BRIDGE(BRIDGE)             void BRIDGE(char *, char *)
-                                        // Declaração da ponte// Função callback chamada pelo cliente mqtt  
-#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void NAME(char *topic, byte *payload, unsigned int length)\ 
+                                        // Declaração da ponte// Função callback chamada pelo cliente mqtt
+#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void NAME(char *topic, byte *payload, unsigned int length)\
                                         {OBJ.mqtt_callback(topic, payload, length);}// Essa é a atribuição da função acionada dentro do objeto TATUDevice
                                         // Atribuição da ponte
-#define MQTT_PUBLISH(BRIDGE, OBJ)       void BRIDGE(char *topic, char *out)\ 
+#define MQTT_PUBLISH(BRIDGE, OBJ)       void BRIDGE(char *topic, char *out)\
                                         { OBJ.publish(topic,out); } // Essa é a função publish do cliente que será chama pelo objeto
 
 // Macro para interrupções
@@ -165,7 +165,7 @@ typedef uint8_t byte;
                                     CLIENT.publish("dev/CONNECTIONS",DEVICE_NAME);\
                                     CLIENT.subscribe(device.aux_topic_name);\
                                     CLIENT.subscribe("dev");
-                        
+
 
 // Conecta o cliente mqtt usando usuário e senha
 #define SECURE_DEVICECONNECT(USER,PASS) Serial.println("Trying to connect to the broker");\
@@ -187,7 +187,7 @@ typedef uint8_t byte;
 //QUOTE; strcpy(OUT_STR, NAME_VAR); aux += strlen(NAME_VAR); QUOTE; COLON;  /* Copia a variavel vinda do payload */ \
 //BRACE_RIGHT; BRACE_RIGHT;  /* Fecha o JSON e a STRING */ \
 //CLOSE_MSG; \
-//publish(name, output_message) //publish the message 
+//publish(name, output_message) //publish the message
 
 /* Utilidades */
 int freeRAM();
@@ -231,39 +231,34 @@ public:
     /* Callback's do Sistema */
     // Callback MQTT
     void mqtt_callback(char *, byte *, unsigned int);
-    
+
     // NOVA ARQUITETURA DE CALLBACK
     // ONLY GET AND SET ARE NEEDED
     // > ONLY GET
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, const int port_m, const int os_v,
+    TATUDevice( const char *name_d, const int os_v,
                 TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type),
                 void (*PUBLISH)(char *, char *));
     // > ONLY SET
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, const int port_m, const int os_v,
+    TATUDevice( const char *name_d, const int os_v,
                 TATUInterpreter *req, bool (*SET_FUNCTION)(uint32_t hash, uint8_t type, void* request),
                 void (*PUBLISH)(char *, char *));
     // > BOTH
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, const int port_m, const int os_v,
-                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type), 
+    TATUDevice( const char *name_d, const int os_v,
+                TATUInterpreter *req, bool (*GET_FUNCTION)(uint32_t hash, void* response, uint8_t type),
                 bool (*SET_FUNCTION)(uint32_t hash, uint8_t type, void* request),
                 void (*PUBLISH)(char *, char *));
     // > NONE
-    TATUDevice( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-                const int sample_d, const int port_m, const int os_v,
+    TATUDevice( const char *name_d, const int os_v,
                 TATUInterpreter *req,
                 void (*PUBLISH)(char *, char *));
-    
-    void init( const char *name_d, byte *ip_d, const int id_d,   const int pan_d,
-            const int sample_d, const int port_m, const int os_v,
-            TATUInterpreter *req); 
+
+    void init( const char *name_d, const int os_v,
+            TATUInterpreter *req);
 
     void interruption(const char *name, int var);
     void interruption(const char *name, char *var);
     void interruption(const char *name, bool var);
-    
+
     void interrupt(const char *var_name, char *var);
 
     void generateHeader();
@@ -283,7 +278,7 @@ public:
     char name[MAX_SIZE_NAME];
 
     void watchdogSetup();
-    void loop(); 
+    void loop();
 };
 #endif
 

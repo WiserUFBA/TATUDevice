@@ -2,6 +2,7 @@
 #define TATUInterpreter_h
 
 //#define AVR_GCC
+#define ESP_F
 
 #include <stdint.h>
 #include "Arduino.h"
@@ -14,31 +15,32 @@
 #include <avr/pgmspace.h>
 #endif
 // Uncomment the follow line to show debug
-#define DEBUG
+// #define DEBUG
 // Change debug port to Software Serial Object if you want to
 
 #ifdef AVR_GCC
     void SerialPrint_PROGMEM(PGM_P str);
-    //#define DEBUG_PORT                ATMSerial
-    #define PRINT(MSG)          ATMSerial.print(MSG)
-    #define PRINTLN(MSG)        ATMSerial.println(MSG)
+    #define DEBUG_PORT                Serial
+    #define PRINT(MSG)          DEBUG_PORT.print(MSG)
+    #define PRINTLN(MSG)        DEBUG_PORT.println(MSG)
     #define PRINT_DEBUG(MSG)    SerialPrint_PROGMEM(MSG)
 #endif
-// Allow Software Serial 
+// Allow Software Serial
 //#define ENABLE_SOFTWARE_SERIAL
 
 //espITEAD
-#define ESP_F
+// #define ESP_F
 #ifdef ESP_F
-//    #include <SoftwareSerial.h>
-    #define DEBUG_PORT                  ESPSerial
-    #define PRINT(MSG)          DEBUG_PORT.print(MSG)
-    #define PRINTLN(MSG)        DEBUG_PORT.println(MSG)
-    #define PRINT_DEBUG(MSG)    DEBUG_PORT.print(MSG)
+   #include <SoftwareSerial.h>
+	//  #define DEBUG_PORT                  Serial //<workaround>c
+    // #define ESPSerial                   Serial //<workaround>
+    // #define PRINT(MSG)          DEBUG_PORT.print(MSG)
+    // #define PRINTLN(MSG)        DEBUG_PORT.println(MSG)
+	// #define PRINT_DEBUG(MSG)    DEBUG_PORT.print(MSG)
 
-    //#define DEBUG_PORT ESPSerial
+    #define DEBUG_PORT ESPSerial
     // Debug Software Serial
-//    SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
+	 SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
 #endif
 
 //#define SIMUL
@@ -49,7 +51,7 @@
 #endif
 
 // If enabled Software Serial
-#define ENABLE_SOFTWARE_SERIAL
+// #define ENABLE_SOFTWARE_SERIAL
 #ifdef ENABLE_SOFTWARE_SERIAL
 #include <SoftwareSerial.h>
 // Software Serial should be static since this file can be called multiple times
@@ -141,7 +143,7 @@ public:
     TATUInterpreter(){
         cmd.OBJ.ERROR = true;
 
-        // Enable Software Serial Debug port if it's not already started 
+        // Enable Software Serial Debug port if it's not already started
         //#ifdef ENABLE_SOFTWARE_SERIAL
         DEBUG_PORT.begin(DEBUG_PORT_SPEED);
         //#endif
