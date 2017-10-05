@@ -9,13 +9,13 @@
 //#include <Str.h>
 //#define flowList *FlowUnit
 
-#define DOD_T   0   
-#define STR_T   1  
-#define INT_T   2 
-#define BOOL_T  3 
+#define DOD_T   0
+#define STR_T   1
+#define INT_T   2
+#define BOOL_T  3
 
 //#define DEBUG
-//#define FLOW_DEBUG
+// #define FLOW_DEBUG
 
 //espITEAD
 //#define ESP_F
@@ -35,10 +35,10 @@
 #endif
 
 #ifdef AVR_GCC
-#define DOD_T   TATU_CODE_DOD   
-#define STR_T   TATU_CODE_INFO  
-#define INT_T   TATU_CODE_VALUE 
-#define BOOL_T  TATU_CODE_STATE 
+#define DOD_T   TATU_CODE_DOD
+#define STR_T   TATU_CODE_INFO
+#define INT_T   TATU_CODE_VALUE
+#define BOOL_T  TATU_CODE_STATE
 
 //#define FLOW_DEBUG 1
 
@@ -54,8 +54,8 @@ const char get_flow[]     PROGMEM = "GET FLOW ";
 class FlowUnit {
   public:
     unsigned long int collect_freq, publish_freq;
-    void* vector; 
-    void* vector_end; 
+    void* vector;
+    void* vector_end;
     int iterator;
     uint8_t size;
     uint8_t t_size;
@@ -73,6 +73,7 @@ typedef FlowUnit* FlowList;
 typedef struct sensorMap{
     uint32_t hash;
     char sensorName[25];
+
 }sensorMap;
 
 typedef struct flowBuffer {
@@ -89,7 +90,7 @@ public:
     sensorMap* sensors;
     //uint8_t flow_buffer[100];
 
-    FlowController(TATUDevice* , char* );
+    FlowController(TATUDevice* , char*, sensorMap* sensors);
     void buffer_alloc(FlowList unit);
     bool isInstantiated(FlowList unit,uint32_t hash);
     void flowbuilder(char* json, uint32_t hash, uint8_t code);

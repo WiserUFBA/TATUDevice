@@ -1,9 +1,10 @@
 #include "FlowController.h"
 
-FlowController::FlowController(TATUDevice* aux_device, char* aux_response){
+FlowController::FlowController(TATUDevice* aux_device, char* aux_response, sensorMap* sensors){
 	#ifdef FLOW_DEBUG
 		DEBUG_PORT.begin(115200);
 	#endif
+	this->sensors = sensors;
 	device = aux_device;
 	vector_response = aux_response;
 	flow_buffer.end = flow_buffer.vector;
@@ -25,7 +26,7 @@ void FlowController::loop() {
 	}
 }
 void FlowController::flowIteration(FlowList unit){
-	
+
 	// If is not used it's not executed
 	if (!unit->used) return;
 
@@ -51,7 +52,7 @@ void FlowController::flowIteration(FlowList unit){
 	}
 }
 //increment a iterator and return the previous
-void* FlowController::vector_iterator(FlowList unit) {	
+void* FlowController::vector_iterator(FlowList unit) {
 	/*	DEPRECATED!
 	if (unit->type == STR_T){
 		//Jumps to the next iterator according to the size of the next string
@@ -99,7 +100,7 @@ void FlowController::flow_pub(FlowList unit){
 		PRINTLN("Publishing...");
 		//print_array((int*)unit->vector,unit->size);
 
-		/*int* arr; 
+		/*int* arr;
 		(int*)unit->vector;
 		for (int i = 0; i < count; ++i)
 		{
@@ -117,11 +118,11 @@ void FlowController::flow_pub(FlowList unit){
 }
 
 void  FlowController::add_info(FlowList unit){
-	/* 
+	/*
 		Work arround to insert the flow collect/publish informations
-		
+
 		<example>
-			,"collect":500,"publish":2500 
+			,"collect":500,"publish":2500
 		</example>
 	*/
 	char num_aux[10];
@@ -135,7 +136,7 @@ void  FlowController::add_info(FlowList unit){
 
 	//inserts collect frequence
 	itoa(unit->collect_freq,num_aux,10);
-	
+
 	i = strlen(response);
 	strcpy(&response[i],"\"collect\":");
 	i = strlen(response);
@@ -160,14 +161,14 @@ void FlowController::requisition(void* response, uint32_t hash,uint8_t code) {
 	device->get_function(hash, response, code);
 	#ifdef FLOW_DEBUG
 		//DEBUG_PORT.begin(115200);
-		//PRINTLN(*(int*)response);
+		PRINTLN(*(int*)response);
 	#endif
 }
 
 
 //responseBuilder INTEGER
 void FlowController::buildResponse(int* arr,int length) {
-	
+
 	#ifdef FLOW_DEBUG
 		print_array(arr,length);
 		PRINTLN("INTEGER!!");
@@ -175,7 +176,7 @@ void FlowController::buildResponse(int* arr,int length) {
 	uint8_t aux;//char response Iterator
 	uint8_t i;//int* arr Iterator
 
-	// Writes the response on the flowController buffer 
+	// Writes the response on the flowController buffer
 	char* response = vector_response;
 	response[0] = '\0';
 
@@ -208,7 +209,7 @@ void FlowController::buildResponse(int* arr,int length) {
 }
 //responseBuilder String
 void FlowController::buildResponse(char arr[][10],int length) {
-	
+
 	int aux;//char response Iterator
 	int i;//int* arr Iterator
 
@@ -217,7 +218,7 @@ void FlowController::buildResponse(char arr[][10],int length) {
 		print_array(arr,length);
 	#endif
 
-	// Writes the response on the flowController buffer 
+	// Writes the response on the flowController buffer
 	char* response = vector_response;
 	response[0] = '\0';
 
@@ -270,7 +271,7 @@ void FlowController::pubResponse(FlowList unit){
 		DEBUG_PORT.println((const char*)unit->message);
 	#endif
 	strcpy_P((char*)req, (const char*)unit->message);
-	device->mqtt_callback("", req, strlen((char*)req) );	
+	device->mqtt_callback("", req, strlen((char*)req) );
 
 }
 
@@ -358,14 +359,14 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, const char*
 	//dynamic array still not implemented
 	//unit->vector = vector;
 	unit->type = type;
-	
+
 	if (type == TATU_CODE_VALUE){
 		unit->t_size = sizeof(int);
 	}
 	if (type == TATU_CODE_INFO){
 		unit->t_size = 10;//sizeof(char(*)[10]);
 	}
-	
+
 	unit->flow = flow;
 
 	//unit->message = message;
@@ -377,10 +378,13 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, const char*
 		the message
 		GET FLOW + temperatureSensor
 	*/
-	#ifdef DEBUG
+	#ifdef FLOW_DEBUG
+		// while
 		PRINT("Nome do sensor: ");
+		long int temp = millis();
+		while (millis() < (temp + 1000) );
 		PRINTLN(sensors[i].sensorName);
-	#endif	
+	#endif
 	strcpy(unit->message,message);
 	strcpy(&(unit->message)[strlen(unit->message)],sensors[i].sensorName);
 	//</workAround>
@@ -497,5 +501,5 @@ void* FlowController::vector_acess(FlowList unit, int i) {
 	}
 
 	return ((unit->vector) + (unit->t_size * i));
-	
+
 }

@@ -205,12 +205,6 @@ public:
     char        name[MAX_SIZE_NAME];
     int         len_name;
     char        aux_topic_name[MAX_SIZE_NAME + 15];
-    char        ip[MAX_SIZE_IP];
-    uint8_t     id;
-    uint8_t     pan;
-    uint8_t     samples;
-    char        mqtt_ip[MAX_SIZE_IP];
-    uint16_t    mqtt_port;
     uint8_t     os_version;
     bool        dod_used;
     bool (*get_function)(uint32_t hash, void* response, uint8_t code);

@@ -86,7 +86,7 @@ TATUDevice::TATUDevice( const char *name_d, const int os_v,
     get_function = GET_FUNCTION;
     set_function = NULL;
     pub = PUBLISH;
-    init(name_d,os_v,req);
+    // init(name_d,os_v,req);
 }
 
 // > ONLY SET
@@ -96,7 +96,7 @@ TATUDevice::TATUDevice( const char *name_d, const int os_v,
     set_function = SET_FUNCTION;
     get_function = NULL;
     pub = PUBLISH;
-    init(name_d,os_v,req);
+    // init(name_d,os_v,req);
 }
 
 // > BOTH
@@ -107,7 +107,7 @@ TATUDevice::TATUDevice( const char *name_d, const int os_v,
     get_function = GET_FUNCTION;
     set_function = SET_FUNCTION;
     pub = PUBLISH;
-    init(name_d,os_v,req);
+    // init(name_d,os_v,req);
 }
 
 // > NONE
@@ -117,7 +117,7 @@ TATUDevice::TATUDevice( const char *name_d, const int os_v,
     get_function = NULL;
     set_function = NULL;
     pub = PUBLISH;
-    init(name_d,os_v,req);
+    // init(name_d,os_v,req);
 }
 
 /* Initialize the class */
@@ -174,22 +174,22 @@ void TATUDevice::generateHeader(){
     aux += 8;
     strcpy(OUT_STR, name);
     aux += strlen(name);
-    QUOTE; COMMA;
+    QUOTE; //COMMA;
 
     /* Coloca o ID */
-    strcpy_P(OUT_STR, id_str);
-    aux += 5;
-    itoa(id, aux_str, 10);
-    strcpy(OUT_STR, aux_str);
-    aux += strlen(aux_str);
-    COMMA;
-
-    /* Coloca o PAN */
-    strcpy_P(OUT_STR, pan_str);
-    aux += 6;
-    itoa(pan, aux_str, 10);
-    strcpy(OUT_STR, aux_str);
-    aux += strlen(aux_str);
+    // strcpy_P(OUT_STR, id_str);
+    // aux += 5;
+    // itoa(id, aux_str, 10);
+    // strcpy(OUT_STR, aux_str);
+    // aux += strlen(aux_str);
+    // COMMA;
+    //
+    // /* Coloca o PAN */
+    // strcpy_P(OUT_STR, pan_str);
+    // aux += 6;
+    // itoa(pan, aux_str, 10);
+    // strcpy(OUT_STR, aux_str);
+    // aux += strlen(aux_str);
     // COMMA;
 
     /* Coloca o IP */

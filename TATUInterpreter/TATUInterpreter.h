@@ -34,11 +34,11 @@
    #include <SoftwareSerial.h>
 	//  #define DEBUG_PORT                  Serial //<workaround>c
     // #define ESPSerial                   Serial //<workaround>
-    // #define PRINT(MSG)          DEBUG_PORT.print(MSG)
-    // #define PRINTLN(MSG)        DEBUG_PORT.println(MSG)
-	// #define PRINT_DEBUG(MSG)    DEBUG_PORT.print(MSG)
+    #define PRINT(MSG)          DEBUG_PORT.print(MSG)
+    #define PRINTLN(MSG)        DEBUG_PORT.println(MSG)
+	#define PRINT_DEBUG(MSG)    DEBUG_PORT.print(MSG)
 
-    #define DEBUG_PORT ESPSerial
+    // #define DEBUG_PORT ESPSerial
     // Debug Software Serial
 	 SoftwareSerial static ESPSerial(12, 13);                 //Extra2 == 12 Extra3 == 13
 #endif
@@ -144,9 +144,9 @@ public:
         cmd.OBJ.ERROR = true;
 
         // Enable Software Serial Debug port if it's not already started
-        //#ifdef ENABLE_SOFTWARE_SERIAL
-        DEBUG_PORT.begin(DEBUG_PORT_SPEED);
-        //#endif
+        #ifdef DEBUG
+        // DEBUG_PORT.begin(DEBUG_PORT_SPEED);
+        #endif
     }
     bool parse(char *, unsigned int);
     bool code_evaluation(char, unsigned int*);

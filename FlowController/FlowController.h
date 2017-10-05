@@ -8,10 +8,10 @@
 #include <ArduinoJson.h>
 //#define flowList *FlowUnit
 
-#define DOD_T   0   
-#define STR_T   1  
-#define INT_T   2 
-#define BOOL_T  3 
+#define DOD_T   0
+#define STR_T   1
+#define INT_T   2
+#define BOOL_T  3
 
 #define PRINTLN(STR) DEBUG_PORT.println(STR)
 #define PRINT(STR) DEBUG_PORT.print(STR)
@@ -22,12 +22,12 @@
 #endif
 
 #ifdef AVR_GCC
-#define DOD_T   TATU_CODE_DOD   
-#define STR_T   TATU_CODE_INFO  
-#define INT_T   TATU_CODE_VALUE 
-#define BOOL_T  TATU_CODE_STATE 
+#define DOD_T   TATU_CODE_DOD
+#define STR_T   TATU_CODE_INFO
+#define INT_T   TATU_CODE_VALUE
+#define BOOL_T  TATU_CODE_STATE
 
-//#define FLOW_DEBUG 1
+#define FLOW_DEBUG 1
 
 #define PRINTLN(STR) ATMSerial.println(STR)
 #define PRINT(STR) ATMSerial.print(STR)
@@ -39,8 +39,8 @@ const char get_flow[]     PROGMEM = "GET INFO flow";
 class FlowUnit {
   public:
     unsigned long int collect_freq, publish_freq;
-    void* vector; 
-    void* vector_end; 
+    void* vector;
+    void* vector_end;
     void* iterator;
     uint8_t size;
     uint8_t t_size;
