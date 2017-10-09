@@ -70,11 +70,25 @@ class FlowUnit {
 };
 typedef FlowUnit* FlowList;
 
-typedef struct sensorMap{
+#define HASH_DJB(START, LEN, INPUT, OUTPUT) for(uint8_t j = START; j < LEN; j++){ OUTPUT = ((OUTPUT << 5) + OUTPUT) + INPUT[j]; }
+class SensorMap{
+public:
+    static uint8_t size;
     uint32_t hash;
     char sensorName[25];
 
-}sensorMap;
+    static void init(uint8_t aux_size,String* sensorsStr,SensorMap* sensors){
+        size = aux_size;
+        for (size_t i = 0; i < size; i++) {
+            sensorsStr[i].toCharArray(sensors[i].sensorName, sizeof(sensors[i].sensorName));
+            uint32_t str_hash = 5381;
+            HASH_DJB(0,strlen(sensors[i].sensorName),sensors[i].sensorName,str_hash);
+            sensors[i].hash = str_hash;
+            // strcpy(sensors[i].sensorName,sensorsStr[i]);
+            /* code */
+        }
+    }
+};
 
 typedef struct flowBuffer {
   uint8_t vector[100];
@@ -87,10 +101,10 @@ public:
     TATUDevice* device;
     char* vector_response;
     flowBuffer flow_buffer;
-    sensorMap* sensors;
+    SensorMap* sensors;
     //uint8_t flow_buffer[100];
 
-    FlowController(TATUDevice* , char*, sensorMap* sensors);
+    FlowController(TATUDevice* , char*, SensorMap* sensors);
     void buffer_alloc(FlowList unit);
     bool isInstantiated(FlowList unit,uint32_t hash);
     void flowbuilder(char* json, uint32_t hash, uint8_t code);

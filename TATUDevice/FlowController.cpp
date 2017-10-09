@@ -1,6 +1,6 @@
 #include "FlowController.h"
 
-FlowController::FlowController(TATUDevice* aux_device, char* aux_response, sensorMap* sensors){
+FlowController::FlowController(TATUDevice* aux_device, char* aux_response, SensorMap* sensors){
 	#ifdef FLOW_DEBUG
 		DEBUG_PORT.begin(115200);
 	#endif
@@ -372,7 +372,7 @@ void FlowController::flow_construct(uint32_t hash, int collect_freq, const char*
 	//unit->message = message;
 	//<workAround>
 	int i;
-	for (i = 0; i < 2 && (sensors[i].hash != hash); i++);
+	for (i = 0; i < SensorMap::size && (sensors[i].hash != hash); i++);
 	//unit->message = message + sensors[i].sensorName;
 	/*
 		the message
@@ -503,3 +503,5 @@ void* FlowController::vector_acess(FlowList unit, int i) {
 	return ((unit->vector) + (unit->t_size * i));
 
 }
+
+uint8_t SensorMap::size;
