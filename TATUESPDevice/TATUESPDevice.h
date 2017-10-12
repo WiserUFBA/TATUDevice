@@ -1,6 +1,5 @@
-#ifndef TATUConfig_h
-#define TATUConfig_h
-
+#ifndef TATUESPDevice_h
+#define TATUESPDevice_h
 
 #include <FS.h>                    //this needs to be first, or it all crashes and burns...
 #include <pgmspace.h>
@@ -23,8 +22,18 @@
 static bool shouldSaveConfig = false;
 void saveConfigCallback();
 
+// System variables
+static WiFiClient espClient;
+static TATUInterpreter interpreter;
+MQTT_BRIDGE(bridge);
+static TATUDevice device("device_name", 1, &interpreter,bridge);
+MQTT_CALLBACK(bridge, device, mqtt_callback);
+static PubSubClient  mqttClient(espClient);
+MQTT_PUBLISH(bridge, mqttClient);
+
+
 #define stringSize 20
-class TATUConfig {
+class TATUESPDevice {
 private:
     /* data */
 public:
@@ -46,7 +55,7 @@ public:
 
     void (*mqtt_callback)(char *, byte *, unsigned int);
 
-    TATUConfig (TATUDevice* device,PubSubClient* client,void (*mqtt_callback)(char *, byte *, unsigned int)){
+    TATUESPDevice (TATUDevice* device,PubSubClient* client,void (*mqtt_callback)(char *, byte *, unsigned int)){
         this->device = device;
         this->client = client;
         this->mqtt_callback = mqtt_callback;
@@ -57,4 +66,4 @@ public:
 
 };
 
-#endif /* TATUConfig_h */
+#endif /* TATUESPDevice */

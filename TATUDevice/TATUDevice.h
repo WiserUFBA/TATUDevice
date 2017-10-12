@@ -77,12 +77,12 @@ typedef uint8_t byte;
 
 // Cria wrapper para a função de callback da classe
                                         // Cria a declaração da função ponte
-#define MQTT_BRIDGE(BRIDGE)             void BRIDGE(char *, char *)
+#define MQTT_BRIDGE(BRIDGE)             static void BRIDGE(char *, char *)
                                         // Declaração da ponte// Função callback chamada pelo cliente mqtt
-#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) void NAME(char *topic, byte *payload, unsigned int length)\
+#define MQTT_CALLBACK(BRIDGE,OBJ, NAME) static void NAME(char *topic, byte *payload, unsigned int length)\
                                         {OBJ.mqtt_callback(topic, payload, length);}// Essa é a atribuição da função acionada dentro do objeto TATUDevice
                                         // Atribuição da ponte
-#define MQTT_PUBLISH(BRIDGE, OBJ)       void BRIDGE(char *topic, char *out)\
+#define MQTT_PUBLISH(BRIDGE, OBJ)       static void BRIDGE(char *topic, char *out)\
                                         { OBJ.publish(topic,out); } // Essa é a função publish do cliente que será chama pelo objeto
 
 // Macro para interrupções

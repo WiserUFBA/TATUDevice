@@ -1,4 +1,4 @@
-#include "TATUConfig.h"
+#include "TATUESPDevice.h"
 
 
 //callback notifying us of the need to save config
@@ -6,7 +6,7 @@ void saveConfigCallback () {
   Serial.println("Should save config");
   shouldSaveConfig = true;
 }
-void TATUConfig::setup_wifi() {
+void TATUESPDevice::setup_wifi() {
 
     Serial.println("Starting Wifi Web Manager...");
     delay(10);
@@ -97,7 +97,7 @@ void TATUConfig::setup_wifi() {
 
 }
 
-void TATUConfig::search_config() {
+void TATUESPDevice::search_config() {
   //read configuration from FS json
 
   Serial.println("mounting FS...");
